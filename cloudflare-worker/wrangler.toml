@@ -1,0 +1,12 @@
+name = "aethelgard-mud-realm"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Durable Object binding for real-time MUD rooms, Co-op Boss Raids, and 3v3 Team PvP
+[[durable_objects.bindings]]
+name = "AETHELGARD_REALM"
+class_name = "AethelgardRealmDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AethelgardRealmDO"]

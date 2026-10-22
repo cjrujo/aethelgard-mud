@@ -1,41 +1,27 @@
-# Aethelgard: Chronicles of the Shattered Rift (v6 — 10-Language Edition)
+# Aethelgard: Chronicles of the Shattered Rift (v9 — Diablo Loot & Hybrid Online Edition)
 
-An open-world browser MUD RPG with a **single-screen 100vh layout**, **player-centered dynamic SVG World Atlas**, **CPU-friendly local TinyLM AI Dungeon Master**, and **10-language single-locale mode** (`en`, `zh`, `es`, `ja`, `ko`, `fr`, `de`, `pt`, `ru`, `ar`).
+An open-world browser MUD RPG featuring:
+- **Diablo-Style Randomized Loot Affixes & Equipment Sets (2pc & 4pc Bonuses)**:
+  - Dynamic Prefixes (*Vampiric*, *Thunder-Forged*, *Godslayer's*, *Chrono-Warped*, *Savage*, *Celestial*) & Suffixes (*of the Void*, *of the Titan*, *of Chain-Lightning*, *of the Phoenix*, *of Execution*).
+  - **3 Complete Equipment Sets**: *Stormcaller's Regalia*, *Crimson Warlord's Battlegear*, and *Astral Singularity Vestments* with real-time **2-Piece** and **4-Piece** combat multipliers and elemental procs.
+- **Hybrid Offline / Online Multiplayer Architecture**:
+  - **Play Offline Anytime**: Explore the 32 hand-crafted rooms + endless procedural frontier sectors, harvest resources, craft, and collect Diablo-style set gear with 100% local persistence (`localStorage` + portable JSON Character Passport).
+  - **Bring Your Character Online**: Click `🌐 Online: OFF/LIVE` in the top bar to set your **Online Alias & Team/Alliance Tag**, sync your offline character into the multiplayer hub, meet friends in the same room, chat, run **Co-op Team Boss Raids**, and fight **3v3 Team Arena Skirmishes**.
+- **3 Zero-Install / 1-Command Online Transports**:
+  1. **Zero-Config WebRTC / BroadcastChannel Mesh** (works out of the box on static **GitHub Pages** or **Cloudflare Pages** with zero backend config).
+  2. **Cloudflare Workers + Durable Objects WebSocket Realm** (`cloudflare-worker/worker.js` + `wrangler.toml` included).
 
-## 🌍 10 Supported Mainstream Languages (Single-Language Display Mode)
-Users can select their preferred language from the top bar (`#lang-select`) or via the terminal command `lang <code>` and **only the selected language** is displayed across the entire UI, rooms, map, items, quests, AI DM, and logs:
-1. `en` — 🇺🇸 English
-2. `zh` — 🇨🇳 简体中文
-3. `es` — 🇪🇸 Español
-4. `ja` — 🇯🇵 日本語
-5. `ko` — 🇰🇷 한국어
-6. `fr` — 🇫🇷 Français
-7. `de` — 🇩🇪 Deutsch
-8. `pt` — 🇧🇷 Português
-9. `ru` — 🇷🇺 Русский
-10. `ar` — 🇸🇦 العربية (with automatic RTL layout support)
+## 🚀 Easy Deployment Guide
 
-## 🚀 Quick Push to Your GitHub Account
+### Option A: Zero-Install Static Hosting on GitHub Pages or Cloudflare Pages
+1. Push this repository to GitHub.
+2. Enable **Settings → Pages → Deploy from `main` branch**.
+3. Open your GitHub Pages URL — offline mode and local/mesh multiplayer work immediately!
 
-### Option A: Using GitHub CLI (`gh`) in 1 Command
-```bash
-unzip aethelgard_mud_github_repo.zip -d aethelgard-chronicles-mud
-cd aethelgard-chronicles-mud
-gh repo create aethelgard-chronicles-mud --public --source=. --remote=origin --push
-```
-
-### Option B: Push to an Existing GitHub Repository
-```bash
-unzip aethelgard_mud_github_repo.zip -d aethelgard-chronicles-mud
-cd aethelgard-chronicles-mud
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
-git branch -M main
-git push -u origin main
-```
-
-## 📁 Repository Structure
-- `index.html` / `open_world_mud.html`: Self-contained production release (`v6`) ready for GitHub Pages.
-- `src/build_mud_game.py`: Deterministic Python builder for generating the single-file bundle.
-- `docs/mud_design_plan.md`: Architecture, world graph, combat math, CPU AI DM, and 10-language localization spec.
-- `tests/verify_mud.py`: Automated static + Selenium Headless Chromium test suite (`C1`–`C12`).
-- `.github/workflows/deploy-pages.yml`: Automatic GitHub Pages deployment pipeline.
+### Option B: Global Real-Time WebSocket Server on Cloudflare Workers (1 Command)
+1. Install Node.js and run:
+   ```bash
+   cd cloudflare-worker
+   npx wrangler deploy
+   ```
+2. Copy the deployed `wss://aethelgard-mud-realm.<your-subdomain>.workers.dev` URL into the **Cloudflare Worker WS Endpoint** box inside the game's `🌐 Online Hub` modal.

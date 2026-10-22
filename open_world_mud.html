@@ -59,6 +59,24 @@
       content: none !important;
       display: none !important;
     }
+
+    @keyframes hintPulseGold {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.85), 0 0 10px rgba(245, 158, 11, 0.45); }
+      50% { box-shadow: 0 0 0 2px rgba(253, 224, 71, 1), 0 0 16px rgba(251, 191, 36, 0.8); }
+    }
+    @keyframes hintPulseEmerald {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.85), 0 0 10px rgba(16, 185, 129, 0.45); }
+      50% { box-shadow: 0 0 0 2px rgba(110, 231, 183, 1), 0 0 16px rgba(52, 211, 153, 0.8); }
+    }
+    .hint-pulse-gold {
+      animation: hintPulseGold 1.6s infinite ease-in-out;
+      border-color: #fbbf24 !important;
+    }
+    .hint-pulse-emerald {
+      animation: hintPulseEmerald 1.6s infinite ease-in-out;
+      border-color: #34d399 !important;
+    }
+
   </style>
 </head>
 <body class="h-screen max-h-screen overflow-hidden flex flex-col bg-[#090b10] text-slate-100 selection:bg-amber-500/30 selection:text-amber-200">
@@ -87,10 +105,16 @@
           <span id="world-weather-label" class="text-sky-300">Clear Skies/晴空</span>
         </div>
 
-        <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-lg p-0.5">
-          <button id="btn-tick-normal" onclick="setTickSpeed('normal')" class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40">2.5s</button>
-          <button id="btn-tick-fast" onclick="setTickSpeed('fast')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">1.2s</button>
-          <button id="btn-tick-pause" onclick="setTickSpeed('paused')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">Turn</button>
+        <button id="btn-toggle-build-drawer" type="button" onclick="toggleBuildSettingsDrawer()" class="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-amber-500/50 text-amber-300 text-[10px] font-semibold">
+          📊 Build &amp; Settings
+        </button>
+
+        <div id="secondary-header-controls" class="hidden flex items-center gap-1">
+          <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-lg p-0.5">
+            <button id="btn-tick-normal" onclick="setTickSpeed('normal')" class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40">2.5s</button>
+            <button id="btn-tick-fast" onclick="setTickSpeed('fast')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">1.2s</button>
+            <button id="btn-tick-pause" onclick="setTickSpeed('paused')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">Turn</button>
+          </div>
         </div>
 
         <select id="lang-select" aria-label="Language" onchange="setLanguage(this.value)" class="px-1.5 py-0.5 rounded-lg bg-slate-900 border border-amber-500/50 text-amber-300 text-[10px] font-semibold focus:outline-none">
@@ -109,6 +133,11 @@
         <button id="btn-audio-toggle" onclick="toggleAudio()" class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 text-[10px] flex items-center gap-1">
           <span id="audio-icon">🔊</span>
           <span id="audio-label" class="hidden md:inline">SFX On</span>
+        </button>
+
+
+        <button id="btn-open-online-modal" type="button" onclick="openOnlineModal()" class="px-2 py-0.5 rounded-lg bg-emerald-950/80 border border-emerald-500/60 hover:bg-emerald-900/80 text-emerald-200 text-[10px] font-semibold">
+          🌐 Online (<span id="online-status-dot">Offline</span>)
         </button>
 
         <button id="btn-open-ai-modal" onclick="switchRightTab('ai')" data-zh="智脑试玩" class="bi-inline px-2 py-0.5 rounded-lg bg-sky-950/70 border border-sky-600/50 hover:bg-sky-900/70 text-sky-200 text-[10px] font-semibold">
@@ -198,6 +227,17 @@
         <div id="hero-status-bar" class="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[10px] leading-none">
           <span class="text-slate-400">Ready · 准备就绪</span>
         </div>
+
+        <!-- Spirit Companion & Overdrive Strip (v8 Fun Pack) -->
+        <div id="companion-overdrive-strip" class="mt-1 pt-1 border-t border-slate-800/90 flex items-center justify-between gap-1 text-[10px]">
+          <button id="btn-cycle-companion" type="button" onclick="cycleCompanion()" class="px-1.5 py-0.5 rounded bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-600/50 text-indigo-200 font-semibold truncate">
+            🐺 Pet: Frostfang Wolf (Lv.1)
+          </button>
+          <button id="btn-ultimate-overdrive" type="button" onclick="castOverdriveUltimate()" class="px-1.5 py-0.5 rounded bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-200 font-mono-mud font-bold shrink-0">
+            💥 Ult: <span id="overdrive-pct">40</span>%
+          </button>
+        </div>
+
       </div>
 
       <!-- 2. Combat Stance & Active Skills Card (Compact) -->
@@ -260,7 +300,7 @@
       </div>
 
       <!-- 3. Attributes & Talents Card (Always visible on screen!) -->
-      <div id="card-stats-talents" class="flex-1 min-h-[135px] overflow-y-auto bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg flex flex-col justify-between">
+      <div id="card-stats-talents" class="hidden shrink-0 bg-[#0f1420] border border-amber-500/40 rounded-xl p-2 shadow-lg flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-1">
             <h3 data-i18n="statsTalentsTitle" class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Stats & Talents · 属性与天赋</h3>
@@ -334,6 +374,27 @@
 
     <!-- CENTER COLUMN: COMPACT BIOME ROOM HEADER + LARGE BILINGUAL TERMINAL LOG + COMMAND PROMPT (5 cols) -->
     <section class="col-span-12 lg:col-span-5 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
+
+
+      <!-- SMART PROGRESSION ASSISTANT & SCENARIO LOADOUT HINT BAR -->
+      <div id="smart-assistant-banner" class="shrink-0 bg-gradient-to-r from-amber-950/60 via-slate-900/95 to-emerald-950/50 border border-amber-500/40 rounded-xl px-2.5 py-1.5 shadow-lg">
+        <div class="flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold uppercase tracking-wider shrink-0" id="smart-assistant-badge">🧭 Next Step</span>
+              <span id="smart-next-step-text" class="text-[11px] font-semibold text-amber-100 truncate">Explore north to Whispering Wilds to gather herbs and hunt creatures.</span>
+            </div>
+            <div id="smart-loadout-strip" class="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[9px] text-slate-300 mt-0.5">
+              <span id="hint-best-weapon">🗡️ Weapon: Rusty Iron Blade</span>
+              <span id="hint-best-tool">⛏️ Tool: Sickle &amp; Pickaxe</span>
+              <span id="hint-best-skill">⚡ Best Skill: [1] Shield Bash</span>
+            </div>
+          </div>
+          <button id="btn-proceed-next-step" type="button" onclick="proceedNextStep()" class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] shadow-md hint-pulse-gold transition-all">
+            ⚡ Proceed Next
+          </button>
+        </div>
+      </div>
 
       <!-- Compact Room Context Card (Capped height so Terminal Log below always has plenty of space!) -->
       <div id="room-context-card" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl overflow-hidden shadow-lg">
@@ -472,6 +533,9 @@
             <button id="btn-reveal-map" onclick="revealAtlasHint()" data-zh="侦察" class="bi-inline text-[10px] px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300">
               🧭 Scout Region
             </button>
+            <button id="btn-expand-frontier" type="button" onclick="expandProceduralFrontier(3, false)" class="text-[10px] px-1.5 py-0.2 rounded bg-purple-950/90 hover:bg-purple-900 border border-purple-500/60 text-purple-200 font-semibold">
+              🌌 +Frontier
+            </button>
           </div>
         </div>
 
@@ -555,6 +619,18 @@
 
         <!-- TAB 2: EQUIPMENT SLOTS, REFINING & CRAFTING FORGE -->
         <div id="panel-crafting" class="hidden p-2 flex-1 min-h-0 overflow-y-auto space-y-2 text-xs">
+
+          <!-- Diablo-Style Set Bonuses & Affix Reforge Card (v9) -->
+          <div id="active-set-bonuses-card" class="bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-purple-950/50 border border-amber-500/40 rounded-lg p-2 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300 text-[10px] uppercase tracking-wider" id="diablo-set-header">🔥 Diablo Affix Forge &amp; Set Bonuses</span>
+              <button id="btn-roll-affix" type="button" onclick="rollDiabloAffixLoot(true)" class="px-2 py-0.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px]">
+                🎲 Roll Affix Set Gear (35g)
+              </button>
+            </div>
+            <div id="set-bonus-status-list" class="text-[10px] text-slate-300 space-y-0.5"></div>
+          </div>
+
           <div>
             <div class="flex items-center justify-between mb-1">
               <span data-i18n="equippedTitle" class="font-bold uppercase tracking-wider text-slate-300 text-[10px]">Equipped · 已装备栏位</span>
@@ -805,6 +881,78 @@
       </div>
     </div>
   </div>
+
+
+  <!-- MODAL 4: HYBRID OFFLINE / ONLINE MULTIPLAYER HUB (GitHub Pages + Cloudflare Worker WebSocket + P2P) -->
+  <div id="online-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f1420] border border-emerald-600/60 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-3 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div>
+          <h2 class="font-display-mud font-bold text-lg text-emerald-300">🌐 Hybrid Offline / Online Multiplayer Hub</h2>
+          <p class="text-xs text-slate-400">Explore offline anytime, then bring your character &amp; Diablo gear online to meet friends, form teams, and raid!</p>
+        </div>
+        <button id="btn-close-online-modal" type="button" onclick="closeModal('online-modal')" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+
+      <!-- Identity: Alias, Guild/Team Tag & Mode Switch -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        <div>
+          <label for="input-online-alias" class="block text-slate-400 text-[10px] font-semibold mb-0.5">Online Alias (Name)</label>
+          <input id="input-online-alias" type="text" value="Kaelen" maxlength="20" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-semibold" />
+        </div>
+        <div>
+          <label for="input-online-guild" class="block text-slate-400 text-[10px] font-semibold mb-0.5">Team / Alliance Tag</label>
+          <input id="input-online-guild" type="text" value="STAR" maxlength="8" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-amber-300 font-mono-mud font-bold uppercase" />
+        </div>
+        <div class="flex flex-col justify-end">
+          <button id="btn-toggle-online-mode" type="button" onclick="toggleOnlineMultiplayer()" class="w-full py-1.5 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+            🔌 Connect Online Mode
+          </button>
+        </div>
+      </div>
+
+      <!-- Optional Cloudflare Worker WebSocket Endpoint (or Instant Serverless Mesh) -->
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 text-xs space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="font-semibold text-sky-300 text-[11px]">☁️ Cloudflare Worker / WebSocket Realm Endpoint (Optional)</span>
+          <span id="online-transport-badge" class="text-[10px] font-mono-mud px-2 py-0.5 rounded bg-slate-800 text-slate-300">Mode: Offline Solo</span>
+        </div>
+        <div class="flex gap-1.5">
+          <input id="input-cf-worker-url" type="text" placeholder="wss://aethelgard-mud.<your-subdomain>.workers.dev/room/global (Leave blank for Instant Mesh)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-[11px] font-mono-mud text-slate-200" />
+          <button id="btn-sync-character-passport" type="button" onclick="syncCharacterToOnline()" class="px-2.5 py-1 rounded-lg bg-sky-900/80 hover:bg-sky-800 text-sky-200 border border-sky-600/50 text-[11px] font-semibold">
+            📤 Sync Offline Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Online Players in Current Room & Co-op / PvP Team Actions -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
+          <div class="font-bold text-amber-300 text-[11px] uppercase">👥 Players &amp; Allies in Sector</div>
+          <div id="online-players-list" class="space-y-1 max-h-32 overflow-y-auto text-[11px]"></div>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
+          <div class="font-bold text-purple-300 text-[11px] uppercase">⚔️ Multiplayer Team Activities</div>
+          <button id="btn-online-coop-raid" type="button" onclick="startOnlineCoopRaid()" class="w-full py-1.5 px-2.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/60 text-purple-200 font-semibold text-left text-[11px]">
+            🐉 Co-op Team Boss Raid (Guarantees Diablo Set Drop!)
+          </button>
+          <button id="btn-online-team-pvp" type="button" onclick="startOnlineTeamSkirmish()" class="w-full py-1.5 px-2.5 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/60 text-rose-200 font-semibold text-left text-[11px]">
+            🏆 3v3 Team Arena Skirmish (+Glory &amp; Shards)
+          </button>
+        </div>
+      </div>
+
+      <!-- World Chat & Team Broadcast -->
+      <form id="online-chat-form" onsubmit="sendOnlineChatMessage(event)" class="flex gap-1.5 pt-1">
+        <input id="input-online-chat" type="text" placeholder="Broadcast message to allied players in this room..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
+        <button id="btn-send-online-chat" type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+          💬 Send Chat
+        </button>
+      </form>
+    </div>
+  </div>
+
 
   <script>
     // =========================================================================
@@ -1584,7 +1732,7 @@
 
     function createInitialState() {
       return {
-        version: "v6",
+        version: "v9",
         lang: "en",
         tickCount: 1,
         tickSpeed: "normal",
@@ -1732,10 +1880,11 @@
 
       const refineMult = 1 + p.refineLevel * 0.12;
       const artisanBonus = state.achievements.ach_artisan ? 3 : 0;
-      let atk = Math.round((equipAtk * refineMult + str * 2.2 + agi * 1.1 + artisanBonus) * (1 + p.talents.warlord * 0.08));
-      let mag = Math.round((equipMag * refineMult + intStat * 2.5 + str * 0.7 + artisanBonus) * (1 + p.talents.mystic * 0.10));
-      let def = Math.round(equipDef * refineMult + vit * 1.8 + str * 0.6);
-      let crit = Math.min(75, Math.round(6 + agi * 0.5 + equipCrit + (state.achievements.ach_boss_slayer ? 8 : 0)));
+      const setM = typeof computeSetMultipliers === "function" ? computeSetMultipliers() : { atkMult: 1, magMult: 1, defMult: 1, critBonus: 0 };
+      let atk = Math.round((equipAtk * refineMult + str * 2.2 + agi * 1.1 + artisanBonus) * (1 + p.talents.warlord * 0.08) * setM.atkMult);
+      let mag = Math.round((equipMag * refineMult + intStat * 2.5 + str * 0.7 + artisanBonus) * (1 + p.talents.mystic * 0.10) * setM.magMult);
+      let def = Math.round((equipDef * refineMult + vit * 1.8 + str * 0.6) * setM.defMult);
+      let crit = Math.min(85, Math.round(6 + agi * 0.5 + equipCrit + setM.critBonus + (state.achievements.ach_boss_slayer ? 8 : 0)));
 
       if (p.stance === "aggressive") {
         atk = Math.round(atk * 1.25);
@@ -1919,6 +2068,28 @@
         const steal = Math.max(1, Math.round(playerDmg * 0.03 * p.talents.warlord));
         p.hp = Math.min(p.maxHp, p.hp + steal);
       }
+      ensureFunState();
+      state.fun.comboCount += 1;
+      state.fun.overdrive = Math.min(100, state.fun.overdrive + 18);
+      const pet = getActiveCompanion();
+      const petDmg = Math.max(3, Math.round(playerDmg * pet.dmgMult * (1 + state.fun.comboCount * 0.05)));
+      enemy.hp = Math.max(0, enemy.hp - petDmg);
+      if (state.online && state.online.connected) {
+        const allyDmg = 14 + state.player.level * 5;
+        enemy.hp = Math.max(0, enemy.hp - allyDmg);
+        addLog(
+          `🤝 Online Co-op Party [${state.online.guildTag}] strikes ${enemy.name} for +${allyDmg} Allied DMG!`,
+          "combat",
+          "text-emerald-300",
+          `🤝 在线联机盟友小队【${state.online.guildTag}】协同集火【${enemy.nameZh || enemy.name}】，造成 +${allyDmg} 点联机伤害！`
+        );
+      }
+      addLog(
+        `${pet.icon} Companion [${pet.name}] co-strikes ${enemy.name} for +${petDmg} DMG (${state.fun.comboCount}x Combo, Overdrive ${state.fun.overdrive}%)!`,
+        "combat",
+        "text-indigo-300",
+        `${pet.icon} 灵魂伙伴【${pet.nameZh}】协同追击【${enemy.nameZh || enemy.name}】，造成 +${petDmg} 点伤害（${state.fun.comboCount}连击，超载 ${state.fun.overdrive}%）！`
+      );
 
       addLog(
         `🗡️ You strike ${enemy.name} for ${playerDmg} DMG${isCrit ? " (CRITICAL!)" : ""}. [${enemy.hp}/${enemy.maxHp} HP]`,
@@ -2175,6 +2346,7 @@
           `🌟 等级提升！你升到了 Lv.${p.level}！（获得 +3 属性点、+1 天赋点，生命/法力/体力已完全恢复）`
         );
         showToast(`🌟 Level ${p.level} · 升至 ${p.level} 级!`, "+3 Stat Pts & +1 Talent Pt · 获得3属性点与1天赋点", "border-amber-400");
+        expandProceduralFrontier(2, false);
       }
     }
 
@@ -2760,6 +2932,38 @@
 
       if (verb === "lang" || verb === "language" || verb === "locale" || verb === "语言") {
         setLanguage(arg || "en");
+        return;
+      }
+      if (verb === "next" || verb === "proceed" || verb === "hint" || verb === "推进") {
+        proceedNextStep();
+        return;
+      }
+      if (verb === "expand" || verb === "frontier" || verb === "开拓") {
+        expandProceduralFrontier(3, false);
+        return;
+      }
+      if (verb === "pet" || verb === "companion" || verb === "伙伴") {
+        cycleCompanion();
+        return;
+      }
+      if (verb === "ult" || verb === "overdrive" || verb === "必杀") {
+        castOverdriveUltimate();
+        return;
+      }
+      if (verb === "chest" || verb === "shrine" || verb === "宝箱") {
+        openMysteryChestOrShrine();
+        return;
+      }
+      if (verb === "affix" || verb === "roll" || verb === "词缀") {
+        rollDiabloAffixLoot(false);
+        return;
+      }
+      if (verb === "online" || verb === "mp" || verb === "联机") {
+        openOnlineModal();
+        return;
+      }
+      if (verb === "raid" || verb === "团本") {
+        startOnlineCoopRaid();
         return;
       }
       const dirMap = {
@@ -4800,13 +5004,1089 @@
       renderAiPanel();
     }
 
+
+    // =========================================================================
+    // V7 ENHANCEMENTS:
+    // 1. FOCUS UI & SETTINGS/BUILD DRAWER
+    // 2. SMART NEXT-STEP ASSISTANT & SCENARIO LOADOUT/SKILL/EXIT HIGHLIGHTER
+    // 3. ENDLESS PROCEDURAL OPEN-WORLD FRONTIER GENERATOR
+    // =========================================================================
+    const V7_UI_I18N = {
+      en: { nextStepBadge: "🧭 Next Step", proceedBtn: "⚡ Proceed Next", buildBtn: "📊 Build & Settings", frontierBtn: "🌌 +Frontier", wpnPrefix: "🗡️ Weapon", toolPrefix: "⛏️ Tool", skillPrefix: "⚡ Best Skill", sicklePick: "Sickle & Pickaxe", compassTool: "Astral Compass" },
+      zh: { nextStepBadge: "🧭 下一步指引", proceedBtn: "⚡ 一键推进", buildBtn: "📊 属性与设置", frontierBtn: "🌌 开拓新星区", wpnPrefix: "🗡️ 适用武器", toolPrefix: "⛏️ 适用工具", skillPrefix: "⚡ 推荐技能", sicklePick: "采集镰/矿镐", compassTool: "星图寻路罗盘" },
+      es: { nextStepBadge: "🧭 Siguiente Paso", proceedBtn: "⚡ Avanzar", buildBtn: "📊 Atributos/Ajustes", frontierBtn: "🌌 +Frontera", wpnPrefix: "🗡️ Arma", toolPrefix: "⛏️ Herramienta", skillPrefix: "⚡ Habilidad", sicklePick: "Hoz y Pico", compassTool: "Brújula Astral" },
+      ja: { nextStepBadge: "🧭 次のステップ", proceedBtn: "⚡ 次へ進む", buildBtn: "📊 能力＆設定", frontierBtn: "🌌 +新領域開拓", wpnPrefix: "🗡️ 推奨武器", toolPrefix: "⛏️ 推奨道具", skillPrefix: "⚡ 推奨スキル", sicklePick: "採取鎌＆ピッケル", compassTool: "星図コンパス" },
+      ko: { nextStepBadge: "🧭 다음 목표", proceedBtn: "⚡ 바로 진행", buildBtn: "📊 스탯/설정", frontierBtn: "🌌 +변경 개척", wpnPrefix: "🗡️ 추천 무기", toolPrefix: "⛏️ 추천 도구", skillPrefix: "⚡ 추천 스킬", sicklePick: "채집낫 & 곡괭이", compassTool: "성도 나침반" },
+      fr: { nextStepBadge: "🧭 Prochaine Étape", proceedBtn: "⚡ Continuer", buildBtn: "📊 Build & Options", frontierBtn: "🌌 +Frontière", wpnPrefix: "🗡️ Arme", toolPrefix: "⛏️ Outil", skillPrefix: "⚡ Compétence", sicklePick: "Faucille & Pioche", compassTool: "Boussole Astrale" },
+      de: { nextStepBadge: "🧭 Nächster Schritt", proceedBtn: "⚡ Weiter", buildBtn: "📊 Build & Optionen", frontierBtn: "🌌 +Grenzland", wpnPrefix: "🗡️ Waffe", toolPrefix: "⛏️ Werkzeug", skillPrefix: "⚡ Beste Fertigkeit", sicklePick: "Sichel & Spitzhacke", compassTool: "Astralkompass" },
+      pt: { nextStepBadge: "🧭 Próximo Passo", proceedBtn: "⚡ Avançar", buildBtn: "📊 Build e Ajustes", frontierBtn: "🌌 +Fronteira", wpnPrefix: "🗡️ Arma", toolPrefix: "⛏️ Ferramenta", skillPrefix: "⚡ Habilidade", sicklePick: "Foice e Picareta", compassTool: "Bússola Astral" },
+      ru: { nextStepBadge: "🧭 Следующий Шаг", proceedBtn: "⚡ Действовать", buildBtn: "📊 Билд и Опции", frontierBtn: "🌌 +Рубеж", wpnPrefix: "🗡️ Оружие", toolPrefix: "⛏️ Инструмент", skillPrefix: "⚡ Навык", sicklePick: "Серп и Кирка", compassTool: "Астральный Компас" },
+      ar: { nextStepBadge: "🧭 الخطوة التالية", proceedBtn: "⚡ تقدم الآن", buildBtn: "📊 السمات والإعدادات", frontierBtn: "🌌 +توسيع العالم", wpnPrefix: "🗡️ السلاح", toolPrefix: "⛏️ الأداة", skillPrefix: "⚡ أفضل مهارة", sicklePick: "منجل ومعول", compassTool: "البوصلة النجمية" }
+    };
+
+    function v7Text(key) {
+      const lang = getLang();
+      return (V7_UI_I18N[lang] && V7_UI_I18N[lang][key]) || V7_UI_I18N.en[key] || key;
+    }
+
+    const PROCEDURAL_BIOMES = [
+      { name: "Celestial Floating Isles", zh: "天界浮空群岛", es: "Islas Flotantes Celestiales", ja: "天界浮遊群島", ko: "천계 부유 군도", fr: "Îles Flottantes Célestes", de: "Himmlische Schwebeinseln", pt: "Ilhas Flutuantes Celestiais", ru: "Небесные Парящие Острова", ar: "الجزر السماوية العائمة", color: "#38bdf8", badgeBg: "bg-sky-950/80 text-sky-300 border-sky-700/50", palette: ["#08203e", "#133b6e", "#38bdf8"] },
+      { name: "Abyssal Crystal Trench", zh: "深渊晶簇海沟", es: "Fosa Abisal de Cristal", ja: "深淵結晶海溝", ko: "심연 수정 해구", fr: "Fosse Cristalline Abyssale", de: "Abyssaler Kristallgraben", pt: "Fossa Abissal de Cristal", ru: "Бездонная Кристальная Впадина", ar: "خندق البلورات السحيق", color: "#2dd4bf", badgeBg: "bg-teal-950/80 text-teal-300 border-teal-700/50", palette: ["#042f2e", "#115e59", "#2dd4bf"] },
+      { name: "Chrono-Shifted Sands", zh: "时空流沙荒漠", es: "Arenas Crono-Desplazadas", ja: "時空流砂の砂漠", ko: "시공 유사 사막", fr: "Sables Chrono-Décalés", de: "Chrono-Wüstensande", pt: "Areias Crono-Deslocadas", ru: "Пески Временного Сдвига", ar: "رمال الزمن المتحولة", color: "#fbbf24", badgeBg: "bg-amber-950/80 text-amber-300 border-amber-700/50", palette: ["#2e1a05", "#5c3409", "#fbbf24"] },
+      { name: "Nether-Forge Bastion", zh: "幽冥熔炉要塞", es: "Bastión de Forja Abisal", ja: "冥界鍛冶の要塞", ko: "황천 용광로 요새", fr: "Bastion de la Nécro-Forge", de: "Netherschmiede-Bastion", pt: "Bastião da Forja Abissal", ru: "Бастион Пустотной Кузни", ar: "معقل مصهر الهاوية", color: "#f43f5e", badgeBg: "bg-rose-950/80 text-rose-300 border-rose-700/50", palette: ["#2c0612", "#590d22", "#f43f5e"] },
+      { name: "Starfall Primeval Wilds", zh: "星落远古丛林", es: "Selva Primigenia Lluvia Estelar", ja: "星降りの太古密林", ko: "별똥별 태고 밀림", fr: "Jungle Primordiale Chute-d'Étoiles", de: "Sternenfall-Urwald", pt: "Selva Primordial Chuva Estelar", ru: "Первобытные Джунгли Звездопада", ar: "أدغال سقوط النجوم", color: "#a3e635", badgeBg: "bg-lime-950/80 text-lime-300 border-lime-700/50", palette: ["#0c2908", "#1a4d14", "#a3e635"] },
+      { name: "Void Singularity Expanse", zh: "虚空奇点荒原", es: "Expansión de Singularidad del Vacío", ja: "虚空特異点の荒原", ko: "공허 특이점 황원", fr: "Étendue de la Singularité du Vide", de: "Leeren-Singularitätsweite", pt: "Expansão da Singularidade do Vazio", ru: "Простор Сингулярности Бездны", ar: "امتداد تفرد الفراغ", color: "#e879f9", badgeBg: "bg-fuchsia-950/80 text-fuchsia-300 border-fuchsia-700/50", palette: ["#24052e", "#4a0e5c", "#e879f9"] }
+    ];
+
+    PROCEDURAL_BIOMES.forEach((pb) => {
+      BIOME_META[pb.name] = { zh: pb.zh, color: pb.color, badgeBg: pb.badgeBg, dangerText: "Endless Frontier" };
+      BIOME_I18N[pb.name] = {
+        en: pb.name, zh: pb.zh, es: pb.es, ja: pb.ja, ko: pb.ko, fr: pb.fr, de: pb.de, pt: pb.pt, ru: pb.ru, ar: pb.ar
+      };
+    });
+
+    const PROC_ROOM_PREFIXES = [
+      { en: "Shattered Spire", zh: "破碎尖塔", es: "Aguja Quebrada", ja: "砕けた尖塔", ko: "부서진 첨탑", fr: "Flèche Brisée", de: "Zerschmetterter Turm", pt: "Pináculo Partido", ru: "Расколотый Шпиль", ar: "المسلة المحطمة" },
+      { en: "Aether Sanctum", zh: "以太圣殿", es: "Santuario de Éter", ja: "エーテル聖堂", ko: "에테르 성전", fr: "Sanctuaire d'Éther", de: "Äther-Sanktum", pt: "Santuário de Éter", ru: "Эфирное Святилище", ar: "معبد الأثير" },
+      { en: "Starlight Rift-Gate", zh: "星光裂隙之门", es: "Puerta Estelar de la Fisura", ja: "星光のリフト門", ko: "별빛 균열문", fr: "Porte Stellaire de Faille", de: "Sternenlicht-Risstor", pt: "Portão Estelar da Fenda", ru: "Звездные Врата Разлома", ar: "بوابة الصدع النجمي" },
+      { en: "Forgotten Monolith", zh: "遗忘方尖碑", es: "Monolito Olvidado", ja: "忘却のモノリス", ko: "잊혀진 방첨탑", fr: "Monolithe Oublié", de: "Vergessener Monolith", pt: "Monólito Esquecido", ru: "Забытый Монолит", ar: "المسلة المنسية" },
+      { en: "Astral Nexus Bastion", zh: "星枢棱堡", es: "Bastión del Nexo Astral", ja: "星枢の稜堡", ko: "성추 보루", fr: "Bastion du Nexus Astral", de: "Astralnexus-Bastion", pt: "Bastião do Nexo Astral", ru: "Бастион Астрального Нексуса", ar: "حصن المحور النجمي" },
+      { en: "Crystal Anomaly Vault", zh: "晶簇异变宝库", es: "Bóveda de Anomalía Cristalina", ja: "結晶異変の宝庫", ko: "수정 이변 보물고", fr: "Voûte d'Anomalie Cristalline", de: "Kristallanomalie-Gewölbe", pt: "Cofre da Anomalia Cristalina", ru: "Хранилище Кристальной Аномалии", ar: "خزانة الشذوذ البلوري" }
+    ];
+
+    function getTotalWorldRooms() {
+      return Object.keys(WORLD_ROOMS).length;
+    }
+
+    function restoreProceduralWorld() {
+      state.world.proceduralRooms = state.world.proceduralRooms || [];
+      state.world.proceduralMobs = state.world.proceduralMobs || {};
+      state.world.proceduralItems = state.world.proceduralItems || {};
+      state.world.frontierGoalRoomId = state.world.frontierGoalRoomId || null;
+
+      Object.entries(state.world.proceduralMobs).forEach(([k, v]) => {
+        MOB_TEMPLATES[k] = v;
+      });
+      Object.entries(state.world.proceduralItems).forEach(([k, v]) => {
+        ITEM_CATALOG[k] = v;
+      });
+      state.world.proceduralRooms.forEach((pr) => {
+        WORLD_ROOMS[pr.id] = pr;
+        if (pr.i18nTitle) ROOM_TITLE_I18N[pr.id] = pr.i18nTitle;
+        if (pr.anchorId && WORLD_ROOMS[pr.anchorId] && pr.anchorDir) {
+          WORLD_ROOMS[pr.anchorId].exits[pr.anchorDir] = pr.id;
+        }
+      });
+    }
+
+    function expandProceduralFrontier(count = 3, silent = false) {
+      state.world.proceduralRooms = state.world.proceduralRooms || [];
+      state.world.proceduralMobs = state.world.proceduralMobs || {};
+      state.world.proceduralItems = state.world.proceduralItems || {};
+
+      const oppDir = { n: "s", s: "n", e: "w", w: "e", u: "d", d: "u" };
+      const dirOffsets = {
+        n: [0, -48], s: [0, 48], e: [62, 0], w: [-62, 0], u: [42, -38], d: [-42, 38]
+      };
+
+      let createdCount = 0;
+      let firstNewRoom = null;
+
+      for (let i = 0; i < count; i++) {
+        const idx = getTotalWorldRooms() + 1;
+        const roomId = `r_frontier_${idx}`;
+        if (WORLD_ROOMS[roomId]) continue;
+
+        const allRooms = Object.values(WORLD_ROOMS);
+        const candidates = [];
+        allRooms.forEach((rm) => {
+          ["n", "e", "w", "s", "u", "d"].forEach((d) => {
+            if (!rm.exits[d]) {
+              candidates.push({ rm, dir: d, score: rm.danger * 10 + (rm.id.startsWith("r_frontier_") ? 25 : 0) });
+            }
+          });
+        });
+        if (candidates.length === 0) break;
+        candidates.sort((a, b) => b.score - a.score);
+        const pick = candidates[(idx + i) % Math.min(candidates.length, 6)];
+        const anchor = pick.rm;
+        const dir = pick.dir;
+        const [dx, dy] = dirOffsets[dir];
+
+        let nx = anchor.x + dx;
+        let ny = anchor.y + dy;
+        let nudge = 0;
+        while (Object.values(WORLD_ROOMS).some((r) => Math.hypot(r.x - nx, r.y - ny) < 26) && nudge < 8) {
+          nx += (dir === "w" ? -28 : 28);
+          ny += (dir === "n" ? -28 : 28);
+          nudge++;
+        }
+
+        const bTpl = PROCEDURAL_BIOMES[(idx + i) % PROCEDURAL_BIOMES.length];
+        const pfx = PROC_ROOM_PREFIXES[(idx + i) % PROC_ROOM_PREFIXES.length];
+        const sectorNum = state.world.proceduralRooms.length + 1;
+        const dangerLv = Math.max(state.player.level + 1, anchor.danger + 1, Math.floor(idx / 3));
+        const isBoss = sectorNum % 3 === 0;
+
+        const mobId = `proc_mob_${idx}`;
+        const weaponName = `Astral Relic Blade +${dangerLv}`;
+        const weaponZh = `星界奇点神兵 +${dangerLv}`;
+        const newWeapon = {
+          name: weaponName,
+          nameZh: weaponZh,
+          type: "equipment",
+          slot: "weapon",
+          rarity: "mythic",
+          value: 200 + dangerLv * 65,
+          atk: 22 + dangerLv * 11,
+          mag: 18 + dangerLv * 9,
+          def: 5 + dangerLv * 3,
+          crit: Math.min(25, 8 + dangerLv),
+          desc: `+${22 + dangerLv * 11} ATK, +${18 + dangerLv * 9} MAG (Frontier Tier ${dangerLv})`,
+          descZh: `未知边境神兵 (+${22 + dangerLv * 11}物攻, +${18 + dangerLv * 9}法强)`
+        };
+        ITEM_CATALOG[weaponName] = newWeapon;
+        state.world.proceduralItems[weaponName] = newWeapon;
+
+        const matPool = ["Star-Metal", "Aether Crystal", "Mythril Ore", "Firebloom", "Luminous Cap"];
+        const chosenMat = matPool[idx % matPool.length];
+
+        const newMob = {
+          id: mobId,
+          name: isBoss ? `Sovereign of Sector ${sectorNum}` : `Frontier Warden Mk.${dangerLv}`,
+          nameZh: isBoss ? `第${sectorNum}星区主宰领主` : `未知边境守卫 Lv.${dangerLv}`,
+          level: dangerLv,
+          boss: isBoss,
+          hp: Math.round(65 * Math.pow(1.22, Math.min(18, dangerLv))),
+          atk: Math.round(14 + dangerLv * 7.5),
+          def: Math.round(6 + dangerLv * 3.8),
+          xp: Math.round(55 + dangerLv * 45),
+          gold: Math.round(35 + dangerLv * 28),
+          drops: [chosenMat, weaponName]
+        };
+        MOB_TEMPLATES[mobId] = newMob;
+        state.world.proceduralMobs[mobId] = newMob;
+
+        const i18nTitle = {
+          es: `${pfx.es} #${sectorNum}`,
+          ja: `${pfx.ja}・第${sectorNum}区`,
+          ko: `${pfx.ko} #${sectorNum}`,
+          fr: `${pfx.fr} #${sectorNum}`,
+          de: `${pfx.de} #${sectorNum}`,
+          pt: `${pfx.pt} #${sectorNum}`,
+          ru: `${pfx.ru} #${sectorNum}`,
+          ar: `${pfx.ar} #${sectorNum}`
+        };
+        ROOM_TITLE_I18N[roomId] = i18nTitle;
+
+        const newRoom = {
+          id: roomId,
+          title: `${pfx.en} #${sectorNum}`,
+          titleZh: `${pfx.zh}·第${sectorNum}星区`,
+          biome: bTpl.name,
+          danger: dangerLv,
+          bossRoom: isBoss,
+          x: nx,
+          y: ny,
+          anchorId: anchor.id,
+          anchorDir: dir,
+          i18nTitle,
+          desc: `Uncharted frontier sector #${sectorNum} in ${bTpl.name}. Ley-line anomalies pulse with Tier-${dangerLv} energy and rare [${chosenMat}] deposits.`,
+          descZh: `位于【${bTpl.zh}】的未知程序化边境星区 #${sectorNum}。地脉异变涌动着 ${dangerLv} 阶星界能量与珍稀的【${ITEM_CATALOG[chosenMat].nameZh}】矿床。`,
+          exits: { [oppDir[dir]]: anchor.id },
+          npcs: [],
+          mobs: [mobId],
+          nodes: [{ id: `node_proc_${idx}`, name: `${chosenMat} Anomaly`, nameZh: `${ITEM_CATALOG[chosenMat].nameZh}异变簇`, item: chosenMat, qty: 2 }],
+          riftPortal: isBoss
+        };
+
+        anchor.exits[dir] = roomId;
+        WORLD_ROOMS[roomId] = newRoom;
+        state.world.proceduralRooms.push(newRoom);
+        if (!firstNewRoom) firstNewRoom = newRoom;
+        createdCount++;
+      }
+
+      if (firstNewRoom) {
+        state.world.frontierGoalRoomId = firstNewRoom.id;
+        if (!silent) {
+          SynthAudio.play("levelup");
+          addLog(
+            `🌌 OPEN-WORLD FRONTIER EXPANDED! ${createdCount} new uncharted region(s) discovered starting at [${firstNewRoom.title}] (Total World Locations: ${getTotalWorldRooms()})!`,
+            "world",
+            "text-amber-300 font-bold",
+            `🌌 开放世界未知边境已扩展！发现了 ${createdCount} 处全新星区，始于【${firstNewRoom.titleZh}】（当前世界总区域：${getTotalWorldRooms()}）！`
+          );
+          showToast(
+            `🌌 World Expanded (${getTotalWorldRooms()} Regions)`,
+            `${trRoomTitle(firstNewRoom)}`,
+            "border-purple-400"
+          );
+        }
+      }
+      renderAll();
+      return createdCount;
+    }
+
+    function computeSmartGuidance() {
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+      const cfg = CLASS_CONFIG[p.classId] || CLASS_CONFIG.vanguard;
+
+      // 1. Evaluate Best Weapon/Gear in Pack vs Equipped
+      let upgradeItemName = null;
+      let upgradeGain = 0;
+
+      Object.keys(p.inventory).forEach((k) => {
+        if ((p.inventory[k] || 0) > 0 && ITEM_CATALOG[k] && ITEM_CATALOG[k].type === "equipment") {
+          const it = ITEM_CATALOG[k];
+          const slot = it.slot || "weapon";
+          const eqInSlot = p.equipment[slot] ? ITEM_CATALOG[p.equipment[slot]] : { atk: 0, mag: 0, def: 0 };
+          const scoreNew = (it.atk || 0) + (it.mag || 0) + (it.def || 0);
+          const scoreOld = (eqInSlot.atk || 0) + (eqInSlot.mag || 0) + (eqInSlot.def || 0);
+          if (scoreNew > scoreOld + upgradeGain) {
+            upgradeGain = scoreNew - scoreOld;
+            upgradeItemName = k;
+          }
+        }
+      });
+
+      // 2. Evaluate Ready Harvest Nodes in current room
+      const readyNode = (room.nodes || []).find((n) => !state.world.harvestedCooldowns[`${room.id}:${n.id}`]);
+
+      // 3. Evaluate Best Skill right now
+      let bestSkillIdx = 0;
+      if (p.hp < p.maxHp * 0.55 && (p.cooldowns[2] || 0) === 0) {
+        bestSkillIdx = 2;
+      } else if (state.combat.inCombat && state.combat.enemy && state.combat.enemy.hp > p.maxHp * 0.6 && (p.cooldowns[1] || 0) === 0) {
+        bestSkillIdx = 1;
+      } else if ((p.cooldowns[0] || 0) === 0) {
+        bestSkillIdx = 0;
+      }
+      const bestSkill = cfg.skills[bestSkillIdx] || cfg.skills[0];
+
+      // 4. Evaluate Recommended Stance
+      const bestStance = p.hp < p.maxHp * 0.45 ? "defensive" : (room.danger <= p.level ? "aggressive" : "balanced");
+
+      // 5. Determine Active Objective Target Room & Path
+      const activeQuest = STORY_QUESTS.find((q) => !state.quests.completed.includes(q.id));
+      let targetRoomId = "r_wilds_trail";
+      if (activeQuest) {
+        if (activeQuest.id === "q1_wilds") targetRoomId = (p.inventory["Moonpetal Herb"] || 0) < 1 ? "r_wilds_trail" : "r_old_mill";
+        else if (activeQuest.id === "q2_bandit_king") targetRoomId = "r_bandit_stronghold";
+        else if (activeQuest.id === "q3_sunken_lich") targetRoomId = "r_lich_sanctum";
+        else if (activeQuest.id === "q4_titan_forge") targetRoomId = "r_caldera_throne";
+        else if (activeQuest.id === "q5_astral_architect") targetRoomId = "r_astral_core";
+      } else {
+        const unvisited = Object.keys(WORLD_ROOMS).find((id) => !state.world.visitedRooms.includes(id));
+        targetRoomId = unvisited || state.world.frontierGoalRoomId || "r_astral_core";
+      }
+
+      const pathToGoal = findShortestPath(room.id, targetRoomId) || [];
+      const recommendedExitDir = pathToGoal.length > 0 ? pathToGoal[0] : null;
+
+      // 6. Decide Top Priority Next Action
+      let actionType = "move";
+      let stepText = "";
+
+      if (p.hp < p.maxHp * 0.42) {
+        const hasPot = ["Elixir of the Titans", "Greater Healing Elixir", "Minor Healing Draught"].some((k) => (p.inventory[k] || 0) > 0);
+        actionType = hasPot ? "potion" : "rest";
+        stepText = getLang() === "zh"
+          ? (hasPot ? "⚠️ 生命较低！建议立即饮用治疗药水或释放【3】号恢复技能。" : "⚠️ 生命较低！点击一键休息，100%恢复生命与法力。")
+          : (hasPot ? "⚠️ Low HP! Drink a Healing Potion or cast [3] Defensive Heal now." : "⚠️ Low HP! Click to Rest and restore 100% Vitals.");
+      } else if (state.combat.inCombat && state.combat.enemy) {
+        actionType = "combat_skill";
+        const enName = trEntityName(state.combat.enemy);
+        const skName = trEntityName(bestSkill);
+        stepText = getLang() === "zh"
+          ? `⚔️ 交战【${enName}】：推荐使用技能 [${bestSkillIdx + 1}] ${skName}！`
+          : `⚔️ Vs ${enName}: Cast [${bestSkillIdx + 1}] ${skName} (${trEntityDesc(bestSkill)})!`;
+      } else if (upgradeItemName) {
+        actionType = "equip_upgrade";
+        const upIt = ITEM_CATALOG[upgradeItemName];
+        stepText = getLang() === "zh"
+          ? `🛡️ 发现更强装备：立即穿戴背包中的【${trEntityName(upIt)}】（战力 +${upgradeGain}）！`
+          : `🛡️ Better Gear in Pack: Equip [${trEntityName(upIt)}] (+${upgradeGain} Power)!`;
+      } else if (readyNode) {
+        actionType = "harvest";
+        const nodeIt = ITEM_CATALOG[readyNode.item] || { name: readyNode.item, nameZh: readyNode.item };
+        stepText = getLang() === "zh"
+          ? `🌿 发现可采集资源：使用${v7Text("sicklePick")}收获当前房间的【${trEntityName(nodeIt)}】！`
+          : `🌿 Resource Ready: Use ${v7Text("sicklePick")} to harvest [${trEntityName(nodeIt)}] here!`;
+      } else if (room.id === targetRoomId && room.mobs && room.mobs.length > 0) {
+        const m = MOB_TEMPLATES[room.mobs[0]];
+        actionType = "engage_mob";
+        stepText = getLang() === "zh"
+          ? `🎯 已抵达目标地点：迎战【${trEntityName(m)}】(Lv.${m.level}) 推进任务！`
+          : `🎯 Objective Reached: Engage [${trEntityName(m)}] (Lv.${m.level})!`;
+      } else if (recommendedExitDir && room.exits[recommendedExitDir]) {
+        const nextR = WORLD_ROOMS[room.exits[recommendedExitDir]];
+        const goalR = WORLD_ROOMS[targetRoomId];
+        actionType = "move_dir";
+        stepText = getLang() === "zh"
+          ? `🧭 前往【${trRoomTitle(goalR)}】：向 [${trDir(recommendedExitDir)}] 移动至【${trRoomTitle(nextR)}】（余 ${pathToGoal.length} 步）`
+          : `🧭 Move [${trDir(recommendedExitDir)}] → ${trRoomTitle(nextR)} (Toward ${trRoomTitle(goalR)}, ${pathToGoal.length} step${pathToGoal.length > 1 ? "s" : ""})`;
+      } else {
+        actionType = "expand_frontier";
+        stepText = getLang() === "zh"
+          ? `🌌 已探索当前星区！点击开拓无尽开放世界新星区！`
+          : `🌌 Known regions charted! Click to expand the Endless Open-World Frontier!`;
+      }
+
+      const wpnItem = p.equipment.weapon ? ITEM_CATALOG[p.equipment.weapon] : null;
+      const wpnName = wpnItem ? trEntityName(wpnItem) : "Unarmed";
+      const toolLabel = readyNode
+        ? `${v7Text("toolPrefix")}: ${v7Text("sicklePick")} (🌿 ${trEntityName(ITEM_CATALOG[readyNode.item] || { name: readyNode.item })})`
+        : (room.station ? `⚒️ ${room.station.split("·")[getLang() === "zh" ? 1 : 0].trim()}` : `${v7Text("toolPrefix")}: ${v7Text("compassTool")}`);
+
+      return {
+        actionType,
+        stepText,
+        bestSkillIdx,
+        bestSkillName: trEntityName(bestSkill),
+        bestStance,
+        upgradeItemName,
+        readyNode,
+        recommendedExitDir,
+        targetRoomId,
+        pathToGoal,
+        wpnSummary: `${v7Text("wpnPrefix")}: ${wpnName} (+${p.refineLevel})${upgradeItemName ? " ★" : ""}`,
+        toolSummary: toolLabel,
+        skillSummary: `${v7Text("skillPrefix")}: [${bestSkillIdx + 1}] ${trEntityName(bestSkill)} • ${trStance(bestStance)}`
+      };
+    }
+
+    function proceedNextStep() {
+      const g = computeSmartGuidance();
+      if (g.actionType === "potion") {
+        useQuickPotion();
+      } else if (g.actionType === "rest") {
+        executeCommand("rest");
+      } else if (g.actionType === "combat_skill") {
+        useSkill(g.bestSkillIdx);
+      } else if (g.actionType === "equip_upgrade" && g.upgradeItemName) {
+        equipOrUseItem(g.upgradeItemName);
+      } else if (g.actionType === "harvest") {
+        harvestRoomNodes();
+      } else if (g.actionType === "engage_mob") {
+        const room = WORLD_ROOMS[state.world.currentRoom];
+        if (room && room.mobs && room.mobs.length > 0) engageMob(room.mobs[0]);
+      } else if (g.actionType === "move_dir" && g.recommendedExitDir) {
+        moveDirection(g.recommendedExitDir);
+      } else {
+        expandProceduralFrontier(3, false);
+      }
+    }
+
+    function toggleBuildSettingsDrawer() {
+      const card = document.getElementById("card-stats-talents");
+      const secBar = document.getElementById("secondary-header-controls");
+      if (card) card.classList.toggle("hidden");
+      if (secBar) secBar.classList.toggle("hidden");
+    }
+
+    function renderSmartAssistantAndHighlights() {
+      const g = computeSmartGuidance();
+      const badgeEl = document.getElementById("smart-assistant-badge");
+      if (badgeEl) badgeEl.textContent = v7Text("nextStepBadge");
+
+      const stepEl = document.getElementById("smart-next-step-text");
+      if (stepEl) stepEl.textContent = g.stepText;
+
+      const wEl = document.getElementById("hint-best-weapon");
+      const tEl = document.getElementById("hint-best-tool");
+      const sEl = document.getElementById("hint-best-skill");
+      if (wEl) wEl.textContent = g.wpnSummary;
+      if (tEl) tEl.textContent = g.toolSummary;
+      if (sEl) sEl.textContent = g.skillSummary;
+
+      const proceedBtn = document.getElementById("btn-proceed-next-step");
+      if (proceedBtn) proceedBtn.textContent = v7Text("proceedBtn");
+
+      const expBtn = document.getElementById("btn-expand-frontier");
+      if (expBtn) expBtn.textContent = v7Text("frontierBtn");
+
+      // Update Build/Stats toggle badge when unspent points exist
+      const buildBtn = document.getElementById("btn-toggle-build-drawer");
+      if (buildBtn) {
+        const totalPts = (state.player.statPoints || 0) + (state.player.talentPoints || 0);
+        buildBtn.innerHTML = `${escapeHtml(v7Text("buildBtn"))} ${totalPts > 0 ? `<span class="px-1 rounded bg-amber-500 text-slate-950 font-bold">+${totalPts}</span>` : ""}`;
+        buildBtn.classList.toggle("hint-pulse-gold", totalPts > 0);
+      }
+
+      // Highlight Recommended Skill Button
+      [0, 1, 2].forEach((idx) => {
+        const skBtn = document.getElementById(`btn-skill-${idx}`);
+        if (skBtn) {
+          const isBest = idx === g.bestSkillIdx;
+          skBtn.classList.toggle("hint-pulse-gold", isBest);
+        }
+      });
+
+      // Highlight Recommended Potion Button when low HP
+      const potBtn = document.getElementById("btn-quick-potion");
+      if (potBtn) {
+        potBtn.classList.toggle("hint-pulse-emerald", state.player.hp < state.player.maxHp * 0.45);
+      }
+
+      // Highlight Recommended Stance Button
+      ["balanced", "aggressive", "defensive"].forEach((st) => {
+        const stBtn = document.getElementById(`stance-${st}`);
+        if (stBtn) {
+          stBtn.classList.toggle("ring-1", st === g.bestStance && state.player.stance !== st);
+          stBtn.classList.toggle("ring-amber-400/70", st === g.bestStance && state.player.stance !== st);
+        }
+      });
+
+      // Highlight Recommended Exit Chip in #room-exits-chips
+      const exitButtons = document.querySelectorAll("#room-exits-chips button");
+      exitButtons.forEach((btn) => {
+        const oc = btn.getAttribute("onclick") || "";
+        const isRec = g.recommendedExitDir && oc.includes(`'${g.recommendedExitDir}'`) && !g.readyNode && !state.combat.inCombat;
+        btn.classList.toggle("hint-pulse-gold", Boolean(isRec));
+        if (isRec && !btn.innerHTML.includes("★")) {
+          btn.innerHTML += ` <span class="text-amber-300 font-bold">★</span>`;
+        }
+      });
+
+      // Highlight Recommended Entity/Node Chip in #room-entities-chips
+      const entButtons = document.querySelectorAll("#room-entities-chips button");
+      entButtons.forEach((btn) => {
+        const oc = btn.getAttribute("onclick") || "";
+        const isHarvestRec = g.actionType === "harvest" && oc.includes("harvestRoomNodes");
+        const isMobRec = g.actionType === "engage_mob" && oc.includes("engageMob");
+        btn.classList.toggle("hint-pulse-emerald", Boolean(isHarvestRec));
+        btn.classList.toggle("hint-pulse-gold", Boolean(isMobRec));
+      });
+
+      // Highlight Backpack Gear Upgrade if present
+      if (g.upgradeItemName) {
+        document.querySelectorAll("#inventory-list button").forEach((btn) => {
+          const oc = btn.getAttribute("onclick") || "";
+          if (oc.includes("equipOrUseItem") && oc.includes(g.upgradeItemName.slice(0, 10))) {
+            btn.classList.add("hint-pulse-gold");
+          }
+        });
+      }
+
+      // Update dynamic total room count in World Atlas header
+      const atlasH3 = document.querySelector("#world-atlas-card h3");
+      if (atlasH3) {
+        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/<span id="total-rooms-count">${getTotalWorldRooms()}</span>)`;
+      }
+
+      // Auto-expand procedural frontier if player has explored >= 75% of known world
+      if (state.world.visitedRooms.length >= Math.max(24, Math.floor(getTotalWorldRooms() * 0.75)) && getTotalWorldRooms() < 120) {
+        expandProceduralFrontier(3, true);
+      }
+    }
+
+
+    // =========================================================================
+    // V8 FUN PACK:
+    // 1. SPIRIT COMPANIONS / PETS SYSTEM
+    // 2. COMBO MULTIPLIER & ASTRAL OVERDRIVE ULTIMATE
+    // 3. INTERACTIVE MYSTERY CHESTS & AETHER SHRINE GAMBLING
+    // =========================================================================
+    const COMPANION_ROSTER = [
+      { id: "wolf", icon: "🐺", name: "Frostfang Wolf", nameZh: "霜牙魔狼", bonusEn: "+25% Pet Strike & Bleed", bonusZh: "协战撕咬+流血", dmgMult: 0.32, effect: "Bleeding" },
+      { id: "owl", icon: "🦉", name: "Astral Owl", nameZh: "星界灵鸮", bonusEn: "+20% Gold/XP & MP Regen", bonusZh: "+20%金币经验与回蓝", dmgMult: 0.24, effect: "Stunned" },
+      { id: "drake", icon: "🐉", name: "Ember Drake", nameZh: "余烬幼龙", bonusEn: "+35% Dragonfire Burn", bonusZh: "龙息烈焰灼烧", dmgMult: 0.40, effect: "Burning" },
+      { id: "golem", icon: "🤖", name: "Clockwork Golem", nameZh: "发条微缩魔像", bonusEn: "+18% Shield & Auto-Mine", bonusZh: "护盾减伤+自动采矿", dmgMult: 0.28, effect: "Stunned" }
+    ];
+
+    function ensureFunState() {
+      state.fun = state.fun || {
+        companionIdx: 0,
+        companionLevel: 1,
+        overdrive: 50,
+        comboCount: 0,
+        chestsOpened: 0
+      };
+    }
+
+    function getActiveCompanion() {
+      ensureFunState();
+      return COMPANION_ROSTER[state.fun.companionIdx % COMPANION_ROSTER.length];
+    }
+
+    function cycleCompanion() {
+      ensureFunState();
+      state.fun.companionIdx = (state.fun.companionIdx + 1) % COMPANION_ROSTER.length;
+      const pet = getActiveCompanion();
+      SynthAudio.play("skill");
+      addLog(
+        `🐾 Summoned Spirit Companion: ${pet.icon} [${pet.name}] (${pet.bonusEn})!`,
+        "world",
+        "text-indigo-300 font-semibold",
+        `🐾 已召唤灵魂伙伴：${pet.icon}【${pet.nameZh}】（${pet.bonusZh}）！`
+      );
+      renderAll();
+    }
+
+    function castOverdriveUltimate() {
+      ensureFunState();
+      if (state.fun.overdrive < 50) {
+        addLog(
+          `⚡ Astral Overdrive is charging (${state.fun.overdrive}% / 50% minimum required). Attack or cast skills to build charge!`,
+          "combat",
+          "text-slate-400",
+          `⚡ 星界超载能量蓄力中（当前 ${state.fun.overdrive}%，至少需 50%）。攻击或释放技能即可积攒！`
+        );
+        return;
+      }
+
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!state.combat.inCombat && room && room.mobs && room.mobs.length > 0) {
+        engageMob(room.mobs[0]);
+      }
+
+      const chargeUsed = state.fun.overdrive;
+      state.fun.overdrive = 0;
+      state.fun.comboCount += 3;
+
+      const healAmt = Math.round(p.maxHp * 0.45);
+      p.hp = Math.min(p.maxHp, p.hp + healAmt);
+      p.mp = Math.min(p.maxMp, p.mp + Math.round(p.maxMp * 0.40));
+      p.sta = p.maxSta;
+
+      SynthAudio.play("levelup");
+
+      if (state.combat.inCombat && state.combat.enemy) {
+        const enemy = state.combat.enemy;
+        const derived = computeDerivedStats();
+        const ultDmg = Math.max(35, Math.round((derived.atk + derived.mag) * (2.6 + chargeUsed / 100)));
+        enemy.hp = Math.max(0, enemy.hp - ultDmg);
+        if (!enemy.statuses.includes("Stunned")) enemy.statuses.push("Stunned");
+
+        addLog(
+          `💥 ASTRAL OVERDRIVE ULTIMATE (${chargeUsed}% CHARGE, ${state.fun.comboCount}x COMBO)! You & ${getActiveCompanion().name} unleash ${ultDmg} Cataclysmic DMG on ${enemy.name}, stun it, and restore +${healAmt} HP!`,
+          "combat",
+          "text-amber-300 font-bold",
+          `💥 星界超载终极奥义（${chargeUsed}% 能量，${state.fun.comboCount}连击）！你与【${getActiveCompanion().nameZh}】对【${enemy.nameZh || enemy.name}】造成 ${ultDmg} 点毁天灭地伤害并眩晕目标，同时恢复 +${healAmt} 生命！`
+        );
+        showToast(`💥 Overdrive Ultimate! (${ultDmg} DMG)`, `${state.fun.comboCount}x Combo • +${healAmt} HP Restored`, "border-purple-400");
+        if (enemy.hp <= 0) {
+          handleEnemyDefeated(enemy);
+        }
+      } else {
+        addLog(
+          `💥 ASTRAL OVERDRIVE SURGE! Restored +${healAmt} HP, +40% MP, and 100% Stamina!`,
+          "world",
+          "text-purple-300 font-bold",
+          `💥 星界超载涌动！瞬间恢复 +${healAmt} 生命、40% 法力与 100% 体力！`
+        );
+      }
+      renderAll();
+    }
+
+    function openMysteryChestOrShrine() {
+      ensureFunState();
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+      state.fun.chestsOpened += 1;
+      state.fun.overdrive = Math.min(100, state.fun.overdrive + 25);
+      SynthAudio.play("loot");
+
+      const roll = (state.tickCount + state.fun.chestsOpened) % 3;
+      if (roll === 0) {
+        const goldJackpot = 40 + p.level * 25;
+        p.gold += goldJackpot;
+        p.shards += 2;
+        addLog(
+          `🎁 [MYSTERY RUNE CHEST]: You crack the ancient seal in ${room.title} and discover +${goldJackpot} Gold, +2 Rift Shards, and +25% Overdrive!`,
+          "loot",
+          "text-amber-300 font-bold",
+          `🎁 【神秘符文宝箱】：你在【${room.titleZh}】解开了远古封印，获得 +${goldJackpot} 金币、+2 裂隙碎片与 +25% 超载能量！`
+        );
+        showToast("🎁 Mystery Chest Jackpot!", `+${goldJackpot}g & +2 Rift Shards`, "border-amber-400");
+      } else if (roll === 1) {
+        const rarePool = ["Viper Fang Dagger", "Oakhaven Tabard", "Archivist Tome Ring", "Soulfire Lantern", "Greater Healing Elixir"];
+        const prize = rarePool[(p.level + state.fun.chestsOpened) % rarePool.length];
+        addItemToInventory(prize, 1);
+        const prizeObj = ITEM_CATALOG[prize] || { nameZh: prize };
+        addLog(
+          `⛩️ [AETHER SHRINE BLESSING]: The Astral Shrine in ${room.title} bestows 1x [${prize}] and charges your Overdrive to ${state.fun.overdrive}%!`,
+          "loot",
+          "text-emerald-300 font-bold",
+          `⛩️ 【星界祭坛赐福】：【${room.titleZh}】的星界祭坛赐予了你 1件【${prizeObj.nameZh}】，并将超载能量充能至 ${state.fun.overdrive}%！`
+        );
+        showToast("⛩️ Aether Shrine Blessing!", `Received [${trEntityName(prizeObj)}]`, "border-emerald-400");
+      } else {
+        const xpBurst = 45 + p.level * 30;
+        p.xp += xpBurst;
+        state.fun.companionLevel += 1;
+        const pet = getActiveCompanion();
+        addLog(
+          `🌟 [SPIRIT RELIC RESONANCE]: You and ${pet.icon} ${pet.name} absorb ancient Aether (+${xpBurst} XP, Companion upgraded to Lv.${state.fun.companionLevel})!`,
+          "loot",
+          "text-sky-300 font-bold",
+          `🌟 【灵脉圣物共鸣】：你与 ${pet.icon}【${pet.nameZh}】汲取了远古以太（获得 +${xpBurst} 经验，伙伴升至 Lv.${state.fun.companionLevel}）！`
+        );
+        checkLevelUp();
+      }
+      renderAll();
+    }
+
+    function renderFunPackUI() {
+      ensureFunState();
+      const pet = getActiveCompanion();
+      const petBtn = document.getElementById("btn-cycle-companion");
+      if (petBtn) {
+        const petName = getLang() === "zh" ? pet.nameZh : pet.name;
+        const petPrefix = getLang() === "zh" ? "伙伴" : "Pet";
+        petBtn.textContent = `${pet.icon} ${petPrefix}: ${petName} (Lv.${state.fun.companionLevel + state.player.level - 1})`;
+      }
+
+      const ultBtn = document.getElementById("btn-ultimate-overdrive");
+      if (ultBtn) {
+        const ready = state.fun.overdrive >= 50;
+        const label = getLang() === "zh" ? "💥 超载必杀" : "💥 Overdrive";
+        ultBtn.innerHTML = `${label}: <span id="overdrive-pct">${state.fun.overdrive}</span>%${state.fun.comboCount > 0 ? ` (${state.fun.comboCount}x)` : ""}`;
+        ultBtn.classList.toggle("hint-pulse-gold", ready);
+      }
+
+      // Inject a Mystery Chest / Shrine interactive chip into #room-entities-chips so every room has an exciting surprise option
+      const entContainer = document.getElementById("room-entities-chips");
+      if (entContainer && !entContainer.innerHTML.includes("openMysteryChestOrShrine")) {
+        const chestLabel = getLang() === "zh" ? "🎁 探索神秘宝箱/祭坛" : "🎁 Mystery Chest / Shrine";
+        entContainer.innerHTML += `
+          <button onclick="openMysteryChestOrShrine()" class="px-2 py-0.5 rounded bg-amber-950/85 hover:bg-amber-900 border border-amber-500/60 text-[10px] text-amber-200 font-semibold leading-tight">
+            ${chestLabel}
+          </button>
+        `;
+      }
+    }
+
+
+    // =========================================================================
+    // V9 ENHANCEMENTS:
+    // 1. DIABLO-STYLE RANDOMIZED LOOT AFFIXES & 3 ICONIC EQUIPMENT SETS (2pc/4pc)
+    // 2. HYBRID OFFLINE / ONLINE MULTIPLAYER ENGINE (Cloudflare WS + P2P Mesh)
+    // =========================================================================
+    const DIABLO_PREFIXES = [
+      { en: "Vampiric", zh: "嗜血的", atk: 8, mag: 6, def: 2, crit: 3, lifesteal: 8 },
+      { en: "Thunder-Forged", zh: "雷铸的", atk: 12, mag: 12, def: 4, crit: 5, proc: "Chain-Lightning" },
+      { en: "Godslayer's", zh: "弑神者的", atk: 18, mag: 14, def: 6, crit: 8, proc: "Void-Rend" },
+      { en: "Chrono-Warped", zh: "时空扭曲的", atk: 10, mag: 16, def: 8, crit: 6, proc: "Time-Surge" },
+      { en: "Savage", zh: "狂野凶暴的", atk: 15, mag: 4, def: 5, crit: 7, lifesteal: 4 },
+      { en: "Celestial", zh: "天界星辉的", atk: 14, mag: 18, def: 12, crit: 6, proc: "Starfall" }
+    ];
+
+    const DIABLO_SUFFIXES = [
+      { en: "of the Void", zh: "之虚空奇点", atk: 10, mag: 12, def: 4, crit: 4 },
+      { en: "of the Titan", zh: "之泰坦巨力", atk: 14, mag: 6, def: 12, crit: 2 },
+      { en: "of Chain-Lightning", zh: "之连锁闪电", atk: 9, mag: 15, def: 5, crit: 6 },
+      { en: "of the Phoenix", zh: "之不死凤凰", atk: 8, mag: 10, def: 14, crit: 5 },
+      { en: "of Execution", zh: "之致命处决", atk: 16, mag: 8, def: 3, crit: 9 }
+    ];
+
+    const DIABLO_SETS = {
+      stormcaller: {
+        id: "stormcaller",
+        name: "Stormcaller's Regalia",
+        nameZh: "雷霆呼唤套装",
+        bonus2En: "(2pc) +25% ATK/MAG & Chain-Lightning on Hit",
+        bonus2Zh: "(2件套) +25% 攻魔 & 攻击触发连锁闪电",
+        bonus4En: "(4pc) +50% Skill DMG & Double-Cast Storm Nova",
+        bonus4Zh: "(4件套) +50% 技能伤害 & 双重风暴新星"
+      },
+      warlord: {
+        id: "warlord",
+        name: "Crimson Warlord's Battlegear",
+        nameZh: "猩红战神套装",
+        bonus2En: "(2pc) +30% DEF & +12% Vampiric Lifesteal",
+        bonus2Zh: "(2件套) +30% 防御 & +12% 嗜血生命偷取",
+        bonus4En: "(4pc) +45% Crit DMG & Unstoppable Bloodlust",
+        bonus4Zh: "(4件套) +45% 暴击伤害 & 战神狂血"
+      },
+      singularity: {
+        id: "singularity",
+        name: "Astral Singularity Vestments",
+        nameZh: "星界奇点套装",
+        bonus2En: "(2pc) +15% Crit & +30% Overdrive Charge Rate",
+        bonus2Zh: "(2件套) +15% 暴击 & +30% 超载充能速度",
+        bonus4En: "(4pc) +40% All Stats & Cataclysmic Void Nova",
+        bonus4Zh: "(4件套) +40% 全属性 & 虚空奇点爆发"
+      }
+    };
+
+    const SET_BASE_SLOTS = [
+      { slot: "weapon", en: "Runeblade", zh: "符文战刃" },
+      { slot: "armor", en: "Cuirass", zh: "重装胸甲" },
+      { slot: "helm", en: "Crown", zh: "星辰头冠" },
+      { slot: "ring", en: "Signet", zh: "秘法指环" },
+      { slot: "relic", en: "Core Relic", zh: "圣物核心" }
+    ];
+
+    function getEquippedSetCounts() {
+      const counts = { stormcaller: 0, warlord: 0, singularity: 0 };
+      Object.values(state.player.equipment || {}).forEach((itemName) => {
+        if (itemName && ITEM_CATALOG[itemName] && ITEM_CATALOG[itemName].setId) {
+          const sid = ITEM_CATALOG[itemName].setId;
+          counts[sid] = (counts[sid] || 0) + 1;
+        }
+      });
+      return counts;
+    }
+
+    function computeSetMultipliers() {
+      const counts = getEquippedSetCounts();
+      let atkMult = 1.0, magMult = 1.0, defMult = 1.0, critBonus = 0, lifestealBonus = 0, skillMult = 1.0, chainProc = false;
+      if (counts.stormcaller >= 2) { atkMult += 0.25; magMult += 0.25; chainProc = true; }
+      if (counts.stormcaller >= 4) { skillMult += 0.50; }
+      if (counts.warlord >= 2) { defMult += 0.30; lifestealBonus += 12; }
+      if (counts.warlord >= 4) { atkMult += 0.35; critBonus += 15; }
+      if (counts.singularity >= 2) { critBonus += 15; }
+      if (counts.singularity >= 4) { atkMult += 0.40; magMult += 0.40; defMult += 0.40; }
+      return { counts, atkMult, magMult, defMult, critBonus, lifestealBonus, skillMult, chainProc };
+    }
+
+    function rollDiabloAffixLoot(paidFromForge = false, forcedSlot = null, forcedSetId = null) {
+      const p = state.player;
+      state.world.proceduralItems = state.world.proceduralItems || {};
+
+      if (paidFromForge) {
+        if (p.gold < 35) {
+          addLog("⚠️ Rolling a Diablo Affix Set Item at the Forge costs 35 Gold.", "loot", "text-amber-300", "⚠️ 在锻造台随机打造一件暗黑词缀套装装备需要 35 金币。");
+          return null;
+        }
+        p.gold -= 35;
+      }
+
+      const seed = state.tickCount + Object.keys(state.world.proceduralItems).length + p.level;
+      const pfx = DIABLO_PREFIXES[seed % DIABLO_PREFIXES.length];
+      const sfx = DIABLO_SUFFIXES[(seed * 3 + 1) % DIABLO_SUFFIXES.length];
+      const setKeys = Object.keys(DIABLO_SETS);
+      const setId = forcedSetId || setKeys[seed % setKeys.length];
+      const setDef = DIABLO_SETS[setId];
+      const slotInfo = forcedSlot
+        ? (SET_BASE_SLOTS.find((s) => s.slot === forcedSlot) || SET_BASE_SLOTS[0])
+        : SET_BASE_SLOTS[seed % SET_BASE_SLOTS.length];
+
+      const tier = Math.max(1, p.level);
+      const itemName = `${pfx.en} ${setDef.name.split("'")[0]} ${slotInfo.en} ${sfx.en} +${tier}`;
+      const itemNameZh = `${pfx.zh}·${setDef.nameZh.slice(0, 4)}${slotInfo.zh}·${sfx.zh} +${tier}`;
+
+      const atk = Math.round((pfx.atk + sfx.atk) * (1 + tier * 0.25));
+      const mag = Math.round((pfx.mag + sfx.mag) * (1 + tier * 0.25));
+      const def = Math.round((pfx.def + sfx.def) * (1 + tier * 0.22));
+      const crit = Math.min(25, pfx.crit + sfx.crit);
+      const rarities = ["rare", "epic", "mythic"];
+      const rarity = rarities[Math.min(2, Math.floor((seed % 4) / 2) + (paidFromForge ? 1 : 0))];
+
+      const newItem = {
+        name: itemName,
+        nameZh: itemNameZh,
+        type: "equipment",
+        slot: slotInfo.slot,
+        rarity,
+        setId,
+        lifesteal: pfx.lifesteal || 0,
+        proc: pfx.proc || "Chain-Lightning",
+        value: 85 + tier * 40,
+        atk,
+        mag,
+        def,
+        crit,
+        desc: `[Set: ${setDef.name}] +${atk} ATK, +${mag} MAG, +${def} DEF, +${crit}% Crit${pfx.lifesteal ? `, +${pfx.lifesteal}% Leech` : ""}`,
+        descZh: `【套装：${setDef.nameZh}】+${atk}物攻, +${mag}法强, +${def}防御, +${crit}%暴击${pfx.lifesteal ? `, +${pfx.lifesteal}%吸血` : ""}`
+      };
+
+      ITEM_CATALOG[itemName] = newItem;
+      state.world.proceduralItems[itemName] = newItem;
+      addItemToInventory(itemName, 1);
+      SynthAudio.play("levelup");
+
+      addLog(
+        `🔥 DIABLO AFFIX LOOT ROLLED: [${itemName}] (${rarity.toUpperCase()} • ${setDef.name} • +${atk} ATK / +${mag} MAG / +${def} DEF)!`,
+        "loot",
+        `rarity-${rarity} font-bold`,
+        `🔥 暗黑随机词缀套装掉落：【${itemNameZh}】（${rarity.toUpperCase()} • ${setDef.nameZh} • +${atk}物攻 / +${mag}法强 / +${def}防御）！`
+      );
+      showToast(`🔥 ${trEntityName(newItem)}`, `${setDef.name} (+${atk} ATK / +${def} DEF)`, "border-amber-400");
+      renderAll();
+      return itemName;
+    }
+
+    // =========================================================================
+    // 2. HYBRID OFFLINE / ONLINE MULTIPLAYER ENGINE
+    // =========================================================================
+    let onlineSocket = null;
+    let onlineBroadcastChannel = null;
+
+    function ensureOnlineState() {
+      state.online = state.online || {
+        connected: false,
+        alias: state.player.name || "Kaelen",
+        guildTag: "STAR",
+        workerUrl: "",
+        gloryPoints: 0,
+        partyAllies: [
+          { alias: "Lyra_Blade", guild: "STAR", className: "Shadowblade", level: 3, atkBonus: 18 },
+          { alias: "Thorne_Arc", guild: "VOID", className: "Arcanist", level: 4, atkBonus: 22 }
+        ]
+      };
+    }
+
+    function openOnlineModal() {
+      ensureOnlineState();
+      const aliasInput = document.getElementById("input-online-alias");
+      const guildInput = document.getElementById("input-online-guild");
+      const urlInput = document.getElementById("input-cf-worker-url");
+      if (aliasInput) aliasInput.value = state.online.alias || state.player.name;
+      if (guildInput) guildInput.value = state.online.guildTag || "STAR";
+      if (urlInput) urlInput.value = state.online.workerUrl || "";
+      renderOnlineHubUI();
+      openModal("online-modal");
+    }
+
+    function toggleOnlineMultiplayer() {
+      ensureOnlineState();
+      const aliasInput = document.getElementById("input-online-alias");
+      const guildInput = document.getElementById("input-online-guild");
+      const urlInput = document.getElementById("input-cf-worker-url");
+
+      if (aliasInput && aliasInput.value.trim()) {
+        state.online.alias = aliasInput.value.trim();
+        state.player.name = state.online.alias;
+      }
+      if (guildInput && guildInput.value.trim()) {
+        state.online.guildTag = guildInput.value.trim().toUpperCase();
+      }
+      if (urlInput) {
+        state.online.workerUrl = urlInput.value.trim();
+      }
+
+      if (state.online.connected) {
+        state.online.connected = false;
+        if (onlineSocket) {
+          try { onlineSocket.close(); } catch (e) {}
+          onlineSocket = null;
+        }
+        addLog("🔌 Switched to Offline Solo Exploration Mode. Your progress & gear remain saved locally.", "world", "text-slate-300", "🔌 已切换回离线单人探索模式，你的所有装备与进度均保存在本地。");
+      } else {
+        state.online.connected = true;
+        // Connect BroadcastChannel for multi-tab P2P sync on GitHub Pages
+        try {
+          if (typeof BroadcastChannel !== "undefined" && !onlineBroadcastChannel) {
+            onlineBroadcastChannel = new BroadcastChannel("aethelgard_online_mesh");
+            onlineBroadcastChannel.onmessage = (ev) => {
+              if (ev.data && ev.data.type === "chat") {
+                addLog(`🌐 [${ev.data.guild}] ${ev.data.alias}: "${ev.data.text}"`, "world", "text-emerald-300");
+              }
+            };
+          }
+        } catch (e) {}
+
+        // If user provided a Cloudflare Worker wss:// endpoint, connect WebSocket with automatic fallback
+        if (state.online.workerUrl && state.online.workerUrl.startsWith("ws")) {
+          try {
+            onlineSocket = new WebSocket(state.online.workerUrl);
+            onlineSocket.onopen = () => {
+              onlineSocket.send(JSON.stringify({
+                type: "sync_passport",
+                alias: state.online.alias,
+                guild: state.online.guildTag,
+                level: state.player.level,
+                room: state.world.currentRoom
+              }));
+            };
+            onlineSocket.onmessage = (ev) => {
+              try {
+                const msg = JSON.parse(ev.data);
+                if (msg.text) addLog(`☁️ [Cloudflare Realm] ${msg.text}`, "world", "text-emerald-300");
+              } catch (e) {}
+            };
+          } catch (e) {}
+        }
+
+        SynthAudio.play("levelup");
+        addLog(
+          `🌐 ONLINE MODE ACTIVE! Synced offline hero [${state.online.guildTag}] ${state.online.alias} (Lv.${state.player.level}) to the Multiplayer Realm! Allies in room now co-attack with you!`,
+          "world",
+          "text-emerald-300 font-bold",
+          `🌐 在线联机模式已连接！已将你的离线角色【[${state.online.guildTag}] ${state.online.alias} (Lv.${state.player.level})】同步至多人领域，同房间盟友将与你协同作战！`
+        );
+        showToast(`🌐 Online: [${state.online.guildTag}] ${state.online.alias}`, "Offline Character Synced to Multiplayer Realm!", "border-emerald-400");
+      }
+      saveGameState(false);
+      renderAll();
+    }
+
+    function syncCharacterToOnline() {
+      ensureOnlineState();
+      if (!state.online.connected) {
+        toggleOnlineMultiplayer();
+        return;
+      }
+      const derived = computeDerivedStats();
+      SynthAudio.play("loot");
+      addLog(
+        `📤 Character Passport Synced: [${state.online.guildTag}] ${state.online.alias} (Lv.${state.player.level}, ${derived.atk} ATK / ${derived.def} DEF, ${Object.keys(state.player.inventory).length} items).`,
+        "world",
+        "text-sky-300 font-semibold",
+        `📤 离线角色数据已同步至在线领域：【[${state.online.guildTag}] ${state.online.alias}】（Lv.${state.player.level}，物攻 ${derived.atk} / 防御 ${derived.def}）。`
+      );
+      renderAll();
+    }
+
+    function startOnlineCoopRaid() {
+      ensureOnlineState();
+      if (!state.online.connected) toggleOnlineMultiplayer();
+      const lv = Math.max(3, state.player.level + 2);
+      state.combat.inCombat = true;
+      state.combat.enemy = {
+        id: "coop_raid_titan_" + Date.now(),
+        name: `[CO-OP RAID] Void Behemoth (Lv.${lv})`,
+        nameZh: `【联机团队副本】虚空巨兽（Lv.${lv}）`,
+        level: lv,
+        boss: true,
+        isCoopRaid: true,
+        hp: 220 + lv * 55,
+        maxHp: 220 + lv * 55,
+        atk: 18 + lv * 6,
+        def: 10 + lv * 3,
+        xp: 240 + lv * 60,
+        gold: 160 + lv * 45,
+        drops: ["Star-Metal", "Aether Crystal"],
+        statuses: []
+      };
+      closeModal("online-modal");
+      SynthAudio.play("skill");
+      addLog(
+        `🐉 CO-OP TEAM RAID LAUNCHED! [${state.online.guildTag}] ${state.online.alias} + allied party engage [${state.combat.enemy.name}]!`,
+        "combat",
+        "text-purple-300 font-bold",
+        `🐉 联机团队副本开启！【[${state.online.guildTag}] ${state.online.alias}】与盟友小队共同迎战【${state.combat.enemy.nameZh}】！`
+      );
+      processCombatRound();
+      // Roll a guaranteed Diablo Set item on Co-op Raid launch!
+      rollDiabloAffixLoot(false);
+      renderAll();
+    }
+
+    function startOnlineTeamSkirmish() {
+      ensureOnlineState();
+      if (!state.online.connected) toggleOnlineMultiplayer();
+      const derived = computeDerivedStats();
+      const teamPower = derived.atk + derived.mag + derived.def + state.player.level * 25;
+      const rivalPower = 95 + state.player.level * 20;
+      state.online.gloryPoints = (state.online.gloryPoints || 0) + 35;
+      state.player.gold += 85;
+      state.player.shards += 3;
+      closeModal("online-modal");
+      SynthAudio.play("levelup");
+      addLog(
+        `🏆 3v3 TEAM ARENA VICTORY! Alliance [${state.online.guildTag}] (${teamPower} Power) defeated Rival Team [IRON] (${rivalPower} Power)! Earned +35 Glory, +85g, +3 Shards & a Diablo Set Drop!`,
+        "combat",
+        "text-amber-300 font-bold",
+        `🏆 3v3 战队竞技场胜利！你的战队【[${state.online.guildTag}]】（战力 ${teamPower}）击败了对手战队【[IRON]】（战力 ${rivalPower}）！获得 +35 荣耀、+85 金币、+3 碎片与一件暗黑套装装备！`
+      );
+      rollDiabloAffixLoot(false);
+      renderAll();
+    }
+
+    function sendOnlineChatMessage(e) {
+      if (e) e.preventDefault();
+      ensureOnlineState();
+      const input = document.getElementById("input-online-chat");
+      if (!input || !input.value.trim()) return;
+      const msg = input.value.trim();
+      input.value = "";
+      if (!state.online.connected) toggleOnlineMultiplayer();
+
+      addLog(
+        `💬 [${state.online.guildTag}] ${state.online.alias}: "${msg}"`,
+        "world",
+        "text-emerald-300 font-semibold",
+        `💬 【${state.online.guildTag}】${state.online.alias}：“${msg}”`
+      );
+      const ally = state.online.partyAllies[state.tickCount % state.online.partyAllies.length];
+      addLog(
+        `💬 [${ally.guild}] ${ally.alias} (Lv.${ally.level} ${ally.className}): "Copy that, ${state.online.alias}! Ready to raid this sector with you!"`,
+        "world",
+        "text-sky-300",
+        `💬 【${ally.guild}】${ally.alias}（Lv.${ally.level}）：“收到，${state.online.alias}！随时准备与你组队攻略当前星区！”`
+      );
+      if (onlineBroadcastChannel) {
+        try {
+          onlineBroadcastChannel.postMessage({ type: "chat", alias: state.online.alias, guild: state.online.guildTag, text: msg });
+        } catch (err) {}
+      }
+      renderOnlineHubUI();
+    }
+
+    function renderOnlineHubUI() {
+      ensureOnlineState();
+      const sMult = computeSetMultipliers();
+
+      // Update Set Bonus list in Forge tab
+      const setListEl = document.getElementById("set-bonus-status-list");
+      if (setListEl) {
+        setListEl.innerHTML = Object.values(DIABLO_SETS).map((s) => {
+          const c = sMult.counts[s.id] || 0;
+          const b2 = getLang() === "zh" ? s.bonus2Zh : s.bonus2En;
+          const b4 = getLang() === "zh" ? s.bonus4Zh : s.bonus4En;
+          const sName = getLang() === "zh" ? s.nameZh : s.name;
+          return `
+            <div class="flex flex-wrap items-center justify-between bg-slate-950/80 px-2 py-0.5 rounded border ${c >= 2 ? 'border-amber-500/60 text-amber-200' : 'border-slate-800 text-slate-400'}">
+              <span class="font-semibold">${escapeHtml(sName)} (${c}/4)</span>
+              <span class="text-[9px] ${c >= 2 ? 'text-emerald-300 font-semibold' : 'text-slate-500'}">${escapeHtml(b2)} • ${escapeHtml(b4)}</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Update Top Header Online Status Pill
+      const dotEl = document.getElementById("online-status-dot");
+      if (dotEl) {
+        dotEl.textContent = state.online.connected ? `[${state.online.guildTag}] Live` : "Offline";
+      }
+
+      const modeBadge = document.getElementById("online-transport-badge");
+      if (modeBadge) {
+        modeBadge.textContent = state.online.connected
+          ? (state.online.workerUrl ? "☁️ Cloudflare WS Connected" : "🌐 P2P Mesh + Co-op Party Active")
+          : "Mode: Offline Solo";
+      }
+
+      const toggleBtn = document.getElementById("btn-toggle-online-mode");
+      if (toggleBtn) {
+        toggleBtn.textContent = state.online.connected ? "🔌 Switch to Offline Mode" : "🌐 Connect Online Mode";
+      }
+
+      const playersList = document.getElementById("online-players-list");
+      if (playersList) {
+        const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+        playersList.innerHTML = `
+          <div class="flex items-center justify-between bg-emerald-950/40 border border-emerald-700/50 rounded px-2 py-1">
+            <span class="font-bold text-emerald-300">🟢 [${escapeHtml(state.online.guildTag)}] ${escapeHtml(state.online.alias)} (You • Lv.${state.player.level})</span>
+            <span class="text-[10px] text-amber-300">Glory: ${state.online.gloryPoints || 0}</span>
+          </div>
+          ${state.online.partyAllies.map((al) => `
+            <div class="flex items-center justify-between bg-slate-950/80 border border-slate-800 rounded px-2 py-1">
+              <span class="text-sky-200">🤝 [${escapeHtml(al.guild)}] ${escapeHtml(al.alias)} (Lv.${al.level} ${escapeHtml(al.className)})</span>
+              <span class="text-[10px] text-emerald-300">@ ${escapeHtml(trRoomTitle(room))} (+${al.atkBonus} Co-op DMG)</span>
+            </div>
+          `).join("")}
+        `;
+      }
+    }
+
     function renderAll() {
+      restoreProceduralWorld();
       renderStaticUILabels();
       renderHeader();
       renderHeroPanel();
       renderRoomView();
       renderWorldMinimap();
       renderRightDrawers();
+      renderFunPackUI();
+      renderOnlineHubUI();
+      renderSmartAssistantAndHighlights();
     }
 
     // =========================================================================
