@@ -1,3 +1,22 @@
+# 历史设计草案：不是 v10 的实现说明或验收记录
+
+> **旧设计草案 / Archived design draft — retained for historical reference.**
+>
+> 下文保留早期设计与历史扩展说明的原文，便于追溯；其中的架构、功能、数值、型号和测试目标可能已经过时。它们不构成当前 v10 已实现、已测试或性能达标的声明。
+>
+> **尤其是 `LocalTinyLM`、神经符号引擎以及“任意笔记本 CPU 上 `<5ms`”的表述，属于旧设计内容，不是 v10 的真实语言模型推理实测结果，也不是性能承诺。** 当前版本明确区分规则助手与加载真实权重的本地语言模型；模型输出、准确性、设备性能和离线能力应分别依据当前实现与验证记录判断。
+>
+> **Current documentation takes precedence.** The legacy `LocalTinyLM` and `<5ms on any laptop CPU` statements below are historical design claims, not measured v10 inference results or performance guarantees.
+
+当前说明与实际验证请从以下文档开始：
+
+- [README：安装、运行与当前交付状态](../README.md)
+- [v10 验证记录：已执行结果、失败案例与限制](verification.md)
+- [本地 AI DM：真实实现、模型配置与使用方式](ai-dm.md)
+- [玩法设计：当前旅程、规则与通关验收](gameplay-design.md)
+
+---
+
 # Phase 1 Architecture & World Design Specification
 ## Project: Aethelgard: Chronicles of the Shattered Rift (Browser Open-World MUD)
 - **Run ID**: `mud-run-20261021-01`

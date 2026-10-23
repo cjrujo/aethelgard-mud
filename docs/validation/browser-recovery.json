@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-10-23T04:25:16.233Z",
+  "modelRequested": true,
+  "checks": [
+    {
+      "name": "six modules boot and default model is Qwen3",
+      "passed": true
+    },
+    {
+      "name": "responsive width 1440",
+      "passed": true,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "name": "responsive width 980",
+      "passed": true,
+      "detail": {
+        "viewport": 980,
+        "document": 980
+      }
+    },
+    {
+      "name": "responsive width 390",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "name": "real first story choice survives save and reload",
+      "passed": true
+    },
+    {
+      "name": "offline model control reflects local package mode",
+      "passed": true
+    },
+    {
+      "name": "real browser CPU WASM generation with external network blocked",
+      "passed": true,
+      "detail": {
+        "tokens": 5,
+        "latencyMs": 4965.299999999814,
+        "text": "向南移动。"
+      }
+    },
+    {
+      "name": "no page errors or external network requests",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failedAssets": [],
+  "model": {
+    "loaded": "onnx-community/Qwen3-0.6B-ONNX",
+    "prompt": "从复苏之井去酒馆，第一步往哪个方向走？只回答方向。",
+    "answer": {
+      "id": 4,
+      "prompt": "从复苏之井去酒馆，第一步往哪个方向走？只回答方向。",
+      "text": "向南移动。",
+      "lang": "zh",
+      "source": "wasm",
+      "status": "complete",
+      "room": "r_town_square",
+      "latencyMs": 4965.299999999814,
+      "facts": "当前位置：橡木港城镇广场。\n从这里前往镀金狮鹫酒馆：依次向南移动。",
+      "type": "complete",
+      "model": "onnx-community/Qwen3-0.6B-ONNX",
+      "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+      "dtype": "q8",
+      "device": "wasm",
+      "inputTokens": 119,
+      "outputTokens": 5,
+      "firstTokenMs": 4250.5,
+      "tokensPerSecond": 1.0069885001913657,
+      "droppedMessages": 0,
+      "generation": {
+        "maxNewTokens": 128,
+        "doSample": false,
+        "repetitionPenalty": 1
+      }
+    },
+    "status": {
+      "backend": "wasm_onnx",
+      "status": "ready",
+      "detail": "",
+      "busy": false,
+      "model": "onnx-community/Qwen3-0.6B-ONNX",
+      "ready": true,
+      "actualLoadedModel": "onnx-community/Qwen3-0.6B-ONNX",
+      "inferenceCount": 1,
+      "loadCount": 1,
+      "lastResult": {
+        "source": "wasm",
+        "model": "onnx-community/Qwen3-0.6B-ONNX",
+        "latencyMs": 4965.299999999814,
+        "firstTokenMs": 4250.5,
+        "inputTokens": 119,
+        "outputTokens": 5,
+        "tokensPerSecond": 1.0069885001913657,
+        "completedAt": "2026-10-23T04:25:29.832Z"
+      }
+    }
+  },
+  "passed": true
+}

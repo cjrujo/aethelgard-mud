@@ -1,0 +1,1209 @@
+{
+  "timestamp": "2026-10-23T04:24:14.870Z",
+  "runtime": "@huggingface/transformers@3.8.1",
+  "model": "onnx-community/Qwen3-0.6B-ONNX",
+  "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+  "dtype": "q8",
+  "registryDtype": "q8",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.19.0",
+    "hostLabel": "recovered-cloud-workspace-cpu",
+    "workingDirectory": "/workspace/scratch/81c1b808ed78/aethelgard-mud"
+  },
+  "backend": "native ONNX CPU, not browser WASM validation",
+  "promptSource": {
+    "src/core.js": "9c354090fbcbc16998f6f8e6ac8ff2d89c2b4537775579c88c7271416cf3a411",
+    "src/gameplay.js": "4404d94cd5020e9df7631141313b399f0456201b941bbcf2c30aa923514d882b",
+    "src/combat.js": "4d1f4e465b1143ef433e817ceabc084b5e91e71317e1d9e84f1d821f42734a23",
+    "src/ai-dm.js": "bd6e4e3914cc19896d8e5844c93b8b8dda457148dc7129fbf76dd0480f04afdf",
+    "src/online.js": "9fc2abf751e5305e2543c431ecf3f42da71aef772d045c8001987fb5622283a6",
+    "src/bootstrap.js": "6d03099006f59c8d4a74259308e90590536e0d3c7cca4e61e855da0fbece102c",
+    "assets/ai-worker.js": "190a184b0e95c731d6ab98162f4d99223495aefde0124b4ad2c80540884617f6",
+    "tests/harness.mjs": "648e57643ae6609df61f6168abc53386b6836941d110e0da1c31369f74d32048",
+    "tests/real-model.mjs": "224b53c5c11b7f4194a0242ac1e0851fd25d4ec3a4070e38b0809ce547610d5e"
+  },
+  "chatTemplateOptions": {
+    "enable_thinking": false
+  },
+  "evaluation": "Required facts and selected contradictions are checked. Raw outputs still need semantic review; narrative samples never pass on nonempty output alone.",
+  "selectedLanguages": [
+    "zh"
+  ],
+  "selectedCases": [
+    "npc",
+    "encounter",
+    "tavern"
+  ],
+  "completeSuite": false,
+  "generation": {
+    "max_new_tokens": 128,
+    "do_sample": false,
+    "repetition_penalty": 1,
+    "return_full_text": false,
+    "add_special_tokens": false
+  },
+  "status": "needs-human-review",
+  "loadMs": 1638.013545,
+  "results": [
+    {
+      "case": "zh-npc",
+      "expected": {
+        "manualReview": [
+          "Speaks as Mara rather than addressing the player as Mara.",
+          "Accurately uses the supplied Silverbrook Ford rumor.",
+          "Does not grant rewards or completed choices."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [
+          {
+            "id": "r_tavern",
+            "name": "镀金狮鹫酒馆",
+            "route": []
+          }
+        ],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是奇幻游戏艾瑟尔加德中的角色酒馆老板娘玛拉。用简体中文回答一到两句。游戏状态以游戏事实为准，人物和约定可从先前对话中回忆。不要编造奖励、出口或已经完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n最近经历：抵达：橡木港圣所. 新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。\n\n玩家提问: 玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是奇幻游戏艾瑟尔加德中的角色酒馆老板娘玛拉。用简体中文回答一到两句。游戏状态以游戏事实为准，人物和约定可从先前对话中回忆。不要编造奖励、出口或已经完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：镀金狮鹫酒馆。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n最近经历：抵达：橡木港圣所. 新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。\n\n玩家提问: 玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 203,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "117851",
+            "99329",
+            "102071",
+            "107318",
+            "99079",
+            "20929",
+            "99462",
+            "101047",
+            "100780",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99329",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "3837",
+            "104013",
+            "33108",
+            "105616",
+            "30440",
+            "45181",
+            "109977",
+            "105051",
+            "15946",
+            "104843",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "99461",
+            "60548",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "107733",
+            "103976",
+            "5122",
+            "102422",
+            "18493",
+            "101399",
+            "79599",
+            "100484",
+            "104393",
+            "104180",
+            "100372",
+            "102005",
+            "100702",
+            "5373",
+            "24339",
+            "47534",
+            "57218",
+            "109251",
+            "6313",
+            "112457",
+            "99660",
+            "104096",
+            "104362",
+            "101562",
+            "112851",
+            "101402",
+            "104575",
+            "102811",
+            "57218",
+            "120493",
+            "100035",
+            "8997",
+            "99407",
+            "17340",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "3837",
+            "16",
+            "52334",
+            "107310",
+            "99417",
+            "99253",
+            "8997",
+            "67949",
+            "100160",
+            "5122",
+            "57218",
+            "50984",
+            "100697",
+            "112354",
+            "113822",
+            "9370",
+            "102138",
+            "99540",
+            "8997",
+            "104044",
+            "100798",
+            "5122",
+            "106906",
+            "5122",
+            "103218",
+            "75405",
+            "99734",
+            "100189",
+            "31838",
+            "13",
+            "78919",
+            "9370",
+            "101065",
+            "76313",
+            "101467",
+            "1773",
+            "104036",
+            "107632",
+            "28946",
+            "24562",
+            "3837",
+            "60726",
+            "101923",
+            "112765",
+            "3837",
+            "99794",
+            "99296",
+            "104067",
+            "100623",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "3837",
+            "35946",
+            "99900",
+            "104071",
+            "99817",
+            "1773",
+            "14880",
+            "23031",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "9370",
+            "39426",
+            "107261",
+            "100437",
+            "35946",
+            "90395",
+            "106525",
+            "101946",
+            "107733",
+            "9370",
+            "112457",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "玛拉，欢迎来到镀金狮鹫酒馆！传说中银溪浅滩通往地下墓穴与烬峰，你是否知道这些神秘之处？",
+          "rawOutput": [
+            {
+              "generated_text": "玛拉，欢迎来到镀金狮鹫酒馆！传说中银溪浅滩通往地下墓穴与烬峰，你是否知道这些神秘之处？"
+            }
+          ],
+          "outputTokens": 34,
+          "latencyMs": 3590.8888290000004,
+          "firstTokenMs": 667.9948709999999,
+          "tokensPerSecond": 9.468407856410415
+        }
+      ],
+      "status": "needs-human-review",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-encounter",
+      "expected": {
+        "encounterId": "first_oath",
+        "opening": "索恩长老托着一枚断裂的铜印。复苏之井开始低语尚在人世者的名字。他需要一位真正出发的旅人，而非又一个承诺。你将如何开始？",
+        "manualReview": [
+          "Preserves the people, their locations, presence or absence, and unresolved choices.",
+          "Adds atmosphere without new actions, events, outcomes, or echoed instructions."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "name": "橡木港城镇广场",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港北哨门",
+            "e": "铁心铁匠铺",
+            "w": "月瓣炼金工坊",
+            "s": "镀金狮鹫酒馆",
+            "u": "冒险者公会大厅"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "encounter": {
+            "id": "first_oath",
+            "token": "3800144264:first_oath:1",
+            "title": "复苏之井的裂纹",
+            "opening": "索恩长老托着一枚断裂的铜印。复苏之井开始低语尚在人世者的名字。他需要一位真正出发的旅人，而非又一个承诺。你将如何开始？",
+            "roomId": "r_town_square",
+            "choices": [
+              {
+                "index": 0,
+                "label": "承诺守护失踪者",
+                "cost": "无需消耗资源",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+10 经验 · +1 初级治疗药剂 · 橡木港 +2"
+              },
+              {
+                "index": 1,
+                "label": "研究铜印的裂口",
+                "cost": "6 体力",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+18 经验 · 裂隙学者 +1"
+              },
+              {
+                "index": 2,
+                "label": "要求签订报酬契约",
+                "cost": "无需消耗资源",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+18 金币"
+              }
+            ]
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "请为当前奇遇【复苏之井的裂纹】补充一到两句感官氛围描写。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。"
+            },
+            {
+              "role": "user",
+              "content": "当前场景原文\n当前位置：橡木港城镇广场。\n复苏之井的裂纹: 索恩长老托着一枚断裂的铜印。复苏之井开始低语尚在人世者的名字。他需要一位真正出发的旅人，而非又一个承诺。你将如何开始？\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【复苏之井的裂纹】补充一到两句感官氛围描写。"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。<|im_end|>\n<|im_start|>user\n当前场景原文\n当前位置：橡木港城镇广场。\n复苏之井的裂纹: 索恩长老托着一枚断裂的铜印。复苏之井开始低语尚在人世者的名字。他需要一位真正出发的旅人，而非又一个承诺。你将如何开始？\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【复苏之井的裂纹】补充一到两句感官氛围描写。<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 175,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "102122",
+            "100484",
+            "99243",
+            "1773",
+            "100345",
+            "103283",
+            "61443",
+            "14777",
+            "26939",
+            "114942",
+            "98237",
+            "31914",
+            "104811",
+            "3837",
+            "104465",
+            "104013",
+            "104473",
+            "5373",
+            "18493",
+            "82224",
+            "57191",
+            "113334",
+            "44091",
+            "3837",
+            "101034",
+            "105307",
+            "99726",
+            "104140",
+            "1773",
+            "91680",
+            "104361",
+            "109587",
+            "5373",
+            "102274",
+            "5373",
+            "111191",
+            "49567",
+            "118119",
+            "104556",
+            "24968",
+            "16530",
+            "93620",
+            "104013",
+            "5373",
+            "100675",
+            "57191",
+            "57621",
+            "3837",
+            "16530",
+            "100290",
+            "99673",
+            "50404",
+            "3837",
+            "16530",
+            "58364",
+            "41932",
+            "101882",
+            "1773",
+            "101041",
+            "66017",
+            "102122",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "67949",
+            "102122",
+            "103283",
+            "198",
+            "108839",
+            "5122",
+            "103218",
+            "75405",
+            "99734",
+            "102571",
+            "104208",
+            "8997",
+            "108105",
+            "53930",
+            "104097",
+            "9370",
+            "100542",
+            "100526",
+            "25",
+            "10236",
+            "112",
+            "95",
+            "100697",
+            "112889",
+            "99829",
+            "99164",
+            "111336",
+            "113822",
+            "9370",
+            "102138",
+            "99540",
+            "1773",
+            "108105",
+            "53930",
+            "104097",
+            "55286",
+            "99285",
+            "72881",
+            "99937",
+            "18493",
+            "17340",
+            "99244",
+            "28946",
+            "105180",
+            "1773",
+            "42411",
+            "85106",
+            "101961",
+            "100690",
+            "104532",
+            "9370",
+            "99407",
+            "17340",
+            "3837",
+            "109093",
+            "99518",
+            "46944",
+            "104327",
+            "1773",
+            "56568",
+            "44063",
+            "100007",
+            "55286",
+            "94432",
+            "99673",
+            "105307",
+            "50404",
+            "3837",
+            "102122",
+            "99754",
+            "112151",
+            "114613",
+            "3407",
+            "14880",
+            "17714",
+            "67949",
+            "99309",
+            "99688",
+            "10904",
+            "108105",
+            "53930",
+            "104097",
+            "9370",
+            "100542",
+            "100526",
+            "10958",
+            "104361",
+            "14777",
+            "26939",
+            "114942",
+            "118119",
+            "104556",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "石板路上的青苔在阳光下泛着微光，远处传来隐约的水声。空气中弥漫着潮湿的泥土味和腐叶的气息，远处的复苏之井仍在低语。",
+          "rawOutput": [
+            {
+              "generated_text": "石板路上的青苔在阳光下泛着微光，远处传来隐约的水声。空气中弥漫着潮湿的泥土味和腐叶的气息，远处的复苏之井仍在低语。"
+            }
+          ],
+          "outputTokens": 43,
+          "latencyMs": 4116.1242950000005,
+          "firstTokenMs": 478.20726099999956,
+          "tokensPerSecond": 10.44672048709355
+        }
+      ],
+      "status": "needs-human-review",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-tavern",
+      "expected": {
+        "encounterId": "tavern_courier",
+        "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+        "manualReview": [
+          "Preserves the people, their locations, presence or absence, and unresolved choices.",
+          "The courier stays missing; the wounded ranger and waterwheel are mentioned in a note and are not currently perceived inside the tavern.",
+          "Adds atmosphere without new actions, events, outcomes, or echoed instructions."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "encounter": {
+            "id": "tavern_courier",
+            "token": "3516185326:tavern_courier:1",
+            "title": "空着的椅子",
+            "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+            "roomId": "r_tavern",
+            "choices": [
+              {
+                "index": 0,
+                "label": "为搜救队留下一瓶药剂",
+                "cost": "1 × 初级治疗药剂",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+15 经验 · 橡木港 +1 · 荒野游侠 +1"
+              },
+              {
+                "index": 1,
+                "label": "买下信使的路线笔记",
+                "cost": "12 金币",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+10 经验"
+              },
+              {
+                "index": 2,
+                "label": "倾听，并承诺寻找他",
+                "cost": "无需消耗资源",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "橡木港 +1"
+              }
+            ]
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。"
+            },
+            {
+              "role": "user",
+              "content": "当前场景原文\n当前位置：镀金狮鹫酒馆。\n空着的椅子: 玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。<|im_end|>\n<|im_start|>user\n当前场景原文\n当前位置：镀金狮鹫酒馆。\n空着的椅子: 玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 170,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "102122",
+            "100484",
+            "99243",
+            "1773",
+            "100345",
+            "103283",
+            "61443",
+            "14777",
+            "26939",
+            "114942",
+            "98237",
+            "31914",
+            "104811",
+            "3837",
+            "104465",
+            "104013",
+            "104473",
+            "5373",
+            "18493",
+            "82224",
+            "57191",
+            "113334",
+            "44091",
+            "3837",
+            "101034",
+            "105307",
+            "99726",
+            "104140",
+            "1773",
+            "91680",
+            "104361",
+            "109587",
+            "5373",
+            "102274",
+            "5373",
+            "111191",
+            "49567",
+            "118119",
+            "104556",
+            "24968",
+            "16530",
+            "93620",
+            "104013",
+            "5373",
+            "100675",
+            "57191",
+            "57621",
+            "3837",
+            "16530",
+            "100290",
+            "99673",
+            "50404",
+            "3837",
+            "16530",
+            "58364",
+            "41932",
+            "101882",
+            "1773",
+            "101041",
+            "66017",
+            "102122",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "67949",
+            "102122",
+            "103283",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "34794",
+            "99164",
+            "9370",
+            "110202",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "89012",
+            "101961",
+            "38342",
+            "100040",
+            "9370",
+            "21317",
+            "32555",
+            "99416",
+            "99164",
+            "110798",
+            "102022",
+            "1773",
+            "42411",
+            "100161",
+            "9370",
+            "18600",
+            "38989",
+            "104496",
+            "99463",
+            "17881",
+            "30709",
+            "66569",
+            "100484",
+            "105497",
+            "9370",
+            "82894",
+            "102530",
+            "3837",
+            "101034",
+            "114711",
+            "100531",
+            "99164",
+            "52510",
+            "110676",
+            "27733",
+            "9370",
+            "52510",
+            "39953",
+            "8997",
+            "99673",
+            "105307",
+            "50404",
+            "3837",
+            "102122",
+            "99754",
+            "112151",
+            "114613",
+            "3407",
+            "14880",
+            "17714",
+            "67949",
+            "99309",
+            "99688",
+            "10904",
+            "34794",
+            "99164",
+            "9370",
+            "110202",
+            "10958",
+            "104361",
+            "14777",
+            "26939",
+            "114942",
+            "118119",
+            "104556",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "镀金狮鹫酒馆的灯光在空着的椅子上投下斑驳的影子，空气中弥漫着老式炖汤的香气，远处传来水车缓缓转动的声响。",
+          "rawOutput": [
+            {
+              "generated_text": "镀金狮鹫酒馆的灯光在空着的椅子上投下斑驳的影子，空气中弥漫着老式炖汤的香气，远处传来水车缓缓转动的声响。"
+            }
+          ],
+          "outputTokens": 42,
+          "latencyMs": 4925.525010000001,
+          "firstTokenMs": 570.710978000001,
+          "tokensPerSecond": 8.527009793825002
+        }
+      ],
+      "status": "needs-human-review",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passedCases": 0,
+  "failedCases": 0,
+  "manualReviewCases": 3,
+  "postInferenceReview": {
+    "method": "Assistant semantic inspection of complete raw responses. Not an automated narrative pass and not a claim of human review.",
+    "cases": [
+      {
+        "case": "zh-npc",
+        "verdict": "fails persona fidelity",
+        "reason": "The model is supposed to be Mara, but addresses the visitor as 玛拉. The Silverbrook Ford rumor is correct; no rewards are granted."
+      },
+      {
+        "case": "zh-encounter",
+        "verdict": "acceptable as limited supplemental atmosphere in this one sample",
+        "reason": "Retains the whispering well and leaves choices unresolved; added light, sound and smell are permitted atmosphere, not new canonical facts. Does not replace the authored opening."
+      },
+      {
+        "case": "zh-tavern",
+        "verdict": "fails strict scene fidelity",
+        "reason": "The missing courier is no longer moved into the tavern, but the waterwheel from his note becomes audible from the tavern. This spatial/acoustic relation is not supplied by the authored scene."
+      }
+    ],
+    "conclusion": "Real local generation is restored. Tiny-model narration still has persona and spatial-grounding limits. Authored story text, choices and game-rule facts remain authoritative.",
+    "noOutputRepair": true,
+    "oldEvidenceLimit": "These are new 2026-10-23 runs. The original cloud scratch reports from 2026-10-22 were not recoverable in full; remembered scores are not counted as validation."
+  }
+}
