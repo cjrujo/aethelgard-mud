@@ -1,0 +1,56 @@
+name: Verify v10 game and local AI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  ONNXRUNTIME_NODE_INSTALL_CUDA: skip
+jobs:
+  game-and-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: git diff --exit-code -- index.html open_world_mud.html sw.js assets/game.css
+      - run: python tests/verify_mud.py
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: game-verification
+          path: test-results/
+  real-local-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: python tools/prepare_offline.py --model qwen-0.6b
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser -- --model
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-browser-model
+          path: test-results/browser.json

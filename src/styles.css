@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Legible, responsive controls remain available without external fonts. */
+[hidden] { display: none !important; }
+button, select, input, textarea { touch-action: manipulation; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #7dd3fc; outline-offset: 3px;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+/* Flex/grid items must be allowed to shrink before long names or form controls
+   contribute an intrinsic width larger than their card. */
+#main-viewport-grid, #main-viewport-grid > section { min-width: 0; }
+#main-viewport-grid :where(.flex, .grid) > *, body > header :where(.flex, .grid) > * { min-width: 0; }
+#main-viewport-grid { overflow-wrap: anywhere; }
+input, select, textarea { min-width: 0; max-width: 100%; }
+#cmd-input, #ai-prompt-input, #input-online-chat, #input-cf-worker-url { width: 0; min-width: 0; }
+.ai-settings { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; min-width: 0; }
+.ai-status { font-size: 11px; color: #94a3b8; white-space: normal; }
+.ai-status[data-state="ready"] { color: #6ee7b7; }
+.ai-status[data-state="error"] { color: #fda4af; }
+.ai-progress { width: 100%; height: .4rem; accent-color: #38bdf8; }
+.ai-message { border-left: 2px solid #334155; padding: .5rem .6rem; overflow-wrap: anywhere; }
+.ai-message[data-source="wasm"], .ai-message[data-source="ollama"] { border-color: #38bdf8; }
+.ai-message[data-status="error"] { border-color: #fb7185; }
+.ai-answer { white-space: pre-wrap; line-height: 1.65; color: #e2e8f0; }
+.ai-meta { color: #94a3b8; font-size: 10px; margin-top: .3rem; }
+#ai-chat-log { min-height: 180px; height: 30vh; max-height: 420px; }
+#ai-prompt-input { min-height: 40px; font-size: 13px; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: .35rem; }
+.ai-control { border: 1px solid #334155; border-radius: .5rem; padding: .45rem .6rem; background: #0f172a; color: #e2e8f0; font-size: 11px; min-width: 0; max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+.ai-primary { background: #0ea5e9; border-color: #38bdf8; color: #082f49; font-weight: 700; }
+.ai-settings label { color: #cbd5e1; font-size: 11px; }
+.ai-settings select, .ai-settings input { background: #020617; color: #e2e8f0; border: 1px solid #334155; border-radius: .4rem; padding: .4rem; width: 100%; }
+.ai-note { color: #94a3b8; font-size: 11px; line-height: 1.6; }
+.onboarding-card { border: 1px solid #6366f1; border-radius: .7rem; padding: .7rem; background: #1e1b4b; font-size: 12px; }
+#toast-container { max-width: min(24rem, calc(100vw - 1.5rem)); overflow-wrap: anywhere; }
+#char-modal > div, #save-modal > div, #help-modal > section, #online-live-ui, .gd-dialog { min-width: 0; overflow-wrap: anywhere; }
+#char-modal > div, #save-modal > div { max-width: min(32rem, 100%); max-height: 90vh; overflow-y: auto; }
+#help-modal > section { max-width: min(42rem, 100%); }
+#online-live-ui, .gd-dialog { max-width: 100%; }
+
+/* The three-column HTML starts at Tailwind's lg = 1024px. Everything below
+   that breakpoint needs natural document flow, including 901–1023px tablets. */
+@media (max-width: 1023.98px) {
+  html, body { height: auto !important; min-height: 100vh; max-height: none !important; overflow: auto !important; }
+  #main-viewport-grid { display: flex !important; flex-direction: column !important; flex: none; height: auto !important; overflow: visible !important; }
+  #main-viewport-grid > section { width: 100% !important; max-width: 100%; height: auto !important; min-height: 0 !important; max-height: none !important; flex: none !important; overflow: visible !important; }
+  #main-viewport-grid .flex:not(.flex-col) { flex-wrap: wrap; }
+  #terminal-log { flex: none; height: clamp(240px, 45vh, 420px); min-height: 240px; max-height: 420px; }
+  #right-drawer-card { flex: none; min-height: 420px; max-height: none; }
+  #right-drawer-card > [id^="panel-"] { flex: none; min-height: 0; max-height: none; overflow: visible; }
+  body > header { position: relative !important; }
+  body > header > div > div:first-child { max-width: 100%; align-items: flex-start; }
+  body > header > div > div:first-child > div:first-child { flex-shrink: 0; }
+  body > header > div > div:first-child > div:last-child { flex-wrap: wrap; }
+  body > header h1, #header-biome-badge, #header-ai-badge { overflow-wrap: anywhere; max-width: 100%; }
+  #smart-assistant-banner > div { flex-direction: column; align-items: stretch; }
+  #smart-next-step-text { min-width: 0; white-space: normal; overflow: visible; }
+  #btn-proceed-next-step { align-self: flex-start; max-width: 100%; }
+  #room-context-card > div:first-child { height: auto; min-height: 64px; }
+  #biome-svg-banner { position: absolute; inset: 0; }
+  #room-context-card > div:first-child > div:last-child { position: relative; min-height: 64px; }
+  #room-title-display, #room-desc-display { white-space: normal; overflow: visible; }
+  #room-exits-chips button, #room-entities-chips button { max-width: 100%; overflow-wrap: anywhere; }
+  #skills-container button > div { flex: 1 1 140px; }
+  #cmd-form { flex-wrap: nowrap !important; }
+  #cmd-form button { flex-shrink: 0; }
+  #right-drawer-card > .grid > button { overflow-wrap: anywhere; }
+  .gd-row { flex-wrap: wrap; }
+  #world-atlas-card { min-height: 200px; }
+  #secondary-header-controls { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

@@ -1,0 +1,107 @@
+{
+  "runtime": "@huggingface/transformers@3.8.1",
+  "runtimeUrl": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.min.js",
+  "runtimeFiles": [
+    "transformers.min.js",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm"
+  ],
+  "models": [
+    {
+      "key": "qwen-0.6b",
+      "id": "onnx-community/Qwen3-0.6B-ONNX",
+      "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+      "name": "Qwen3 0.6B · default Chinese model",
+      "nameZh": "Qwen3 0.6B · 默认中文模型",
+      "dtype": "q8",
+      "device": "wasm",
+      "downloadMB": 635,
+      "contextBudget": 1600,
+      "maxNewTokens": 128,
+      "languages": [
+        "zh",
+        "en"
+      ],
+      "chatTemplateOptions": {
+        "enable_thinking": false
+      },
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/LICENSE",
+      "files": [
+        "config.json",
+        "generation_config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "onnx/model_quantized.onnx"
+      ],
+      "sha256": {
+        "onnx/model_quantized.onnx": "ccf8734e59fdf7475b2dc0c117005e267a3a08342c1d951e0a79f0bce57bf62a"
+      },
+      "sizes": {
+        "onnx/model_quantized.onnx": 617687575
+      }
+    },
+    {
+      "key": "qwen-0.5b",
+      "id": "onnx-community/Qwen2.5-0.5B-Instruct",
+      "revision": "516c8d04add8a80c5228f32102b57953b8d421a9",
+      "name": "Qwen2.5 0.5B · experimental alternative",
+      "nameZh": "Qwen2.5 0.5B · 实验备选",
+      "dtype": "q4",
+      "device": "wasm",
+      "downloadMB": 800,
+      "contextBudget": 1600,
+      "maxNewTokens": 128,
+      "languages": [
+        "zh",
+        "en"
+      ],
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct/blob/main/LICENSE",
+      "files": [
+        "config.json",
+        "generation_config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "onnx/model_q4.onnx"
+      ],
+      "sha256": {
+        "onnx/model_q4.onnx": "09235a3b1c135cd04ef570e5053b5c079e028078a2cc5f76ba6a251e91bf3296"
+      },
+      "sizes": {
+        "onnx/model_q4.onnx": 786156820
+      }
+    },
+    {
+      "key": "smol-135m",
+      "id": "onnx-community/SmolLM2-135M-Instruct-ONNX",
+      "revision": "b8a5c0f183b78c55955a5364f610c36668b5e681",
+      "name": "SmolLM2 135M · experimental lightweight English",
+      "nameZh": "SmolLM2 135M · 实验英文轻量",
+      "dtype": "q4",
+      "device": "wasm",
+      "downloadMB": 185,
+      "contextBudget": 1100,
+      "maxNewTokens": 128,
+      "languages": [
+        "en"
+      ],
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/blob/main/LICENSE",
+      "files": [
+        "config.json",
+        "generation_config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "onnx/model_q4.onnx"
+      ],
+      "sha256": {
+        "onnx/model_q4.onnx": "eb0d67c7e3b7d40f42d681b5f2eff4cef78968afe3f76c954f987dd870327a2a"
+      },
+      "sizes": {
+        "onnx/model_q4.onnx": 180581125
+      }
+    }
+  ]
+}

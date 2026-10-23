@@ -1,0 +1,4720 @@
+// =========================================================================
+    // 1. WORLD GRAPH: 32 INTERCONNECTED ROOMS ACROSS 5 BIOMES (BILINGUAL EN + ZH)
+    // =========================================================================
+    const BIOME_META = {
+      "Oakhaven Sanctuary": { zh: "橡木港圣所", color: "#10b981", badgeBg: "bg-emerald-950/80 text-emerald-300 border-emerald-700/50", dangerText: "Safe Haven · 安全圣所 (Lv.0)" },
+      "Whispering Wilds":   { zh: "低语荒野", color: "#84cc16", badgeBg: "bg-lime-950/80 text-lime-300 border-lime-700/50", dangerText: "Frontier Wilds · 边境荒野 (Lv.1-3)" },
+      "Sunken Catacombs":   { zh: "沉没地下墓穴", color: "#38bdf8", badgeBg: "bg-sky-950/80 text-sky-300 border-sky-700/50", dangerText: "Undead Crypts · 亡灵地宫 (Lv.3-5)" },
+      "Emberpeak Forge-Ruins": { zh: "烬峰熔炉遗迹", color: "#f97316", badgeBg: "bg-orange-950/80 text-orange-300 border-orange-700/50", dangerText: "Volcanic Ruins · 火山遗迹 (Lv.5-8)" },
+      "Astral Rift Citadel":   { zh: "星界裂隙堡垒", color: "#c084fc", badgeBg: "bg-purple-950/80 text-purple-300 border-purple-700/50", dangerText: "Endgame Abyss · 终局深渊 (Lv.8-12+)" }
+    };
+
+    const DIR_ZH = { n: "北", s: "南", e: "东", w: "西", u: "上", d: "下" };
+
+    const WORLD_ROOMS = {
+      // BIOME 1: OAKHAVEN SANCTUARY (6 rooms)
+      r_town_square: {
+        id: "r_town_square", title: "Oakhaven Town Square", titleZh: "橡木港城镇广场", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 110, y: 260,
+        desc: "Lanterns sway above cobbled flagstones around the crystalline Well of Renewal. Adventurers gather by the bounty board while Elder Thorne studies a shimmering Rift-map.",
+        descZh: "灯笼在复苏之井周围的鹅卵石路面上摇曳。冒险者们聚集在悬赏板旁，索恩长老正研究着一张微光闪烁的裂隙星图。",
+        exits: { n: "r_north_gate", e: "r_blacksmith", w: "r_alchemist", s: "r_tavern", u: "r_guild_hall" },
+        npcs: [{ id: "elder_thorne", name: "Elder Thorne", nameZh: "索恩长老", role: "Lorekeeper · 史诗学者", dialogue: "The Shattered Rift grows wider each night. Start by clearing the Whispering Wilds to the north, then bring me word of the Bandit King!", dialogueZh: "破碎裂隙每晚都在扩大。先去清理北方的低语荒野，再向我回报强盗之王的消息！" }],
+        mobs: [], nodes: []
+      },
+      r_blacksmith: {
+        id: "r_blacksmith", title: "Ironheart Smithy", titleZh: "铁心铁匠铺", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 165, y: 260,
+        desc: "Sparks cascade from a rune-etched anvil as Forgemaster Brom hammers glowing ingots. Racks of tempered blades and reinforced cuirasses line the soot-stained walls.",
+        descZh: "锻造大师布罗姆猛击炽热的金属锭，符文铁砧上火星四溅。烟熏的石墙边挂满了千锤百炼的刀剑与重甲。",
+        exits: { w: "r_town_square" },
+        npcs: [{ id: "forgemaster_brom", name: "Forgemaster Brom", nameZh: "锻造大师布罗姆", role: "Weaponsmith · 武器宗师", dialogue: "Bring me Copper, Silver, or Mythril Ore from the wilds and you can forge or Star-Refine legendary armaments right here!", dialogueZh: "从荒野带回铜矿、银矿或秘银矿，你就能在这里锻造或星辰精炼传奇神兵！" }],
+        mobs: [], nodes: [], station: "Anvil Runeforge · 符文铁砧"
+      },
+      r_alchemist: {
+        id: "r_alchemist", title: "Moonpetal Apothecary", titleZh: "月瓣炼金工坊", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 55, y: 260,
+        desc: "Spiral glass alembics bubble with luminescent elixirs. Dried bundles of Moonpetal and Firebloom hang from cedar rafters, filling the air with restorative vapor.",
+        descZh: "螺旋玻璃蒸馏器中翻涌着发光的灵药。雪松横梁上悬挂着月瓣草与火绒花束，空气中弥漫着治愈蒸汽。",
+        exits: { e: "r_town_square" },
+        npcs: [{ id: "alchemist_lyra", name: "Alchemist Lyra", nameZh: "炼金术士莱拉", role: "High Apothecary · 首席药剂师", dialogue: "Moonpetal and Luminous Caps make potent draughts. And if you venture into the Sunken Catacombs, end Malakor's curse for me!", dialogueZh: "月瓣草和荧光菌伞能炼制强效药剂。若你深入沉没墓穴，请替我终结马拉科尔的亡灵诅咒！" }],
+        mobs: [], nodes: [{ id: "herb_basket", name: "Moonpetal Herb", nameZh: "月瓣草篮", item: "Moonpetal Herb", qty: 1 }], station: "Alchemy Alembic · 炼金蒸馏台"
+      },
+      r_guild_hall: {
+        id: "r_guild_hall", title: "Adventurers' Guild Hall", titleZh: "冒险者公会大厅", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 110, y: 215,
+        desc: "Banners of fallen orders hang above a massive oak war-table. Commander Vance stamps wax seals onto rotating bounty contracts for bold mercenaries.",
+        descZh: "古老骑士团的旗帜悬挂在巨大的橡木战桌上方。万斯指挥官正在为勇敢的佣兵加盖悬赏契约火漆印。",
+        exits: { d: "r_town_square" },
+        npcs: [{ id: "commander_vance", name: "Commander Vance", nameZh: "万斯指挥官", role: "Guild Marshal · 公会元帅", dialogue: "Check the Quests & Bounties tab! Garrick the Bandit King has fortified the northern palisade—bring me his signet!", dialogueZh: "查看任务与悬赏面板！强盗王加里克盘踞在北方木寨，替我取回他的徽记！" }],
+        mobs: [], nodes: []
+      },
+      r_tavern: {
+        id: "r_tavern", title: "The Gilded Griffin Tavern", titleZh: "镀金狮鹫酒馆", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 110, y: 305,
+        desc: "A roaring hearth warms travelers sipping spiced mead. Innkeeper Mara polishes tankards while a hooded bard plucks a ballad of the Astral Citadel.",
+        descZh: "熊熊壁炉温暖着痛饮香料蜜酒的旅人。玛拉老板娘擦拭着酒杯，兜帽吟游诗人弹唱着星界堡垒的古老叙事诗。",
+        exits: { n: "r_town_square" },
+        npcs: [{ id: "innkeeper_mara", name: "Innkeeper Mara", nameZh: "酒馆老板娘玛拉", role: "Hearthkeeper · 炉火守护者", dialogue: "Rest by the fire anytime to restore full HP, MP, and Stamina! Rumor says the Silverbrook Ford leads both to the Catacombs and Emberpeak.", dialogueZh: "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。" }],
+        mobs: [], nodes: []
+      },
+      r_north_gate: {
+        id: "r_north_gate", title: "Oakhaven Northern Watchgate", titleZh: "橡木港北哨门", biome: "Oakhaven Sanctuary", danger: 0, safe: true,
+        x: 110, y: 175,
+        desc: "Iron-bound portcullises stand raised beneath twin ballista towers. Beyond the torchlight stretches the mist-shrouded canopy of the Whispering Wilds.",
+        descZh: "双子弩炮塔下铁闸高悬。火把光芒之外，便是迷雾笼罩的低语荒野林冠。",
+        exits: { s: "r_town_square", n: "r_wilds_trail" },
+        npcs: [{ id: "captain_sorin", name: "Watch Captain Sorin", nameZh: "守卫队长索林", role: "Gate Warden · 城门守卫长", dialogue: "Keep your potions stocked and your stance sharp. North lies the Whispering Wilds.", dialogueZh: "备好药水，调整好战斗姿态。往北便是危机四伏的低语荒野。" }],
+        mobs: [], nodes: []
+      },
+
+      // BIOME 2: WHISPERING WILDS (7 rooms)
+      r_wilds_trail: {
+        id: "r_wilds_trail", title: "Mossy Forest Trail", titleZh: "苔藓林间小径", biome: "Whispering Wilds", danger: 1,
+        x: 110, y: 130,
+        desc: "Ancient oaks arch over a fern-choked trail. Pale Moonpetal blossoms glow beside gnarly roots while low growls echo from the brush.",
+        descZh: "苍老古橡树笼罩着蕨类丛生的小径。苍白的月瓣花在盘根错节间闪烁微光，灌木丛中传来低沉咆哮。",
+        exits: { s: "r_north_gate", n: "r_hunter_camp", e: "r_old_mill", w: "r_mushroom_grove" },
+        npcs: [],
+        mobs: ["briar_wolf", "moss_goblin"],
+        nodes: [{ id: "node_moonpetal", name: "Moonpetal Herb", nameZh: "月瓣草丛", item: "Moonpetal Herb", qty: 1 }]
+      },
+      r_old_mill: {
+        id: "r_old_mill", title: "Abandoned Watermill", titleZh: "废弃水磨坊", biome: "Whispering Wilds", danger: 1,
+        x: 175, y: 130,
+        desc: "A moss-covered waterwheel creaks beside a foaming creek. Exposed veins of dull copper gleam along the rocky bank.",
+        descZh: "覆满青苔的水车在白沫翻涌的溪流旁吱呀作响。裸露的赤铜矿脉在岩石河岸上闪烁微光。",
+        exits: { w: "r_wilds_trail", e: "r_river_ford" },
+        npcs: [],
+        mobs: ["moss_goblin", "rabid_gnoll"],
+        nodes: [{ id: "node_copper", name: "Copper Ore Vein", nameZh: "赤铜矿脉", item: "Copper Ore", qty: 1 }]
+      },
+      r_mushroom_grove: {
+        id: "r_mushroom_grove", title: "Bioluminescent Spore Grove", titleZh: "荧光孢子林", biome: "Whispering Wilds", danger: 2,
+        x: 50, y: 130,
+        desc: "Towering azure fungi pulse with hypnotic light, drifting shimmering spores across damp mossy hollows.",
+        descZh: "高耸的蔚蓝巨蕈脉动着迷幻光芒，闪烁的孢子飘荡在潮湿的苔藓树洞之间。",
+        exits: { e: "r_wilds_trail", n: "r_ancient_menhir" },
+        npcs: [],
+        mobs: ["sporeling_mystic", "venomfang_spider"],
+        nodes: [{ id: "node_lumcap", name: "Luminous Cap Cluster", nameZh: "荧光菌群", item: "Luminous Cap", qty: 1 }]
+      },
+      r_hunter_camp: {
+        id: "r_hunter_camp", title: "Ranger's Outpost", titleZh: "游侠前哨营地", biome: "Whispering Wilds", danger: 2, safe: true,
+        x: 110, y: 85,
+        desc: "Sharpened stakes ring a crackling scouting campfire. Scout Elara fletches silver-tipped arrows while watching the northern bandit palisade.",
+        descZh: "削尖木桩环绕着噼啪作响的侦察篝火。斥候艾拉拉一边制作银簇箭矢，一边监视着北方的强盗木寨。",
+        exits: { s: "r_wilds_trail", n: "r_bandit_stronghold", w: "r_ancient_menhir" },
+        npcs: [{ id: "scout_elara", name: "Scout Elara", nameZh: "斥候艾拉拉", role: "Frontier Ranger · 边境游侠", dialogue: "Garrick the Bandit King holds the palisade just north of here. Defeat him to claim the Crypt Key!", dialogueZh: "强盗王加里克就盘踞在正北方的木寨里。击败他即可夺取地宫钥匙！" }],
+        mobs: [], nodes: [{ id: "node_camp_herb", name: "Moonpetal Herb", nameZh: "营地月瓣草", item: "Moonpetal Herb", qty: 1 }]
+      },
+      r_ancient_menhir: {
+        id: "r_ancient_menhir", title: "Circle of Standing Stones", titleZh: "远古立石法阵", biome: "Whispering Wilds", danger: 2,
+        x: 50, y: 85,
+        desc: "Seven monoliths carved with Elven star-runes hum with geomagnetic power. Twisted treants patrol the sacred turf.",
+        descZh: "七座刻有精灵星辰符文的巨石柱嗡鸣着地磁能量，扭曲的树人守卫在神圣草坪四周。",
+        exits: { s: "r_mushroom_grove", e: "r_hunter_camp" },
+        npcs: [],
+        mobs: ["corrupted_treant", "sporeling_mystic"],
+        nodes: [{ id: "node_copper_2", name: "Copper Ore Outcrop", nameZh: "铜矿露头", item: "Copper Ore", qty: 1 }]
+      },
+      r_river_ford: {
+        id: "r_river_ford", title: "Silverbrook Ford", titleZh: "银溪浅滩", biome: "Whispering Wilds", danger: 3,
+        x: 240, y: 130,
+        desc: "Icy mountain waters rush over knee-deep stepping stones. To the east rise the smoking peaks of Emberpeak; a sunken stone staircase spirals downward into flooded crypts.",
+        descZh: "冰冷的山涧溪水漫过齐膝的踏脚石。往东是浓烟滚滚的烬峰；一道沉没的石阶螺旋向下通往积水墓穴。",
+        exits: { w: "r_old_mill", e: "r_cinder_pass", d: "r_catacomb_stairs" },
+        npcs: [],
+        mobs: ["rabid_gnoll", "venomfang_spider"],
+        nodes: [{ id: "node_silver_sand", name: "Silver Ore Deposit", nameZh: "银砂矿床", item: "Silver Ore", qty: 1 }]
+      },
+      r_bandit_stronghold: {
+        id: "r_bandit_stronghold", title: "Thornwood Bandit Palisade", titleZh: "荆棘木强盗营寨", biome: "Whispering Wilds", danger: 3, bossRoom: true,
+        x: 110, y: 40,
+        desc: "Log ramparts and stolen guild banners surround a timber throne. Garrick the Bandit King hefting a jagged cleaver guards an ironbound war-chest.",
+        descZh: "圆木壁垒与劫掠来的公会旗帜环绕着木制王座。手持锯齿重刀的强盗王加里克正守卫着铁箍战利品箱。",
+        exits: { s: "r_hunter_camp" },
+        npcs: [],
+        mobs: ["boss_garrick", "rabid_gnoll"],
+        nodes: [{ id: "node_palisade_silver", name: "Stolen Silver Ingot", nameZh: "劫掠银锭", item: "Silver Ore", qty: 1 }]
+      },
+
+      // BIOME 3: SUNKEN CATACOMBS (6 rooms)
+      r_catacomb_stairs: {
+        id: "r_catacomb_stairs", title: "Flooded Crypt Stairwell", titleZh: "积水地宫阶梯", biome: "Sunken Catacombs", danger: 3,
+        x: 240, y: 195,
+        desc: "Green phosphorescent moss clings to weeping limestone steps descending into ankle-deep black water.",
+        descZh: "绿色磷光苔藓附着在渗水的石灰岩台阶上，向下延伸进没过脚踝的幽暗黑水中。",
+        exits: { u: "r_river_ford", s: "r_ossuary" },
+        npcs: [],
+        mobs: ["risen_skeleton", "crypt_bat"],
+        nodes: [{ id: "node_crypt_cap", name: "Luminous Cap", nameZh: "幽暗荧光菌", item: "Luminous Cap", qty: 1 }]
+      },
+      r_ossuary: {
+        id: "r_ossuary", title: "Hall of Ten Thousand Bones", titleZh: "万骨回廊", biome: "Sunken Catacombs", danger: 4,
+        x: 240, y: 245,
+        desc: "Vaulted pillars of skulls and femurs support a dripping ceiling. Pale veins of native silver glint behind collapsed sarcophagi.",
+        descZh: "由颅骨与骸骨筑成的拱柱支撑着滴水的穹顶。坍塌的石棺后闪烁着苍白的原生银矿脉。",
+        exits: { n: "r_catacomb_stairs", e: "r_drowned_nave", w: "r_scriptorium" },
+        npcs: [],
+        mobs: ["bone_weaver", "risen_skeleton"],
+        nodes: [{ id: "node_crypt_silver", name: "Silver Ore Vein", nameZh: "地宫银矿脉", item: "Silver Ore", qty: 1 }]
+      },
+      r_drowned_nave: {
+        id: "r_drowned_nave", title: "Drowned Cathedral Nave", titleZh: "沉没大教堂中殿", biome: "Sunken Catacombs", danger: 4,
+        x: 300, y: 245,
+        desc: "Shattered stained glass reflects spectral candlelight across submerged pews. A translucent spirit kneels before the ruined altar.",
+        descZh: "破碎的彩绘玻璃将幽灵烛光折射在淹没的长椅上。一道半透明的灵魂跪在残破祭坛前。",
+        exits: { w: "r_ossuary", s: "r_reliquary" },
+        npcs: [{ id: "sister_vesper", name: "Echo of Sister Vesper", nameZh: "维斯珀修女的残响", role: "Fallen Cleric · 陨落牧师", dialogue: "Malakor bound our souls to the sanctum below. Strike him down to free the cathedral!", dialogueZh: "马拉科尔将我们的灵魂禁锢在下方的圣所中。击败他，解放这座大教堂！" }],
+        mobs: ["drowned_templar"],
+        nodes: []
+      },
+      r_scriptorium: {
+        id: "r_scriptorium", title: "Forbidden Scriptorium", titleZh: "禁忌抄写室", biome: "Sunken Catacombs", danger: 5,
+        x: 190, y: 295,
+        desc: "Floating grimoires flutter between iron lecterns. An arcane enchanting circle still hums with necrotic indigo runes.",
+        descZh: "悬浮的魔典在铁制诵经台间翻飞。一座奥术附魔阵依然嗡鸣着死灵靛蓝符文。",
+        exits: { e: "r_ossuary", s: "r_lich_sanctum" },
+        npcs: [],
+        mobs: ["cursed_archivist", "bone_weaver"],
+        nodes: [{ id: "node_script_crystal", name: "Aether Crystal Shard", nameZh: "以太水晶簇", item: "Aether Crystal", qty: 1 }],
+        station: "Runic Enchanting Circle · 符文附魔阵"
+      },
+      r_reliquary: {
+        id: "r_reliquary", title: "Sealed Reliquary Vault", titleZh: "封印圣物宝库", biome: "Sunken Catacombs", danger: 5,
+        x: 300, y: 295,
+        desc: "Gilded reliquaries and ancient burial urns line this reinforced chamber bordering the Lich's inner sanctum.",
+        descZh: "镀金圣骨匣与古老骨灰瓮排列在这座毗邻巫妖内殿的加固密室中。",
+        exits: { n: "r_drowned_nave", w: "r_lich_sanctum" },
+        npcs: [],
+        mobs: ["drowned_templar", "cursed_archivist"],
+        nodes: [{ id: "node_reliquary_silver", name: "Pure Silver Deposit", nameZh: "纯银矿床", item: "Silver Ore", qty: 2 }]
+      },
+      r_lich_sanctum: {
+        id: "r_lich_sanctum", title: "Sanctum of the Undying", titleZh: "不死巫妖圣所", biome: "Sunken Catacombs", danger: 5, bossRoom: true,
+        x: 245, y: 315,
+        desc: "A phylactery brazier burns with cold emerald soulfire at the heart of an obsidian dais. Malakor the Soul-Binder hovers above the bones of kings.",
+        descZh: "黑曜石高台中央的命匣火盆燃烧着冰冷的翠绿魂火。缚魂者马拉科尔悬浮在历代先王的骸骨之上。",
+        exits: { n: "r_scriptorium", e: "r_reliquary" },
+        npcs: [],
+        mobs: ["boss_malakor"],
+        nodes: [{ id: "node_lich_aether", name: "Aether Crystal Cluster", nameZh: "以太水晶矿群", item: "Aether Crystal", qty: 1 }]
+      },
+
+      // BIOME 4: EMBERPEAK FORGE-RUINS (7 rooms)
+      r_cinder_pass: {
+        id: "r_cinder_pass", title: "Cinderwind Mountain Pass", titleZh: "烬风山隘", biome: "Emberpeak Forge-Ruins", danger: 5,
+        x: 320, y: 130,
+        desc: "Ash swirls on scorching updrafts between basalt cliffs. Crimson Firebloom petals thrive beside steaming sulfur fissures.",
+        descZh: "火山灰在玄武岩峭壁间的灼热上升气流中盘旋。深红的火绒花在冒着蒸汽的硫磺裂隙旁盛开。",
+        exits: { w: "r_river_ford", e: "r_dwarven_gate" },
+        npcs: [],
+        mobs: ["ash_hound", "magma_imp"],
+        nodes: [{ id: "node_firebloom", name: "Firebloom Herb", nameZh: "火绒花株", item: "Firebloom", qty: 1 }]
+      },
+      r_dwarven_gate: {
+        id: "r_dwarven_gate", title: "Shattered Obsidian Gate", titleZh: "破碎黑曜石大门", biome: "Emberpeak Forge-Ruins", danger: 6, safe: true,
+        x: 380, y: 130,
+        desc: "Colossal dwarven statues flank a breached gatehouse of black volcanic glass. Engineer Borin repairs a steam-powered ballista.",
+        descZh: "巨大的矮人雕像矗立在破裂的黑曜石城门两侧。工程师博林正在抢修一台蒸汽弩炮。",
+        exits: { w: "r_cinder_pass", n: "r_slag_foundry", s: "r_obsidian_barracks" },
+        npcs: [{ id: "engineer_borin", name: "Engineer Borin", nameZh: "矮人工程师博林", role: "Master Artificer · 巨匠技师", dialogue: "Ignis-Vulcan seized the Caldera Throne! Gather Mythril Ore and slay the Titan Forge-Lord to reclaim our hold!", dialogueZh: "伊格尼斯·伏尔甘占据了火山口王座！采集秘银矿并击败泰坦熔炉领主，夺回我们的要塞！" }],
+        mobs: [], nodes: []
+      },
+      r_slag_foundry: {
+        id: "r_slag_foundry", title: "Great Slag Foundry", titleZh: "巨型熔渣铸造厂", biome: "Emberpeak Forge-Ruins", danger: 6,
+        x: 380, y: 80,
+        desc: "Crucibles of liquid gold and magma pour into rune-molds. Rogue clockwork automatons patrol the catwalks.",
+        descZh: "盛满液态黄金与岩浆的坩埚倾泻入符文铸模。失控的发条自动机在悬空栈道上巡逻。",
+        exits: { s: "r_dwarven_gate", e: "r_lava_bridge" },
+        npcs: [],
+        mobs: ["clockwork_automaton", "cinder_golem"],
+        nodes: [{ id: "node_mythril_1", name: "Mythril Ore Vein", nameZh: "秘银矿脉", item: "Mythril Ore", qty: 1 }],
+        station: "Master Titan Runeforge · 泰坦符文熔炉"
+      },
+      r_obsidian_barracks: {
+        id: "r_obsidian_barracks", title: "Obsidian Watch Barracks", titleZh: "黑曜石守望兵营", biome: "Emberpeak Forge-Ruins", danger: 7,
+        x: 380, y: 185,
+        desc: "Weapon racks and charred banners fill this subterranean garrison. Veins of gleaming blue Mythril thread through the basalt wall.",
+        descZh: "武器架与焦黑战旗遍布这座地下驻军营。闪烁蓝光的秘银矿脉穿行于玄武岩墙壁间。",
+        exits: { n: "r_dwarven_gate", e: "r_crystal_cavern" },
+        npcs: [],
+        mobs: ["ashen_warlock", "cinder_golem"],
+        nodes: [{ id: "node_mythril_2", name: "Rich Mythril Seam", nameZh: "富集秘银矿层", item: "Mythril Ore", qty: 1 }]
+      },
+      r_lava_bridge: {
+        id: "r_lava_bridge", title: "Span of Molten Chains", titleZh: "熔岩锁链吊桥", biome: "Emberpeak Forge-Ruins", danger: 7,
+        x: 445, y: 80,
+        desc: "Titanic iron chains suspend a stone causeway above a churning sea of magma. Pyroclast drakes roost on the chains.",
+        descZh: "泰坦铁链将一座石制长堤悬吊在翻涌的岩浆海之上，火碎飞龙栖息在铁链之间。",
+        exits: { w: "r_slag_foundry", s: "r_crystal_cavern", e: "r_caldera_throne" },
+        npcs: [],
+        mobs: ["pyroclast_drake", "magma_imp"],
+        nodes: [{ id: "node_firebloom_2", name: "Firebloom Cluster", nameZh: "火绒花簇", item: "Firebloom", qty: 2 }]
+      },
+      r_crystal_cavern: {
+        id: "r_crystal_cavern", title: "Starlight Geode Cavern", titleZh: "星光晶洞", biome: "Emberpeak Forge-Ruins", danger: 8,
+        x: 445, y: 185,
+        desc: "Prismatic Aether Crystals the size of pillars refract violet light upward toward a gravity-defying vortex leading into the Astral Rift.",
+        descZh: "柱状棱镜以太水晶将紫罗兰色光芒向上折射，直通反重力旋转的星界裂隙漩涡。",
+        exits: { w: "r_obsidian_barracks", n: "r_lava_bridge", u: "r_rift_breach" },
+        npcs: [],
+        mobs: ["crystalline_watcher", "ashen_warlock"],
+        nodes: [{ id: "node_aether_1", name: "Aether Crystal Geode", nameZh: "以太晶洞", item: "Aether Crystal", qty: 1 }]
+      },
+      r_caldera_throne: {
+        id: "r_caldera_throne", title: "The Molten Caldera Throne", titleZh: "熔火火山口王座", biome: "Emberpeak Forge-Ruins", danger: 8, bossRoom: true,
+        x: 500, y: 80,
+        desc: "At the center of the volcanic crater rises an anvil-throne wreathed in solar flame. Ignis-Vulcan, the Titan Forge-Lord, wields a hammer of living magma.",
+        descZh: "火山口中央耸立着日冕烈焰环绕的铁砧王座。泰坦熔炉领主伊格尼斯·伏尔甘挥舞着活体岩浆战锤。",
+        exits: { w: "r_lava_bridge" },
+        npcs: [],
+        mobs: ["boss_ignis_vulcan"],
+        nodes: [{ id: "node_caldera_mythril", name: "Royal Mythril Cache", nameZh: "皇家秘银宝藏", item: "Mythril Ore", qty: 2 }]
+      },
+
+      // BIOME 5: ASTRAL RIFT CITADEL (6 rooms)
+      r_rift_breach: {
+        id: "r_rift_breach", title: "The Shattered Horizon Breach", titleZh: "破碎天际裂口", biome: "Astral Rift Citadel", danger: 9, safe: true,
+        x: 445, y: 250,
+        desc: "Fragments of marble citadel float in a violet nebula. Rift Researcher Kaelen maintains a stabilized containment ward around the landing platform.",
+        descZh: "大理石堡垒残骸漂浮在紫罗兰色星云中。裂隙研究员凯伦在降落平台四周维持着稳定结界。",
+        exits: { d: "r_crystal_cavern", n: "r_chrono_gallery" },
+        npcs: [{ id: "researcher_kaelen", name: "Rift Researcher Kaelen", nameZh: "裂隙研究员凯伦", role: "Astral Savant · 星界学者", dialogue: "Beyond lies the Citadel of Xal'korath. Harvest Star-Metal in the Void Conduit and shatter the Architect at the Astral Core!", dialogueZh: "前方就是萨尔科拉斯的星界堡垒。去虚空导管采集星辰金属，并在星界核心击碎虚空建筑师！" }],
+        mobs: [], nodes: [{ id: "node_rift_aether", name: "Pure Aether Crystal", nameZh: "纯净以太水晶", item: "Aether Crystal", qty: 1 }]
+      },
+      r_chrono_gallery: {
+        id: "r_chrono_gallery", title: "Gallery of Fractured Time", titleZh: "破碎时光长廊", biome: "Astral Rift Citadel", danger: 9,
+        x: 445, y: 295,
+        desc: "Shattered hourglasses hang suspended in mid-air while echoes of past and future battles replay along starlit colonnades.",
+        descZh: "破碎的沙漏悬浮在半空中，过去与未来的战斗残响在星光柱廊间不断重演。",
+        exits: { s: "r_rift_breach", e: "r_void_conduit", w: "r_celestial_observatory" },
+        npcs: [],
+        mobs: ["chrono_wraith", "void_stalker"],
+        nodes: []
+      },
+      r_celestial_observatory: {
+        id: "r_celestial_observatory", title: "Ruined Celestial Observatory", titleZh: "残破天体观星台", biome: "Astral Rift Citadel", danger: 10,
+        x: 380, y: 295,
+        desc: "A brass armillary sphere rotates beneath a torn sky of colliding galaxies. Star-Metal meteorites stud the fractured floor.",
+        descZh: "黄铜浑天仪在星系碰撞的撕裂天穹下旋转，星辰金属陨石镶嵌在碎裂的地面上。",
+        exits: { e: "r_chrono_gallery", n: "r_throne_approach" },
+        npcs: [],
+        mobs: ["astral_sentinel", "chrono_wraith"],
+        nodes: [{ id: "node_starmetal_1", name: "Star-Metal Meteorite", nameZh: "星辰金属陨石", item: "Star-Metal", qty: 1 }]
+      },
+      r_void_conduit: {
+        id: "r_void_conduit", title: "Nexus of Bleeding Stars", titleZh: "泣血群星枢纽", biome: "Astral Rift Citadel", danger: 10,
+        x: 500, y: 295,
+        desc: "Streams of cosmic energy converge into an Astral Transmutation Altar. Rift Weavers harvest raw Star-Metal from dying constellations.",
+        descZh: "宇宙能量流汇聚至星界转化祭坛。裂隙编织者正从垂死的星座中汲取原生星辰金属。",
+        exits: { w: "r_chrono_gallery", n: "r_throne_approach" },
+        npcs: [],
+        mobs: ["rift_weaver", "void_stalker"],
+        nodes: [{ id: "node_starmetal_2", name: "Star-Metal Core", nameZh: "星辰金属核心", item: "Star-Metal", qty: 1 }],
+        station: "Astral Transmutation Altar · 星界转化祭坛"
+      },
+      r_throne_approach: {
+        id: "r_throne_approach", title: "Stair of Eclipsed Suns", titleZh: "日蚀阶梯", biome: "Astral Rift Citadel", danger: 11, bossRoom: true,
+        x: 445, y: 330,
+        desc: "Floating steps of starlight ascend toward the singularity. Vaelen, Herald of the Void, stands guard with twin eclipse glaives.",
+        descZh: "漂浮的星光台阶通向奇点王座。虚空先驱维伦手持双子日蚀战戟在此镇守。",
+        exits: { s: "r_chrono_gallery", w: "r_celestial_observatory", e: "r_void_conduit", u: "r_astral_core" },
+        npcs: [],
+        mobs: ["boss_vaelen"],
+        nodes: [{ id: "node_eclipse_star", name: "Star-Metal Cluster", nameZh: "星辰金属矿簇", item: "Star-Metal", qty: 1 }]
+      },
+      r_astral_core: {
+        id: "r_astral_core", title: "Heart of the Shattered Rift", titleZh: "破碎裂隙之心", biome: "Astral Rift Citadel", danger: 12, bossRoom: true,
+        x: 500, y: 330,
+        desc: "Reality bends around the Singularity Throne where Xal'korath, Architect of the Void, weaves galaxies into shadow. The Endless Rift Portal pulses beside the dais.",
+        descZh: "现实在奇点王座周围扭曲，虚空建筑师萨尔科拉斯将星系编织入暗影。无尽裂隙传送门在高台旁脉动。",
+        exits: { d: "r_throne_approach" },
+        npcs: [],
+        mobs: ["boss_xalkorath"],
+        nodes: [{ id: "node_core_starmetal", name: "Primal Star-Metal Singularity", nameZh: "原初星辰金属奇点", item: "Star-Metal", qty: 2 }],
+        riftPortal: true
+      }
+    };
+
+    // =========================================================================
+    // 2. BILINGUAL MOBS, CLASSES, ITEMS, RECIPES, QUESTS & ACHIEVEMENTS
+    // =========================================================================
+    const MOB_TEMPLATES = {
+      briar_wolf:          { id: "briar_wolf", name: "Briar Wolf", nameZh: "荆棘野狼", level: 1, hp: 50, atk: 11, def: 4, xp: 35, gold: 14, drops: ["Moonpetal Herb", "Rusty Iron Blade"] },
+      moss_goblin:         { id: "moss_goblin", name: "Moss Goblin", nameZh: "苔藓哥布林", level: 1, hp: 45, atk: 10, def: 3, xp: 32, gold: 16, drops: ["Copper Ore", "Minor Healing Draught"] },
+      rabid_gnoll:         { id: "rabid_gnoll", name: "Rabid Gnoll", nameZh: "狂暴豺狼人", level: 2, hp: 78, atk: 15, def: 6, xp: 52, gold: 24, drops: ["Copper Ore", "Scout Leather Armor"] },
+      sporeling_mystic:    { id: "sporeling_mystic", name: "Sporeling Mystic", nameZh: "孢子秘术师", level: 2, hp: 70, atk: 17, def: 5, xp: 55, gold: 26, drops: ["Luminous Cap", "Arcane Mana Vial"] },
+      venomfang_spider:    { id: "venomfang_spider", name: "Venomfang Spider", nameZh: "毒牙巨蛛", level: 2, hp: 82, atk: 18, def: 7, xp: 60, gold: 28, drops: ["Luminous Cap", "Viper Fang Dagger"] },
+      corrupted_treant:    { id: "corrupted_treant", name: "Corrupted Treant", nameZh: "腐化树人", level: 3, hp: 115, atk: 21, def: 11, xp: 80, gold: 38, drops: ["Moonpetal Herb", "Oakheart Buckler"] },
+      boss_garrick:        { id: "boss_garrick", name: "Garrick the Bandit King", nameZh: "强盗王加里克", level: 3, boss: true, hp: 175, atk: 25, def: 12, xp: 160, gold: 95, drops: ["Bandit King's Cleaver", "Crypt Key"] },
+      risen_skeleton:      { id: "risen_skeleton", name: "Risen Skeleton", nameZh: "复生骷髅兵", level: 4, hp: 125, atk: 24, def: 12, xp: 95, gold: 44, drops: ["Silver Ore", "Minor Healing Draught"] },
+      crypt_bat:           { id: "crypt_bat", name: "Crypt Bat", nameZh: "墓穴夜蝠", level: 3, hp: 95, atk: 22, def: 8, xp: 75, gold: 32, drops: ["Luminous Cap"] },
+      bone_weaver:         { id: "bone_weaver", name: "Bone Weaver", nameZh: "织骨死灵师", level: 4, hp: 140, atk: 28, def: 13, xp: 115, gold: 52, drops: ["Silver Ore", "Boneweave Mantle"] },
+      drowned_templar:     { id: "drowned_templar", name: "Drowned Templar", nameZh: "溺亡圣殿骑士", level: 5, hp: 175, atk: 32, def: 18, xp: 140, gold: 64, drops: ["Silver Ore", "Templar Runeblade"] },
+      cursed_archivist:    { id: "cursed_archivist", name: "Cursed Archivist", nameZh: "受诅咒的档案官", level: 5, hp: 155, atk: 35, def: 14, xp: 145, gold: 68, drops: ["Aether Crystal", "Archivist Tome Ring"] },
+      boss_malakor:        { id: "boss_malakor", name: "Malakor the Soul-Binder", nameZh: "缚魂者马拉科尔", level: 5, boss: true, hp: 290, atk: 42, def: 20, xp: 320, gold: 180, drops: ["Soulbinder's Staff", "Aether Crystal"] },
+      ash_hound:           { id: "ash_hound", name: "Ash Hound", nameZh: "灰烬猎犬", level: 6, hp: 210, atk: 40, def: 19, xp: 175, gold: 80, drops: ["Firebloom", "Greater Healing Elixir"] },
+      magma_imp:           { id: "magma_imp", name: "Magma Imp", nameZh: "熔岩小鬼", level: 6, hp: 190, atk: 43, def: 17, xp: 170, gold: 78, drops: ["Firebloom", "Mythril Ore"] },
+      clockwork_automaton: { id: "clockwork_automaton", name: "Clockwork Automaton", nameZh: "发条自动机", level: 7, hp: 255, atk: 48, def: 26, xp: 220, gold: 105, drops: ["Mythril Ore", "Clockwork Aegis"] },
+      cinder_golem:        { id: "cinder_golem", name: "Cinder Golem", nameZh: "余烬魔像", level: 7, hp: 290, atk: 50, def: 30, xp: 240, gold: 115, drops: ["Mythril Ore", "Cinderforged Greatsword"] },
+      ashen_warlock:       { id: "ashen_warlock", name: "Ashen Warlock", nameZh: "灰烬术士", level: 7, hp: 235, atk: 55, def: 21, xp: 235, gold: 110, drops: ["Aether Crystal", "Pyromancer's Signet"] },
+      pyroclast_drake:     { id: "pyroclast_drake", name: "Pyroclast Drake", nameZh: "火碎飞龙", level: 8, hp: 330, atk: 60, def: 28, xp: 280, gold: 135, drops: ["Firebloom", "Drake-Scale Cuirass"] },
+      crystalline_watcher: { id: "crystalline_watcher", name: "Crystalline Watcher", nameZh: "晶簇守望者", level: 8, hp: 310, atk: 58, def: 32, xp: 290, gold: 140, drops: ["Aether Crystal", "Prism Heart Relic"] },
+      boss_ignis_vulcan:   { id: "boss_ignis_vulcan", name: "Ignis-Vulcan, Titan Forge-Lord", nameZh: "泰坦熔炉领主伊格尼斯·伏尔甘", level: 8, boss: true, hp: 520, atk: 72, def: 36, xp: 620, gold: 360, drops: ["Vulcan's Worldbreaker", "Star-Metal"] },
+      void_stalker:        { id: "void_stalker", name: "Void Stalker", nameZh: "虚空追猎者", level: 9, hp: 380, atk: 70, def: 34, xp: 360, gold: 175, drops: ["Aether Crystal", "Void-Edge Katana"] },
+      chrono_wraith:       { id: "chrono_wraith", name: "Chrono Wraith", nameZh: "时空怨灵", level: 9, hp: 360, atk: 74, def: 32, xp: 375, gold: 185, drops: ["Star-Metal", "Chrono Band"] },
+      astral_sentinel:     { id: "astral_sentinel", name: "Astral Sentinel", nameZh: "星界哨兵", level: 10, hp: 440, atk: 80, def: 42, xp: 430, gold: 210, drops: ["Star-Metal", "Celestial Plate"] },
+      rift_weaver:         { id: "rift_weaver", name: "Rift Weaver", nameZh: "裂隙编织者", level: 10, hp: 410, atk: 85, def: 38, xp: 450, gold: 225, drops: ["Star-Metal", "Nexus Sovereign Relic"] },
+      boss_vaelen:         { id: "boss_vaelen", name: "Vaelen, Herald of the Void", nameZh: "虚空先驱维伦", level: 11, boss: true, hp: 680, atk: 94, def: 45, xp: 850, gold: 500, drops: ["Eclipse Glaive of Vaelen", "Star-Metal"] },
+      boss_xalkorath:      { id: "boss_xalkorath", name: "Xal'korath, Architect of the Void", nameZh: "虚空建筑师萨尔科拉斯", level: 12, boss: true, hp: 950, atk: 112, def: 52, xp: 1600, gold: 1000, drops: ["Sovereign Blade of Cosmos", "Crown of Eternity"] }
+    };
+
+    const CLASS_CONFIG = {
+      vanguard: {
+        name: "Vanguard", nameZh: "先锋卫士", title: "Bulwark of Aethelgard · 艾瑟尔加德壁垒",
+        baseStats: { str: 14, int: 6, agi: 8, vit: 14, maxHp: 140, maxMp: 45, maxSta: 100 },
+        skills: [
+          { name: "Shield Bash", nameZh: "盾牌猛击", costType: "sta", cost: 15, cd: 3, mult: 1.4, stat: "str", effect: "stun", desc: "140% STR DMG + Stun", descZh: "140%力量伤害 + 1回合眩晕" },
+          { name: "Whirlwind Cleave", nameZh: "旋风顺劈", costType: "sta", cost: 25, cd: 4, mult: 1.75, stat: "str", effect: "bleed", desc: "175% STR DMG + Bleed", descZh: "175%力量伤害 + 持续流血" },
+          { name: "Iron Will", nameZh: "钢铁意志", costType: "mp", cost: 18, cd: 5, mult: 0, stat: "vit", effect: "heal_guard", desc: "Heal 32% HP + Guard", descZh: "恢复32%生命 + 铁壁护盾" }
+        ]
+      },
+      arcanist: {
+        name: "Arcanist", nameZh: "裂隙奥术师", title: "Weaver of the Rift · 裂隙编织者",
+        baseStats: { str: 6, int: 16, agi: 9, vit: 10, maxHp: 105, maxMp: 120, maxSta: 75 },
+        skills: [
+          { name: "Arcane Bolt", nameZh: "奥术冲击", costType: "mp", cost: 16, cd: 2, mult: 1.65, stat: "int", effect: "none", desc: "165% INT Arcane DMG", descZh: "165%智力纯粹奥术伤害" },
+          { name: "Supernova", nameZh: "超新星爆发", costType: "mp", cost: 30, cd: 4, mult: 2.1, stat: "int", effect: "burn", desc: "210% INT DMG + Burn", descZh: "210%智力伤害 + 烈焰灼烧" },
+          { name: "Mana Barrier", nameZh: "法力屏障", costType: "mp", cost: 22, cd: 5, mult: 0, stat: "int", effect: "shield_heal", desc: "Heal 32% HP + Shield", descZh: "恢复32%生命 + 奥术结界" }
+        ]
+      },
+      shadowblade: {
+        name: "Shadowblade", nameZh: "暗影刺客", title: "Phantom of the Wilds · 荒野魅影",
+        baseStats: { str: 10, int: 8, agi: 16, vit: 10, maxHp: 115, maxMp: 65, maxSta: 120 },
+        skills: [
+          { name: "Viper Strike", nameZh: "毒蛇突袭", costType: "sta", cost: 15, cd: 2, mult: 1.45, stat: "agi", effect: "poison", desc: "145% AGI DMG + Venom", descZh: "145%敏捷伤害 + 剧毒持续伤害" },
+          { name: "Shadowstep Ambush", nameZh: "暗影步伏击", costType: "sta", cost: 28, cd: 4, mult: 2.25, stat: "agi", effect: "crit", desc: "225% AGI Crit Strike", descZh: "225%敏捷必定暴击伤害" },
+          { name: "Smoke Veil", nameZh: "烟幕隐身", costType: "mp", cost: 18, cd: 5, mult: 0, stat: "agi", effect: "evade_heal", desc: "Heal 32% HP + Evasion", descZh: "恢复32%生命 + 高额闪避帷幕" }
+        ]
+      }
+    };
+
+    const ITEM_CATALOG = {
+      "Moonpetal Herb":  { name: "Moonpetal Herb", nameZh: "月瓣草", type: "material", rarity: "common", value: 8, desc: "Luminescent forest herb.", descZh: "发光的森林草药，炼金必备。" },
+      "Copper Ore":      { name: "Copper Ore", nameZh: "赤铜矿石", type: "material", rarity: "common", value: 10, desc: "Raw metallic ore from the Wilds.", descZh: "采自低语荒野的原生铜矿。" },
+      "Luminous Cap":    { name: "Luminous Cap", nameZh: "荧光菌伞", type: "material", rarity: "uncommon", value: 16, desc: "Spore-cap rich in mana.", descZh: "富含法力精华的发光孢子菌。" },
+      "Silver Ore":      { name: "Silver Ore", nameZh: "纯银矿石", type: "material", rarity: "uncommon", value: 22, desc: "Conductive silver from dark crypts.", descZh: "采自幽暗地宫的导魔银矿。" },
+      "Firebloom":       { name: "Firebloom", nameZh: "火绒花", type: "material", rarity: "rare", value: 35, desc: "Volcanic blossom radiating heat.", descZh: "散发炽热火元素的火山奇花。" },
+      "Mythril Ore":     { name: "Mythril Ore", nameZh: "秘银矿石", type: "material", rarity: "rare", value: 48, desc: "Feather-light dwarven metal.", descZh: "轻若鸿毛却坚不可摧的矮人秘银。" },
+      "Aether Crystal":  { name: "Aether Crystal", nameZh: "以太水晶", type: "material", rarity: "epic", value: 70, desc: "Crystallized arcane energy.", descZh: "晶洞深处凝结的高纯度奥术水晶。" },
+      "Star-Metal":      { name: "Star-Metal", nameZh: "星辰金属", type: "material", rarity: "mythic", value: 120, desc: "Cosmic alloy from dying stars.", descZh: "由陨落星辰核心锻造的宇宙神金。" },
+      "Crypt Key":       { name: "Crypt Key", nameZh: "地宫秘钥", type: "key", rarity: "rare", value: 50, desc: "Garrick's old crypt token, kept as proof of your victory. The Catacombs are freely accessible.", descZh: "加里克留下的古老墓穴凭证，作为胜利的纪念。沉没墓穴可自由进入。" },
+
+      "Minor Healing Draught": { name: "Minor Healing Draught", nameZh: "初级治疗药剂", type: "consumable", rarity: "common", value: 20, healHp: 65, healMp: 0, healSta: 20, desc: "Restores 65 HP & 20 STA.", descZh: "恢复 65 点生命与 20 点体力。" },
+      "Arcane Mana Vial":      { name: "Arcane Mana Vial", nameZh: "奥术法力瓶", type: "consumable", rarity: "uncommon", value: 28, healHp: 20, healMp: 60, healSta: 30, desc: "Restores 60 MP, 30 STA & 20 HP.", descZh: "恢复 60 点法力、30 点体力与 20 点生命。" },
+      "Greater Healing Elixir":{ name: "Greater Healing Elixir", nameZh: "强效治愈灵药", type: "consumable", rarity: "rare", value: 65, healHp: 180, healMp: 50, healSta: 50, desc: "Restores 180 HP, 50 MP & 50 STA.", descZh: "恢复 180 点生命、50 点法力与 50 点体力。" },
+      "Elixir of the Titans":  { name: "Elixir of the Titans", nameZh: "泰坦不朽合剂", type: "consumable", rarity: "epic", value: 140, healHp: 400, healMp: 150, healSta: 100, desc: "Restores 400 HP, 150 MP & 100 STA.", descZh: "恢复 400 点生命、150 点法力与 100 点体力。" },
+
+      "Rusty Iron Blade":       { name: "Rusty Iron Blade", nameZh: "锈蚀铁剑", type: "equipment", slot: "weapon", rarity: "common", value: 25, atk: 8, mag: 2, def: 0, crit: 2, desc: "+8 ATK, +2 MAG", descZh: "基础制式铁剑 (+8物攻, +2法强)" },
+      "Viper Fang Dagger":      { name: "Viper Fang Dagger", nameZh: "毒牙短匕", type: "equipment", slot: "weapon", rarity: "uncommon", value: 55, atk: 15, mag: 6, def: 2, crit: 6, desc: "+15 ATK, +6% Crit", descZh: "淬毒弯匕 (+15物攻, +6%暴击)" },
+      "Bandit King's Cleaver":  { name: "Bandit King's Cleaver", nameZh: "强盗王重斩刀", type: "equipment", slot: "weapon", rarity: "rare", value: 120, atk: 24, mag: 8, def: 5, crit: 8, desc: "+24 ATK, +5 DEF, +8% Crit", descZh: "加里克的战刀 (+24物攻, +5防御, +8%暴击)" },
+      "Templar Runeblade":      { name: "Templar Runeblade", nameZh: "圣殿符文剑", type: "equipment", slot: "weapon", rarity: "rare", value: 165, atk: 32, mag: 22, def: 8, crit: 7, desc: "+32 ATK, +22 MAG, +8 DEF", descZh: "刻有圣堂护印的长剑 (+32物攻, +22法强)" },
+      "Soulbinder's Staff":     { name: "Soulbinder's Staff", nameZh: "缚魂者法杖", type: "equipment", slot: "weapon", rarity: "epic", value: 280, atk: 28, mag: 48, def: 10, crit: 10, desc: "+48 MAG, +28 ATK, +10% Crit", descZh: "脉动翠绿魂火的法杖 (+48法强, +28物攻)" },
+      "Cinderforged Greatsword":{ name: "Cinderforged Greatsword", nameZh: "烬铸巨剑", type: "equipment", slot: "weapon", rarity: "epic", value: 340, atk: 54, mag: 25, def: 12, crit: 11, desc: "+54 ATK, +25 MAG, +12 DEF", descZh: "熔岩核心矮人巨剑 (+54物攻, +25法强)" },
+      "Vulcan's Worldbreaker":  { name: "Vulcan's Worldbreaker", nameZh: "伏尔甘灭世战锤", type: "equipment", slot: "weapon", rarity: "mythic", value: 650, atk: 82, mag: 55, def: 22, crit: 14, desc: "+82 ATK, +55 MAG, +22 DEF", descZh: "泰坦熔炉领主战锤 (+82物攻, +55法强)" },
+      "Void-Edge Katana":       { name: "Void-Edge Katana", nameZh: "虚空之刃", type: "equipment", slot: "weapon", rarity: "epic", value: 480, atk: 68, mag: 42, def: 14, crit: 16, desc: "+68 ATK, +42 MAG, +16% Crit", descZh: "斩裂维度的名刀 (+68物攻, +16%暴击)" },
+      "Eclipse Glaive of Vaelen":{ name: "Eclipse Glaive of Vaelen", nameZh: "维伦日蚀战戟", type: "equipment", slot: "weapon", rarity: "mythic", value: 850, atk: 105, mag: 80, def: 26, crit: 18, desc: "+105 ATK, +80 MAG, +18% Crit", descZh: "虚空先驱双刃长戟 (+105物攻, +80法强)" },
+      "Sovereign Blade of Cosmos":{ name: "Sovereign Blade of Cosmos", nameZh: "寰宇君王神剑", type: "equipment", slot: "weapon", rarity: "mythic", value: 1500, atk: 145, mag: 130, def: 40, crit: 22, desc: "+145 ATK, +130 MAG, +40 DEF", descZh: "奇点之心铸就的创世神剑 (+145物攻, +130法强)" },
+
+      "Scout Leather Armor":    { name: "Scout Leather Armor", nameZh: "斥候皮甲", type: "equipment", slot: "armor", rarity: "common", value: 35, atk: 2, mag: 2, def: 10, crit: 2, desc: "+10 DEF, +2 ATK", descZh: "轻便游侠皮甲 (+10防御, +2物攻)" },
+      "Oakheart Buckler":       { name: "Oakheart Buckler", nameZh: "橡心圆盾", type: "equipment", slot: "relic", rarity: "uncommon", value: 60, atk: 4, mag: 4, def: 14, crit: 2, desc: "+14 DEF, +4 ATK/MAG", descZh: "铁橡木护符盾 (+14防御, +4攻魔)" },
+      "Oakhaven Tabard":        { name: "Oakhaven Tabard", nameZh: "橡木港战袍", type: "equipment", slot: "armor", rarity: "rare", value: 130, atk: 8, mag: 8, def: 24, crit: 4, desc: "+24 DEF, +8 ATK/MAG", descZh: "橡木港精锐锁甲 (+24防御, +8攻魔)" },
+      "Boneweave Mantle":       { name: "Boneweave Mantle", nameZh: "织骨冠冕", type: "equipment", slot: "helm", rarity: "uncommon", value: 85, atk: 5, mag: 12, def: 15, crit: 3, desc: "+15 DEF, +12 MAG", descZh: "万骨回廊死灵头冠 (+15防御, +12法强)" },
+      "Archivist Tome Ring":    { name: "Archivist Tome Ring", nameZh: "档案官魔典戒", type: "equipment", slot: "ring", rarity: "rare", value: 150, atk: 8, mag: 22, def: 8, crit: 6, desc: "+22 MAG, +6% Crit", descZh: "禁忌抄写室印戒 (+22法强, +6%暴击)" },
+      "Ranger's Signet Ring":   { name: "Ranger's Signet Ring", nameZh: "游侠徽记戒", type: "equipment", slot: "ring", rarity: "uncommon", value: 75, atk: 9, mag: 6, def: 6, crit: 5, desc: "+9 ATK, +6 DEF, +5% Crit", descZh: "橡木港游侠翠戒 (+9物攻, +6防御)" },
+      "Soulfire Lantern":       { name: "Soulfire Lantern", nameZh: "魂火提灯", type: "equipment", slot: "relic", rarity: "epic", value: 290, atk: 18, mag: 32, def: 20, crit: 8, desc: "+32 MAG, +20 DEF, +8% Crit", descZh: "照亮幽冥深渊的提灯 (+32法强, +20防御)" },
+      "Clockwork Aegis":        { name: "Clockwork Aegis", nameZh: "发条神盾甲", type: "equipment", slot: "armor", rarity: "epic", value: 320, atk: 14, mag: 14, def: 42, crit: 5, desc: "+42 DEF, +14 ATK/MAG", descZh: "矮人精密齿轮重甲 (+42防御, +14攻魔)" },
+      "Drake-Scale Cuirass":    { name: "Drake-Scale Cuirass", nameZh: "龙鳞胸甲", type: "equipment", slot: "armor", rarity: "epic", value: 410, atk: 22, mag: 20, def: 54, crit: 8, desc: "+54 DEF, +22 ATK", descZh: "火碎飞龙鳞片重甲 (+54防御, +22物攻)" },
+      "Pyromancer's Signet":    { name: "Pyromancer's Signet", nameZh: "烈焰术士指环", type: "equipment", slot: "ring", rarity: "epic", value: 280, atk: 20, mag: 35, def: 12, crit: 10, desc: "+35 MAG, +20 ATK, +10% Crit", descZh: "脉动火山熔岩的红宝石戒 (+35法强)" },
+      "Prism Heart Relic":      { name: "Prism Heart Relic", nameZh: "棱镜之心圣物", type: "equipment", slot: "relic", rarity: "epic", value: 390, atk: 25, mag: 40, def: 28, crit: 9, desc: "+40 MAG, +28 DEF, +25 ATK", descZh: "折射奥术光芒的晶核 (+40法强, +28防御)" },
+      "Chrono Band":            { name: "Chrono Band", nameZh: "时空指环", type: "equipment", slot: "ring", rarity: "epic", value: 460, atk: 32, mag: 42, def: 22, crit: 12, desc: "+42 MAG, +32 ATK, +12% Crit", descZh: "扭曲局部时间的星戒 (+42法强, +12%暴击)" },
+      "Celestial Plate":        { name: "Celestial Plate", nameZh: "天界星光铠甲", type: "equipment", slot: "armor", rarity: "mythic", value: 780, atk: 40, mag: 45, def: 85, crit: 12, desc: "+85 DEF, +45 MAG, +40 ATK", descZh: "星界堡垒灌注的战铠 (+85防御, +40物攻)" },
+      "Nexus Sovereign Relic":  { name: "Nexus Sovereign Relic", nameZh: "星枢君王圣物", type: "equipment", slot: "relic", rarity: "mythic", value: 820, atk: 48, mag: 65, def: 45, crit: 15, desc: "+65 MAG, +48 ATK, +45 DEF", descZh: "凝聚群星脉动的圣物 (+65法强, +48物攻)" },
+      "Crown of Eternity":      { name: "Crown of Eternity", nameZh: "永恒星冕", type: "equipment", slot: "helm", rarity: "mythic", value: 1200, atk: 65, mag: 75, def: 60, crit: 18, desc: "+75 MAG, +65 ATK, +60 DEF", descZh: "星界主宰的不朽王冠 (+75法强, +65物攻)" }
+    };
+
+    const CRAFTING_RECIPES = [
+      { id: "rec_heal_1", output: "Minor Healing Draught", qty: 2, ingredients: { "Moonpetal Herb": 1 }, desc: "Brew 2x Minor Healing Draughts", descZh: "炼制 2瓶 初级治疗药剂" },
+      { id: "rec_mana_1", output: "Arcane Mana Vial", qty: 2, ingredients: { "Luminous Cap": 1 }, desc: "Distill 2x Arcane Mana Vials", descZh: "提炼 2瓶 奥术法力瓶" },
+      { id: "rec_heal_2", output: "Greater Healing Elixir", qty: 2, ingredients: { "Firebloom": 1, "Moonpetal Herb": 1 }, desc: "Brew 2x Greater Healing Elixirs", descZh: "炼制 2瓶 强效治愈灵药" },
+      { id: "rec_titan_elixir", output: "Elixir of the Titans", qty: 1, ingredients: { "Aether Crystal": 1, "Firebloom": 1 }, desc: "Transmute 1x Elixir of the Titans", descZh: "转化 1瓶 泰坦不朽合剂" },
+      { id: "rec_viper_dagger", output: "Viper Fang Dagger", qty: 1, ingredients: { "Copper Ore": 2, "Luminous Cap": 1 }, desc: "Forge Viper Fang Dagger (+15 ATK)", descZh: "锻造 毒牙短匕 (+15物攻)" },
+      { id: "rec_oakhaven_armor", output: "Oakhaven Tabard", qty: 1, ingredients: { "Copper Ore": 2, "Silver Ore": 1 }, desc: "Forge Oakhaven Tabard (+24 DEF)", descZh: "锻造 橡木港战袍 (+24防御)" },
+      { id: "rec_templar_blade", output: "Templar Runeblade", qty: 1, ingredients: { "Silver Ore": 2, "Luminous Cap": 1 }, desc: "Forge Templar Runeblade (+32 ATK)", descZh: "锻造 圣殿符文剑 (+32物攻)" },
+      { id: "rec_cinder_sword", output: "Cinderforged Greatsword", qty: 1, ingredients: { "Mythril Ore": 2, "Firebloom": 1 }, desc: "Forge Cinderforged Greatsword (+54 ATK)", descZh: "锻造 烬铸巨剑 (+54物攻)" },
+      { id: "rec_celestial_plate", output: "Celestial Plate", qty: 1, ingredients: { "Star-Metal": 1, "Mythril Ore": 2, "Aether Crystal": 1 }, desc: "Forge Mythic Celestial Plate (+85 DEF)", descZh: "锻造 天界星光铠甲 (+85防御)" },
+      { id: "rec_cosmos_blade", output: "Sovereign Blade of Cosmos", qty: 1, ingredients: { "Star-Metal": 2, "Aether Crystal": 2 }, desc: "Forge Mythic Sovereign Blade (+145 ATK)", descZh: "锻造 寰宇君王神剑 (+145物攻)" }
+    ];
+
+    const SHOP_ITEMS = [
+      "Minor Healing Draught",
+      "Arcane Mana Vial",
+      "Greater Healing Elixir",
+      "Scout Leather Armor",
+      "Viper Fang Dagger",
+      "Oakhaven Tabard",
+      "Archivist Tome Ring"
+    ];
+
+    const STORY_QUESTS = [
+      {
+        id: "q1_wilds",
+        title: "Ch.1: Whispers in the Wilds", titleZh: "第一章：荒野低语",
+        giver: "Elder Thorne · 索恩长老",
+        desc: "Harvest 1 Moonpetal Herb and slay 2 wild creatures north of Oakhaven.",
+        descZh: "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。",
+        reqKills: 2, reqItem: "Moonpetal Herb", reqItemQty: 1,
+        rewardXp: 120, rewardGold: 80, rewardItem: "Ranger's Signet Ring"
+      },
+      {
+        id: "q2_bandit_king",
+        title: "Ch.2: The Bandit King's Toll", titleZh: "第二章：强盗之王的买路钱",
+        giver: "Commander Vance · 万斯指挥官",
+        desc: "Storm Thornwood Bandit Palisade and defeat Garrick the Bandit King.",
+        descZh: "攻入游侠前哨北方的荆棘木强盗营寨，击败强盗王加里克。",
+        reqBoss: "boss_garrick",
+        rewardXp: 280, rewardGold: 160, rewardItem: "Oakhaven Tabard"
+      },
+      {
+        id: "q3_sunken_lich",
+        title: "Ch.3: Echoes of the Drowned Crypt", titleZh: "第三章：沉没地宫的回响",
+        giver: "Alchemist Lyra · 炼金术士莱拉",
+        desc: "Descend into the Sunken Catacombs and vanquish Malakor the Soul-Binder.",
+        descZh: "从银溪浅滩向下进入沉没地下墓穴，击败缚魂者马拉科尔。",
+        reqBoss: "boss_malakor",
+        rewardXp: 580, rewardGold: 320, rewardItem: "Soulfire Lantern"
+      },
+      {
+        id: "q4_titan_forge",
+        title: "Ch.4: Reigniting the Runeforge", titleZh: "第四章：重燃泰坦符文熔炉",
+        giver: "Engineer Borin · 工程师博林",
+        desc: "Ascend to the Molten Caldera Throne and defeat Ignis-Vulcan.",
+        descZh: "登上烬峰的熔火火山口王座，击败泰坦熔炉领主伊格尼斯·伏尔甘。",
+        reqBoss: "boss_ignis_vulcan",
+        rewardXp: 1150, rewardGold: 650, rewardItem: "Vulcan's Worldbreaker"
+      },
+      {
+        id: "q5_astral_architect",
+        title: "Ch.5: Architect of the Void", titleZh: "第五章：虚空建筑师",
+        giver: "Researcher Kaelen · 研究员凯伦",
+        desc: "Breach the Heart of the Shattered Rift and defeat Xal'korath.",
+        descZh: "突破至破碎裂隙之心，击败虚空建筑师萨尔科拉斯。",
+        reqBoss: "boss_xalkorath",
+        rewardXp: 2500, rewardGold: 1500, rewardItem: "Crown of Eternity"
+      }
+    ];
+
+    const ACHIEVEMENT_DEFS = [
+      { id: "ach_first_blood", title: "First Blood · 初战告捷", desc: "Win your first combat encounter (+5 Max HP)", descZh: "赢得第一场战斗胜利（+5 最大生命）", bonus: "+5 HP" },
+      { id: "ach_forager", title: "Wilderness Gatherer · 荒野采集者", desc: "Harvest 3 resource nodes (+10% Gold Find)", descZh: "累计采集3次资源节点（+10% 金币获取）", bonus: "+10% Gold" },
+      { id: "ach_artisan", title: "Runeforge Artisan · 符文工匠", desc: "Craft any item at the Forge (+3 ATK/MAG)", descZh: "在锻造台合成任意物品（+3 物攻/法强）", bonus: "+3 ATK/MAG" },
+      { id: "ach_cartographer", title: "Master Cartographer · 星图测绘师", desc: "Explore at least 10 rooms (+10 Max STA)", descZh: "探索至少10个地图房间（+10 最大体力）", bonus: "+10 STA" },
+      { id: "ach_boss_slayer", title: "Bane of Tyrants · 暴君克星", desc: "Defeat any Region Boss (+8% Crit)", descZh: "击败任意区域首领（+8% 暴击率）", bonus: "+8% Crit" },
+      { id: "ach_rift_walker", title: "Astral Rift Walker · 裂隙行者", desc: "Clear Wave 1 of Endless Rift (+5 All Stats)", descZh: "通关无尽裂隙第1波（全属性 +5）", bonus: "+5 Stats" }
+    ];
+
+    // =========================================================================
+    // 3. LOCAL AI TRANSLATION HELPERS (model implementation in ai-dm.js)
+    // =========================================================================
+    // AI DM is implemented in src/ai-dm.js. Model inference runs in a dedicated Worker.
+    function translateTimeZh(t) { return { Dawn: "黎明", Day: "白昼", Dusk: "黄昏", Midnight: "午夜" }[t] || t; }
+    function translateWeatherZh(w) { return { "Clear Skies": "万里晴空", "Emerald Mist": "翡翠迷雾", "Arcane Storm": "奥术风暴", "Blood Moon": "血月降临" }[w] || w; }
+    function translateStanceZh(s) { return { balanced: "均衡", aggressive: "狂攻", defensive: "守护" }[s] || s; }
+
+    // =========================================================================
+    // 4. SYNTHESIZED WEB AUDIO SOUND ENGINE (ZERO EXTERNAL FILES)
+    // =========================================================================
+    const SynthAudio = {
+      ctx: null,
+      enabled: true,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === "suspended") {
+          this.ctx.resume().catch(() => {});
+        }
+      },
+      play(type) {
+        if (!this.enabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          if (type === "step") {
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(140, now);
+            osc.frequency.exponentialRampToValueAtTime(75, now + 0.06);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            osc.start(now); osc.stop(now + 0.06);
+          } else if (type === "hit") {
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(90, now + 0.11);
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+            osc.start(now); osc.stop(now + 0.11);
+          } else if (type === "skill") {
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.exponentialRampToValueAtTime(640, now + 0.18);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            osc.start(now); osc.stop(now + 0.18);
+          } else if (type === "loot") {
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.07);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            osc.start(now); osc.stop(now + 0.18);
+          } else if (type === "levelup") {
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(554.37, now + 0.08);
+            osc.frequency.setValueAtTime(659.25, now + 0.16);
+            osc.frequency.setValueAtTime(880, now + 0.24);
+            gain.gain.setValueAtTime(0.11, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+            osc.start(now); osc.stop(now + 0.38);
+          }
+        } catch (e) {}
+      }
+    };
+
+    // =========================================================================
+    // 5. CENTRAL GAME STATE
+    // =========================================================================
+    const STORAGE_KEY = "aethelgard_mud_save_v2";
+    let tickIntervalHandle = null;
+    let autoWalkHandle = null;
+    let selectedClassOption = "vanguard";
+
+    function createInitialState() {
+      return {
+        version: "v10",
+        lang: "en",
+        tickCount: 1,
+        tickSpeed: "normal",
+        timeOfDay: "Day",
+        weather: "Clear Skies",
+        logFilter: "all",
+        autoHunt: false,
+        rightTab: "quests",
+        mapZoom: 1.0,
+        cmdHistory: [],
+        cmdHistoryIdx: -1,
+        player: {
+          name: "Kaelen",
+          classId: "vanguard",
+          level: 1,
+          xp: 0,
+          xpNext: 100,
+          gold: 60,
+          shards: 0,
+          rep: 0,
+          hp: 140,
+          maxHp: 140,
+          mp: 45,
+          maxMp: 45,
+          sta: 100,
+          maxSta: 100,
+          stats: { str: 14, int: 6, agi: 8, vit: 14 },
+          statPoints: 2,
+          talentPoints: 1,
+          talents: { warlord: 0, mystic: 0, pathfinder: 0 },
+          stance: "balanced",
+          refineLevel: 0,
+          buffs: [],
+          cooldowns: [0, 0, 0],
+          equipment: {
+            weapon: "Rusty Iron Blade",
+            armor: "Scout Leather Armor",
+            helm: null,
+            ring: null,
+            relic: null
+          },
+          inventory: {
+            "Minor Healing Draught": 3,
+            "Arcane Mana Vial": 2,
+            "Moonpetal Herb": 1,
+            "Copper Ore": 1
+          }
+        },
+        world: {
+          currentRoom: "r_town_square",
+          visitedRooms: ["r_town_square"],
+          roomGroundItems: {},
+          harvestedCooldowns: {},
+          defeatedBosses: []
+        },
+        combat: {
+          inCombat: false,
+          enemy: null
+        },
+        quests: {
+          completed: [],
+          bounties: [
+            { id: "b1", desc: "Hunt 2 Creatures in Whispering Wilds", descZh: "在低语荒野狩猎 2 只生物", targetKills: 2, progress: 0, rewardGold: 55, rewardXp: 80, claimed: false },
+            { id: "b2", desc: "Gather 2 Crafting Materials", descZh: "采集 2 份锻造与炼金材料", targetHarvests: 2, progress: 0, rewardGold: 50, rewardXp: 70, claimed: false },
+            { id: "b3", desc: "Vanquish 1 Elite or Region Boss", descZh: "击败 1 名精英或区域首领", targetBoss: 1, progress: 0, rewardGold: 150, rewardXp: 200, claimed: false }
+          ]
+        },
+        telemetry: {
+          kills: 0,
+          harvests: 0,
+          crafted: 0,
+          bossesKilled: 0,
+          riftBestWave: 0,
+          activeRiftWave: 0
+        },
+        achievements: {},
+        logs: [],
+        aiLogs: []
+      };
+    }
+
+    let state = createInitialState();
+
+    // =========================================================================
+    // 6. BILINGUAL LOGGING, TOASTS & DERIVED STATS
+    // =========================================================================
+    function fallbackTranslateToZh(enText) {
+      const s = String(enText || "");
+      if (s.startsWith(">")) return `指令输入：${s.slice(1).trim()}`;
+      return "艾瑟尔加德编年史交互记录 · 双语同步显示";
+    }
+
+    function addLog(textEn, category = "world", colorClass = "text-slate-200", textZh = "") {
+      const zhLine = textZh || fallbackTranslateToZh(textEn);
+      state.logs.push({
+        id: Date.now() + Math.random(),
+        tick: state.tickCount,
+        category,
+        text: textEn,
+        textZh: zhLine,
+        colorClass
+      });
+      if (state.logs.length > 140) state.logs.shift();
+      renderTerminalLog();
+    }
+
+    function showToast(title, subtitle, borderClass = "border-amber-500/60") {
+      const container = document.getElementById("toast-container");
+      if (!container) return;
+      const el = document.createElement("div");
+      el.className = `bg-[#111726]/95 border ${borderClass} rounded-xl px-3 py-2 shadow-xl text-xs transition-all duration-300`;
+      el.innerHTML = `<div class="font-bold text-amber-300">${escapeHtml(title)}</div><div class="text-slate-300 text-[11px] mt-0.5">${escapeHtml(subtitle)}</div>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function computeDerivedStats() {
+      const p = state.player;
+      const achBonus = state.achievements.ach_rift_walker ? 5 : 0;
+      const str = p.stats.str + achBonus;
+      const intStat = p.stats.int + achBonus;
+      const agi = p.stats.agi + achBonus;
+      const vit = p.stats.vit + achBonus;
+
+      let equipAtk = 0, equipMag = 0, equipDef = 0, equipCrit = 0;
+      Object.values(p.equipment).forEach((itemName) => {
+        if (itemName && ITEM_CATALOG[itemName]) {
+          const it = ITEM_CATALOG[itemName];
+          equipAtk += it.atk || 0;
+          equipMag += it.mag || 0;
+          equipDef += it.def || 0;
+          equipCrit += it.crit || 0;
+        }
+      });
+
+      const refineMult = 1 + p.refineLevel * 0.12;
+      const artisanBonus = state.achievements.ach_artisan ? 3 : 0;
+      const setM = typeof computeSetMultipliers === "function" ? computeSetMultipliers() : { atkMult: 1, magMult: 1, defMult: 1, critBonus: 0 };
+      let atk = Math.round((equipAtk * refineMult + str * 2.2 + agi * 1.1 + artisanBonus) * (1 + p.talents.warlord * 0.08) * setM.atkMult);
+      let mag = Math.round((equipMag * refineMult + intStat * 2.5 + str * 0.7 + artisanBonus) * (1 + p.talents.mystic * 0.10) * setM.magMult);
+      let def = Math.round((equipDef * refineMult + vit * 1.8 + str * 0.6) * setM.defMult);
+      let crit = Math.min(85, Math.round(6 + agi * 0.5 + equipCrit + setM.critBonus + (state.achievements.ach_boss_slayer ? 8 : 0)));
+
+      if (p.stance === "aggressive") {
+        atk = Math.round(atk * 1.25);
+        mag = Math.round(mag * 1.20);
+        def = Math.round(def * 0.82);
+        crit = Math.min(85, crit + 10);
+      } else if (p.stance === "defensive") {
+        atk = Math.round(atk * 0.85);
+        def = Math.round(def * 1.35);
+      }
+
+      if (p.buffs.includes("Guard")) def = Math.round(def * 1.3);
+      if (p.buffs.includes("ArcaneShield")) def = Math.round(def * 1.25);
+
+      const baseCfg = CLASS_CONFIG[p.classId] || CLASS_CONFIG.vanguard;
+      const maxHp = baseCfg.baseStats.maxHp + (vit - baseCfg.baseStats.vit) * 12 + (p.level - 1) * 22 + (state.achievements.ach_first_blood ? 5 : 0);
+      const maxMp = baseCfg.baseStats.maxMp + (intStat - baseCfg.baseStats.int) * 8 + (p.level - 1) * 10;
+      const maxSta = baseCfg.baseStats.maxSta + (agi - baseCfg.baseStats.agi) * 5 + (p.level - 1) * 8 + (state.achievements.ach_cartographer ? 10 : 0);
+
+      p.maxHp = maxHp;
+      p.maxMp = maxMp;
+      p.maxSta = maxSta;
+      if (p.hp > p.maxHp) p.hp = p.maxHp;
+      if (p.mp > p.maxMp) p.mp = p.maxMp;
+      if (p.sta > p.maxSta) p.sta = p.maxSta;
+
+      return { atk, mag, def, crit, str, intStat, agi, vit };
+    }
+
+    function checkAchievements() {
+      const t = state.telemetry;
+      const unlock = (id) => {
+        if (!state.achievements[id]) {
+          state.achievements[id] = true;
+          const def = ACHIEVEMENT_DEFS.find((a) => a.id === id);
+          if (def) {
+            SynthAudio.play("levelup");
+            addLog(
+              `🏅 ACHIEVEMENT UNLOCKED: [${def.title}] — ${def.desc}!`,
+              "loot",
+              "text-amber-300 font-bold",
+              `🏅 解锁成就：【${def.title}】—— ${def.descZh}！`
+            );
+            showToast(`🏅 ${def.title}`, `${def.desc} · ${def.descZh}`, "border-amber-400");
+          }
+        }
+      };
+      if (t.kills >= 1) unlock("ach_first_blood");
+      if (t.harvests >= 3) unlock("ach_forager");
+      if (t.crafted >= 1) unlock("ach_artisan");
+      if (state.world.visitedRooms.length >= 10) unlock("ach_cartographer");
+      if (t.bossesKilled >= 1) unlock("ach_boss_slayer");
+      if (t.riftBestWave >= 1) unlock("ach_rift_walker");
+    }
+
+    // =========================================================================
+    // 7. WORLD HEARTBEAT & BILINGUAL COMBAT ENGINE
+    // =========================================================================
+    function startHeartbeat() {
+      if (tickIntervalHandle) clearInterval(tickIntervalHandle);
+      if (state.tickSpeed === "paused") return;
+      const ms = state.tickSpeed === "fast" ? 1200 : 2500;
+      tickIntervalHandle = setInterval(() => {
+        runWorldTick();
+      }, ms);
+    }
+
+    function setTickSpeed(speed) {
+      state.tickSpeed = speed;
+      startHeartbeat();
+      renderHeader();
+      const zhMap = { normal: "标准 (2.5秒)", fast: "快速 (1.2秒)", paused: "回合制暂停" };
+      addLog(
+        `⏱️ World heartbeat speed set to: ${speed.toUpperCase()}.`,
+        "world",
+        "text-slate-400",
+        `⏱️ 世界心跳速率已设置为：${zhMap[speed] || speed}。`
+      );
+    }
+
+    function runWorldTick() {
+      state.tickCount += 1;
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom];
+
+      const phases = ["Dawn", "Day", "Dusk", "Midnight"];
+      state.timeOfDay = phases[Math.floor(state.tickCount / 12) % phases.length];
+      const weathers = ["Clear Skies", "Emerald Mist", "Arcane Storm", "Blood Moon"];
+      state.weather = weathers[Math.floor(state.tickCount / 18) % weathers.length];
+
+      p.cooldowns = p.cooldowns.map((cd) => Math.max(0, cd - 1));
+
+      const regenMult = room && room.safe ? 2.5 : 1.0;
+      p.hp = Math.min(p.maxHp, p.hp + Math.max(2, Math.round(p.maxHp * 0.03 * regenMult)));
+      p.mp = Math.min(p.maxMp, p.mp + Math.max(2, Math.round((p.maxMp * 0.05 + p.talents.mystic * 3) * regenMult)));
+      p.sta = Math.min(p.maxSta, p.sta + Math.max(4, Math.round(p.maxSta * 0.08 * regenMult)));
+
+      Object.keys(state.world.harvestedCooldowns).forEach((key) => {
+        state.world.harvestedCooldowns[key] -= 1;
+        if (state.world.harvestedCooldowns[key] <= 0) {
+          delete state.world.harvestedCooldowns[key];
+        }
+      });
+
+      if (state.combat.inCombat && state.combat.enemy) {
+        processCombatRound();
+      } else if (state.autoHunt && room && !room.safe && room.mobs && room.mobs.length > 0) {
+        engageMob(room.mobs[0]);
+      }
+
+      renderAll();
+    }
+
+    function engageMob(mobIdOrQuery) {
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!room) return;
+
+      let chosenId = null;
+      if (room.mobs && room.mobs.includes(mobIdOrQuery)) {
+        chosenId = mobIdOrQuery;
+      } else if (room.mobs && room.mobs.length > 0) {
+        const q = (mobIdOrQuery || "").toLowerCase();
+        chosenId = room.mobs.find((id) => {
+          const tpl = MOB_TEMPLATES[id];
+          return tpl && (id.toLowerCase().includes(q) || tpl.name.toLowerCase().includes(q) || (tpl.nameZh && tpl.nameZh.includes(q)));
+        }) || room.mobs[0];
+      }
+
+      if (!chosenId || !MOB_TEMPLATES[chosenId]) {
+        addLog(
+          "There are no hostile creatures matching that description here.",
+          "combat",
+          "text-slate-400",
+          "当前区域没有发现匹配的敌对生物。"
+        );
+        return;
+      }
+
+      const tpl = MOB_TEMPLATES[chosenId];
+      state.combat.inCombat = true;
+      state.combat.enemy = {
+        id: tpl.id,
+        name: tpl.name,
+        nameZh: tpl.nameZh || tpl.name,
+        level: tpl.level,
+        boss: Boolean(tpl.boss),
+        hp: tpl.hp,
+        maxHp: tpl.hp,
+        atk: tpl.atk,
+        def: tpl.def,
+        xp: tpl.xp,
+        gold: tpl.gold,
+        drops: tpl.drops || [],
+        statuses: []
+      };
+
+      SynthAudio.play("hit");
+      addLog(
+        `⚔️ You engage [${tpl.name}] (Lv.${tpl.level}, ${tpl.hp} HP)!`,
+        "combat",
+        "text-rose-400 font-semibold",
+        `⚔️ 你向【${tpl.nameZh}】（Lv.${tpl.level}，${tpl.hp} 生命）发起了战斗！`
+      );
+      processCombatRound();
+      renderAll();
+    }
+
+    function processCombatRound() {
+      const p = state.player;
+      const enemy = state.combat.enemy;
+      if (!enemy) return;
+
+      const derived = computeDerivedStats();
+
+      const isCrit = Math.random() * 100 < derived.crit;
+      const rawPlayerDmg = Math.max(derived.atk, derived.mag * 0.9) * (isCrit ? 1.65 : 1.0);
+      const playerDmg = Math.max(4, Math.round(rawPlayerDmg * (100 / (100 + enemy.def * 1.6))));
+      enemy.hp = Math.max(0, enemy.hp - playerDmg);
+
+      if (p.talents.warlord > 0) {
+        const steal = Math.max(1, Math.round(playerDmg * 0.03 * p.talents.warlord));
+        p.hp = Math.min(p.maxHp, p.hp + steal);
+      }
+      ensureFunState();
+      state.fun.comboCount += 1;
+      state.fun.overdrive = Math.min(100, state.fun.overdrive + 18);
+      const pet = getActiveCompanion();
+      const petDmg = Math.max(3, Math.round(playerDmg * pet.dmgMult * (1 + state.fun.comboCount * 0.05)));
+      enemy.hp = Math.max(0, enemy.hp - petDmg);
+      if (state.online && state.online.connected) {
+        const allyDmg = 14 + state.player.level * 5;
+        enemy.hp = Math.max(0, enemy.hp - allyDmg);
+        addLog(
+          `🤝 Online Co-op Party [${state.online.guildTag}] strikes ${enemy.name} for +${allyDmg} Allied DMG!`,
+          "combat",
+          "text-emerald-300",
+          `🤝 在线联机盟友小队【${state.online.guildTag}】协同集火【${enemy.nameZh || enemy.name}】，造成 +${allyDmg} 点联机伤害！`
+        );
+      }
+      addLog(
+        `${pet.icon} Companion [${pet.name}] co-strikes ${enemy.name} for +${petDmg} DMG (${state.fun.comboCount}x Combo, Overdrive ${state.fun.overdrive}%)!`,
+        "combat",
+        "text-indigo-300",
+        `${pet.icon} 灵魂伙伴【${pet.nameZh}】协同追击【${enemy.nameZh || enemy.name}】，造成 +${petDmg} 点伤害（${state.fun.comboCount}连击，超载 ${state.fun.overdrive}%）！`
+      );
+
+      addLog(
+        `🗡️ You strike ${enemy.name} for ${playerDmg} DMG${isCrit ? " (CRITICAL!)" : ""}. [${enemy.hp}/${enemy.maxHp} HP]`,
+        "combat",
+        isCrit ? "text-amber-300 font-semibold" : "text-rose-200",
+        `🗡️ 你攻击了【${enemy.nameZh || enemy.name}】，造成 ${playerDmg} 点伤害${isCrit ? "（暴击！）" : ""}。[${enemy.hp}/${enemy.maxHp} 生命]`
+      );
+
+      if (enemy.statuses.length > 0 && enemy.hp > 0) {
+        const dotDmg = Math.max(3, Math.round((derived.atk + derived.mag) * 0.22));
+        enemy.hp = Math.max(0, enemy.hp - dotDmg);
+        addLog(
+          `🔥 ${enemy.name} suffers ${dotDmg} affliction damage (${enemy.statuses.join(", ")})!`,
+          "combat",
+          "text-purple-300",
+          `🔥 【${enemy.nameZh || enemy.name}】受到 ${dotDmg} 点持续状态伤害（${enemy.statuses.join(", ")}）！`
+        );
+      }
+
+      if (enemy.hp <= 0) {
+        handleEnemyDefeated(enemy);
+        return;
+      }
+
+      const stunIdx = enemy.statuses.indexOf("Stunned");
+      if (stunIdx !== -1) {
+        enemy.statuses.splice(stunIdx, 1);
+        addLog(
+          `⚡ ${enemy.name} is STUNNED and misses its turn!`,
+          "combat",
+          "text-sky-300",
+          `⚡ 【${enemy.nameZh || enemy.name}】处于眩晕状态，无法行动！`
+        );
+        return;
+      }
+
+      if (p.buffs.includes("EvasionVeil") && Math.random() < 0.45) {
+        addLog(
+          `💨 You dodge ${enemy.name}'s attack inside your Smoke Veil!`,
+          "combat",
+          "text-emerald-300",
+          `💨 你凭借烟幕隐身闪避了【${enemy.nameZh || enemy.name}】的攻击！`
+        );
+        return;
+      }
+
+      const rawEnemyDmg = enemy.atk * (0.9 + Math.random() * 0.2);
+      const enemyDmg = Math.max(1, Math.round(rawEnemyDmg * (100 / (100 + derived.def * 1.9))));
+      p.hp = Math.max(0, p.hp - enemyDmg);
+      addLog(
+        `💥 ${enemy.name} hits you for ${enemyDmg} DMG! [${p.hp}/${p.maxHp} HP]`,
+        "combat",
+        "text-rose-400",
+        `💥 【${enemy.nameZh || enemy.name}】击中了你，造成 ${enemyDmg} 点伤害！[${p.hp}/${p.maxHp} 生命]`
+      );
+
+      if (p.hp <= 0) {
+        handlePlayerDefeated();
+      }
+    }
+
+    function useSkill(skillIdx) {
+      const p = state.player;
+      const cfg = CLASS_CONFIG[p.classId] || CLASS_CONFIG.vanguard;
+      const skill = cfg.skills[skillIdx];
+      if (!skill) return;
+
+      if (p.cooldowns[skillIdx] > 0) {
+        addLog(
+          `⏳ [${skill.name}] is on cooldown (${p.cooldowns[skillIdx]} ticks remaining).`,
+          "combat",
+          "text-slate-400",
+          `⏳ 技能【${skill.nameZh}】冷却中（剩余 ${p.cooldowns[skillIdx]} 回合）。`
+        );
+        return;
+      }
+
+      const poolKey = skill.costType === "mp" ? "mp" : "sta";
+      if (p[poolKey] < skill.cost) {
+        addLog(
+          `⚠️ Not enough ${skill.costType.toUpperCase()} to use ${skill.name} (Needs ${skill.cost}).`,
+          "combat",
+          "text-amber-300",
+          `⚠️ ${skill.costType === "mp" ? "法力" : "体力"}不足，无法释放【${skill.nameZh}】（需要 ${skill.cost} 点）。`
+        );
+        return;
+      }
+
+      p[poolKey] -= skill.cost;
+      p.cooldowns[skillIdx] = skill.cd;
+      SynthAudio.play("skill");
+
+      if (skill.effect === "heal_guard" || skill.effect === "shield_heal" || skill.effect === "evade_heal") {
+        const healAmt = Math.round(p.maxHp * 0.32);
+        p.hp = Math.min(p.maxHp, p.hp + healAmt);
+        const buffName = skill.effect === "heal_guard" ? "Guard" : (skill.effect === "shield_heal" ? "ArcaneShield" : "EvasionVeil");
+        if (!p.buffs.includes(buffName)) p.buffs.push(buffName);
+        addLog(
+          `✨ You cast [${skill.name}], restoring ${healAmt} HP and gaining [${buffName}]!`,
+          "combat",
+          "text-emerald-300 font-semibold",
+          `✨ 你施展了【${skill.nameZh}】，恢复 ${healAmt} 点生命并获得【${buffName}】增益！`
+        );
+        renderAll();
+        return;
+      }
+
+      if (!state.combat.inCombat || !state.combat.enemy) {
+        const room = WORLD_ROOMS[state.world.currentRoom];
+        if (room && room.mobs && room.mobs.length > 0) {
+          engageMob(room.mobs[0]);
+        } else {
+          addLog(
+            `You unleash [${skill.name}] into the air! Engage a hostile target first.`,
+            "combat",
+            "text-slate-400",
+            `你向空气挥出了【${skill.nameZh}】！请先选择一名敌对目标。`
+          );
+          renderAll();
+          return;
+        }
+      }
+
+      const enemy = state.combat.enemy;
+      if (!enemy) return;
+      const derived = computeDerivedStats();
+      const basePower = skill.stat === "int" ? derived.mag : derived.atk;
+      const skillDmg = Math.max(8, Math.round(basePower * skill.mult * (100 / (100 + enemy.def * 1.4))));
+      enemy.hp = Math.max(0, enemy.hp - skillDmg);
+
+      if (skill.effect === "stun" && !enemy.statuses.includes("Stunned")) enemy.statuses.push("Stunned");
+      if (skill.effect === "bleed" && !enemy.statuses.includes("Bleeding")) enemy.statuses.push("Bleeding");
+      if (skill.effect === "burn" && !enemy.statuses.includes("Burning")) enemy.statuses.push("Burning");
+      if (skill.effect === "poison" && !enemy.statuses.includes("Poisoned")) enemy.statuses.push("Poisoned");
+
+      addLog(
+        `⚡ SKILL [${skill.name}] blasts ${enemy.name} for ${skillDmg} DMG!`,
+        "combat",
+        "text-sky-300 font-bold",
+        `⚡ 技能【${skill.nameZh}】重创了【${enemy.nameZh || enemy.name}】，造成 ${skillDmg} 点伤害！`
+      );
+
+      if (enemy.hp <= 0) {
+        handleEnemyDefeated(enemy);
+      }
+      renderAll();
+    }
+
+    function handleEnemyDefeated(enemy) {
+      const p = state.player;
+      state.combat.inCombat = false;
+      state.combat.enemy = null;
+      p.buffs = [];
+
+      const bonusMult = 1 + p.talents.pathfinder * 0.15 + (state.weather === "Clear Skies" ? 0.05 : 0.10);
+      const xpGain = Math.round(enemy.xp * bonusMult);
+      const goldGain = Math.round(enemy.gold * (1 + p.talents.pathfinder * 0.15 + (state.achievements.ach_forager ? 0.10 : 0)));
+
+      p.xp += xpGain;
+      p.gold += goldGain;
+      p.rep += enemy.boss ? 15 : 2;
+      state.telemetry.kills += 1;
+
+      if (enemy.boss) {
+        state.telemetry.bossesKilled += 1;
+        p.shards += 3;
+        if (!state.world.defeatedBosses.includes(enemy.id)) {
+          state.world.defeatedBosses.push(enemy.id);
+        }
+      }
+
+      if (enemy.isRiftWave) {
+        p.shards += 5;
+        state.telemetry.riftBestWave = Math.max(state.telemetry.riftBestWave, state.telemetry.activeRiftWave);
+        addLog(
+          `🌀 RIFT WAVE ${state.telemetry.activeRiftWave} CLEARED! (+5 Rift Shards)`,
+          "loot",
+          "text-purple-300 font-bold",
+          `🌀 成功通关无尽裂隙第 ${state.telemetry.activeRiftWave} 波！（获得 +5 裂隙碎片）`
+        );
+      }
+
+      SynthAudio.play("loot");
+      addLog(
+        `🏆 Victory! You slayed [${enemy.name}] and gained +${xpGain} XP, +${goldGain} Gold!`,
+        "loot",
+        "text-emerald-300 font-bold",
+        `🏆 战斗胜利！你击败了【${enemy.nameZh || enemy.name}】，获得 +${xpGain} 经验、+${goldGain} 金币！`
+      );
+
+      if (enemy.drops && enemy.drops.length > 0) {
+        const dropItem = enemy.drops[Math.floor(Math.random() * enemy.drops.length)];
+        addItemToInventory(dropItem, 1);
+        const itObj = ITEM_CATALOG[dropItem] || { rarity: "common", nameZh: dropItem };
+        addLog(
+          `🎁 Looted: [${dropItem}] (${itObj.rarity.toUpperCase()})!`,
+          "loot",
+          `rarity-${itObj.rarity} font-semibold`,
+          `🎁 战利品掉落：获得【${itObj.nameZh || dropItem}】（${itObj.rarity.toUpperCase()}）！`
+        );
+      }
+
+      state.quests.bounties.forEach((b) => {
+        if (!b.claimed) {
+          if (b.targetKills) b.progress = Math.min(b.targetKills, b.progress + 1);
+          if (b.targetBoss && enemy.boss) b.progress = Math.min(b.targetBoss, b.progress + 1);
+        }
+      });
+
+      checkLevelUp();
+      checkStoryQuests();
+      checkAchievements();
+      saveGameState(false);
+      renderAll();
+    }
+
+    function handlePlayerDefeated() {
+      const p = state.player;
+      state.combat.inCombat = false;
+      state.combat.enemy = null;
+      state.autoHunt = false;
+      p.buffs = [];
+      p.hp = p.maxHp;
+      p.mp = p.maxMp;
+      p.sta = p.maxSta;
+      state.world.currentRoom = "r_town_square";
+      addLog(
+        "💀 You fell in battle! Rescued by Oakhaven Templars, you awaken restored at the Well of Renewal in Town Square.",
+        "combat",
+        "text-rose-400 font-bold",
+        "💀 你在战斗中力竭倒下！橡木港圣殿骑士将你救回，你在城镇广场的复苏之井旁满状态苏醒。"
+      );
+      showToast("Rescued · 圣所复苏", "Revived at Oakhaven Town Square · 已在橡木港广场满状态复活", "border-rose-500");
+      renderAll();
+    }
+
+    function checkLevelUp() {
+      const p = state.player;
+      while (p.xp >= p.xpNext) {
+        p.xp -= p.xpNext;
+        p.level += 1;
+        p.xpNext = Math.floor(100 * Math.pow(p.level, 1.45));
+        p.statPoints += 3;
+        p.talentPoints += 1;
+        computeDerivedStats();
+        p.hp = p.maxHp;
+        p.mp = p.maxMp;
+        p.sta = p.maxSta;
+        SynthAudio.play("levelup");
+        addLog(
+          `🌟 LEVEL UP! You reached Level ${p.level}! (+3 Attribute Pts, +1 Talent Pt, Full Vitals Restored)`,
+          "loot",
+          "text-amber-300 font-bold",
+          `🌟 等级提升！你升到了 Lv.${p.level}！（获得 +3 属性点、+1 天赋点，生命/法力/体力已完全恢复）`
+        );
+        showToast(`🌟 Level ${p.level} · 升至 ${p.level} 级!`, "+3 Stat Pts & +1 Talent Pt · 获得3属性点与1天赋点", "border-amber-400");
+        expandProceduralFrontier(2, false);
+      }
+    }
+
+    // =========================================================================
+    // 8. INVENTORY, GEAR, CRAFTING, SHOP & QUESTS (BILINGUAL)
+    // =========================================================================
+    function addItemToInventory(itemName, qty = 1) {
+      if (!itemName) return;
+      state.player.inventory[itemName] = (state.player.inventory[itemName] || 0) + qty;
+    }
+
+    function removeItemFromInventory(itemName, qty = 1) {
+      if (!state.player.inventory[itemName] || state.player.inventory[itemName] < qty) return false;
+      state.player.inventory[itemName] -= qty;
+      if (state.player.inventory[itemName] <= 0) {
+        delete state.player.inventory[itemName];
+      }
+      return true;
+    }
+
+    function equipOrUseItem(itemName) {
+      const item = ITEM_CATALOG[itemName];
+      if (!item || !state.player.inventory[itemName]) return;
+
+      if (item.type === "consumable") {
+        removeItemFromInventory(itemName, 1);
+        const p = state.player;
+        if (item.healHp) p.hp = Math.min(p.maxHp, p.hp + item.healHp);
+        if (item.healMp) p.mp = Math.min(p.maxMp, p.mp + item.healMp);
+        if (item.healSta) p.sta = Math.min(p.maxSta, p.sta + item.healSta);
+        SynthAudio.play("loot");
+        addLog(
+          `🧪 Used [${itemName}]: ${item.desc}`,
+          "world",
+          "text-emerald-300",
+          `🧪 使用了【${item.nameZh}】：${item.descZh}`
+        );
+      } else if (item.type === "equipment") {
+        const slot = item.slot || "weapon";
+        const currentEquipped = state.player.equipment[slot];
+        removeItemFromInventory(itemName, 1);
+        if (currentEquipped) {
+          addItemToInventory(currentEquipped, 1);
+        }
+        state.player.equipment[slot] = itemName;
+        computeDerivedStats();
+        SynthAudio.play("loot");
+        addLog(
+          `🛡️ Equipped [${itemName}] in ${slot.toUpperCase()} slot.`,
+          "loot",
+          "text-sky-300 font-semibold",
+          `🛡️ 已将【${item.nameZh}】装备至 ${slot.toUpperCase()} 栏位。`
+        );
+      } else {
+        addLog(
+          `📦 [${itemName}]: ${item.desc}`,
+          "world",
+          "text-slate-300",
+          `📦 【${item.nameZh}】：${item.descZh}`
+        );
+      }
+      renderAll();
+    }
+
+    function useQuickPotion() {
+      const priority = ["Elixir of the Titans", "Greater Healing Elixir", "Minor Healing Draught", "Arcane Mana Vial"];
+      const found = priority.find((name) => state.player.inventory[name] > 0);
+      if (found) {
+        equipOrUseItem(found);
+      } else {
+        addLog(
+          "⚠️ No potions left in your pack! Craft or buy more.",
+          "combat",
+          "text-amber-300",
+          "⚠️ 背包中没有药水了！请前往商店购买或在锻造台炼制。"
+        );
+      }
+    }
+
+    function buyShopItem(itemName) {
+      const item = ITEM_CATALOG[itemName];
+      if (!item) return;
+      if (state.player.gold < item.value) {
+        addLog(
+          `⚠️ Not enough gold to buy [${itemName}] (Costs ${item.value}g).`,
+          "world",
+          "text-amber-300",
+          `⚠️ 金币不足，无法购买【${item.nameZh}】（需要 ${item.value} 金币）。`
+        );
+        return;
+      }
+      state.player.gold -= item.value;
+      addItemToInventory(itemName, 1);
+      SynthAudio.play("loot");
+      addLog(
+        `🛒 Purchased [${itemName}] for ${item.value}g.`,
+        "loot",
+        "text-emerald-300",
+        `🛒 花费 ${item.value} 金币购买了【${item.nameZh}】。`
+      );
+      renderAll();
+    }
+
+    function sellInventoryItem(itemName) {
+      const item = ITEM_CATALOG[itemName];
+      if (!item || !state.player.inventory[itemName]) return;
+      const sellPrice = Math.max(4, Math.floor(item.value * 0.6));
+      removeItemFromInventory(itemName, 1);
+      state.player.gold += sellPrice;
+      SynthAudio.play("loot");
+      addLog(
+        `🪙 Sold [${itemName}] for ${sellPrice}g.`,
+        "loot",
+        "text-amber-300",
+        `🪙 出售了【${item.nameZh}】，获得 ${sellPrice} 金币。`
+      );
+      renderAll();
+    }
+
+    function sellAllCommonLoot() {
+      let count = 0;
+      let earned = 0;
+      Object.keys(state.player.inventory).forEach((name) => {
+        const it = ITEM_CATALOG[name];
+        const qty = state.player.inventory[name];
+        if (it && it.type === "equipment" && (it.rarity === "common" || it.rarity === "uncommon") && qty > 0) {
+          const price = Math.max(5, Math.floor(it.value * 0.6)) * qty;
+          earned += price;
+          count += qty;
+          delete state.player.inventory[name];
+        }
+      });
+      if (count > 0) {
+        state.player.gold += earned;
+        SynthAudio.play("loot");
+        addLog(
+          `🪙 Sold ${count} surplus equipment piece(s) for ${earned}g!`,
+          "loot",
+          "text-amber-300 font-semibold",
+          `🪙 批量出售了 ${count} 件多余装备，共获得 ${earned} 金币！`
+        );
+      } else {
+        addLog(
+          "No surplus Common/Uncommon equipment in pack to bulk-sell.",
+          "world",
+          "text-slate-400",
+          "背包中没有可批量出售的普通/优秀多余装备。"
+        );
+      }
+      renderAll();
+    }
+
+    function craftRecipe(recipeId) {
+      const rec = CRAFTING_RECIPES.find((r) => r.id === recipeId || r.output.toLowerCase().includes(String(recipeId).toLowerCase()));
+      if (!rec) {
+        addLog("Unknown crafting recipe.", "world", "text-slate-400", "未知的锻造或炼金配方。");
+        return;
+      }
+      for (const [mat, count] of Object.entries(rec.ingredients)) {
+        if ((state.player.inventory[mat] || 0) < count) {
+          const matZh = (ITEM_CATALOG[mat] && ITEM_CATALOG[mat].nameZh) || mat;
+          addLog(
+            `⚠️ Missing ingredients for [${rec.output}]: requires ${count}x ${mat}.`,
+            "world",
+            "text-amber-300",
+            `⚠️ 缺少合成【${ITEM_CATALOG[rec.output].nameZh}】的材料：需要 ${count}x ${matZh}。`
+          );
+          return;
+        }
+      }
+      for (const [mat, count] of Object.entries(rec.ingredients)) {
+        removeItemFromInventory(mat, count);
+      }
+      addItemToInventory(rec.output, rec.qty);
+      state.telemetry.crafted += 1;
+      const outZh = (ITEM_CATALOG[rec.output] && ITEM_CATALOG[rec.output].nameZh) || rec.output;
+      SynthAudio.play("levelup");
+      addLog(
+        `⚒️ Crafted ${rec.qty}x [${rec.output}]!`,
+        "loot",
+        "text-emerald-300 font-bold",
+        `⚒️ 成功锻造/炼制了 ${rec.qty}x 【${outZh}】！`
+      );
+      showToast(`⚒️ Crafted · 合成成功`, `${rec.qty}x ${rec.output} (${outZh})`, "border-emerald-400");
+      checkAchievements();
+      renderAll();
+    }
+
+    function refineEquippedGear() {
+      const p = state.player;
+      const costGold = (p.refineLevel + 1) * 45;
+      if (p.gold < costGold) {
+        addLog(
+          `⚠️ Star-Refining to +${p.refineLevel + 1} requires ${costGold} Gold.`,
+          "world",
+          "text-amber-300",
+          `⚠️ 星辰精炼至 +${p.refineLevel + 1} 需要 ${costGold} 金币。`
+        );
+        return;
+      }
+      p.gold -= costGold;
+      p.refineLevel += 1;
+      computeDerivedStats();
+      SynthAudio.play("levelup");
+      addLog(
+        `✨ STAR-REFINED! All equipped gear upgraded to +${p.refineLevel} (+${p.refineLevel * 12}% Equipment Power)!`,
+        "loot",
+        "text-amber-300 font-bold",
+        `✨ 星辰精炼成功！全身装备强化至 +${p.refineLevel}（装备基础属性提升 +${p.refineLevel * 12}%）！`
+      );
+      showToast(`✨ Star-Refined +${p.refineLevel}`, `全身装备强化至 +${p.refineLevel} (+${p.refineLevel * 12}%)`, "border-amber-400");
+      renderAll();
+    }
+
+    function harvestRoomNodes() {
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!room || !room.nodes || room.nodes.length === 0) {
+        addLog(
+          "There are no harvestable resource nodes in this location.",
+          "world",
+          "text-slate-400",
+          "当前区域没有可采集的资源点。"
+        );
+        return;
+      }
+      let gathered = 0;
+      room.nodes.forEach((node) => {
+        const key = `${room.id}:${node.id}`;
+        if (!state.world.harvestedCooldowns[key]) {
+          state.world.harvestedCooldowns[key] = 5;
+          const bonusQty = state.player.talents.pathfinder >= 2 ? node.qty + 1 : node.qty;
+          addItemToInventory(node.item, bonusQty);
+          state.telemetry.harvests += 1;
+          gathered += bonusQty;
+          const itemZh = (ITEM_CATALOG[node.item] && ITEM_CATALOG[node.item].nameZh) || node.item;
+          addLog(
+            `🌿 Harvested ${bonusQty}x [${node.item}] from ${node.name}!`,
+            "loot",
+            "text-emerald-300",
+            `🌿 从【${node.nameZh || node.name}】采集到了 ${bonusQty}x 【${itemZh}】！`
+          );
+        }
+      });
+
+      if (gathered === 0) {
+        addLog(
+          "⏳ Resource nodes here are regenerating. Wait a few world ticks or explore adjacent rooms.",
+          "world",
+          "text-slate-400",
+          "⏳ 当前区域的资源正在生长恢复中，请稍候几个心跳回合或探索相邻房间。"
+        );
+      } else {
+        SynthAudio.play("loot");
+        state.quests.bounties.forEach((b) => {
+          if (!b.claimed && b.targetHarvests) {
+            b.progress = Math.min(b.targetHarvests, b.progress + 1);
+          }
+        });
+        checkStoryQuests();
+        checkAchievements();
+      }
+      renderAll();
+    }
+
+    function checkStoryQuests() {
+      STORY_QUESTS.forEach((q) => {
+        if (state.quests.completed.includes(q.id)) return;
+        let ready = true;
+        if (q.reqKills && state.telemetry.kills < q.reqKills) ready = false;
+        if (q.reqItem && (state.player.inventory[q.reqItem] || 0) < (q.reqItemQty || 1)) ready = false;
+        if (q.reqBoss && !state.world.defeatedBosses.includes(q.reqBoss)) ready = false;
+
+        if (ready) {
+          claimStoryQuest(q.id);
+        }
+      });
+    }
+
+    function claimStoryQuest(questId) {
+      const q = STORY_QUESTS.find((item) => item.id === questId);
+      if (!q || state.quests.completed.includes(questId)) return;
+      const index = STORY_QUESTS.indexOf(q);
+      if (index > 0 && !state.quests.completed.includes(STORY_QUESTS[index - 1].id)) return;
+      if (q.reqKills && state.telemetry.kills < q.reqKills) return;
+      if (q.reqItem && (state.player.inventory[q.reqItem] || 0) < (q.reqItemQty || 1)) return;
+      if (q.reqBoss && !state.world.defeatedBosses.includes(q.reqBoss)) return;
+      state.quests.completed.push(questId);
+      state.player.xp += q.rewardXp;
+      state.player.gold += q.rewardGold;
+      state.player.rep += 25;
+      if (q.rewardItem) addItemToInventory(q.rewardItem, 1);
+      const rewardZh = (ITEM_CATALOG[q.rewardItem] && ITEM_CATALOG[q.rewardItem].nameZh) || q.rewardItem;
+
+      SynthAudio.play("levelup");
+      addLog(
+        `📜 QUEST COMPLETED: [${q.title}]! Reward: +${q.rewardXp} XP, +${q.rewardGold}g, [${q.rewardItem}]!`,
+        "loot",
+        "text-amber-300 font-bold",
+        `📜 主线任务完成：【${q.titleZh}】！奖励：+${q.rewardXp} 经验、+${q.rewardGold} 金币、【${rewardZh}】！`
+      );
+      showToast(`📜 ${q.title} · ${q.titleZh}`, `+${q.rewardXp} XP, +${q.rewardGold}g & ${q.rewardItem}`, "border-amber-400");
+      checkLevelUp();
+      renderAll();
+    }
+
+    function claimBounty(bountyId) {
+      const b = state.quests.bounties.find((item) => item.id === bountyId);
+      if (!b || b.claimed) return;
+      const target = b.targetKills || b.targetHarvests || b.targetBoss || 1;
+      if (b.progress < target) {
+        addLog(
+          `Bounty in progress (${b.progress}/${target}).`,
+          "world",
+          "text-slate-400",
+          `公会悬赏进行中（当前进度 ${b.progress}/${target}）。`
+        );
+        return;
+      }
+      b.claimed = true;
+      state.player.gold += b.rewardGold;
+      state.player.xp += b.rewardXp;
+      state.player.rep += 10;
+      SynthAudio.play("levelup");
+      addLog(
+        `🎯 BOUNTY CLAIMED: [${b.desc}] -> +${b.rewardXp} XP, +${b.rewardGold}g!`,
+        "loot",
+        "text-purple-300 font-bold",
+        `🎯 悬赏奖励已领取：【${b.descZh || b.desc}】 -> 获得 +${b.rewardXp} 经验、+${b.rewardGold} 金币！`
+      );
+      checkLevelUp();
+      renderAll();
+    }
+
+    function refreshBounties() {
+      const lv = state.player.level;
+      state.quests.bounties = [
+        { id: "b_" + Date.now() + "_1", desc: `Slay ${2 + (lv % 2)} Hostiles Across Aethelgard`, descZh: `在艾瑟尔加德讨伐 ${2 + (lv % 2)} 只敌对生物`, targetKills: 2 + (lv % 2), progress: 0, rewardGold: 50 * lv, rewardXp: 75 * lv, claimed: false },
+        { id: "b_" + Date.now() + "_2", desc: "Harvest 2 Resource Nodes", descZh: "采集 2 处荒野资源节点", targetHarvests: 2, progress: 0, rewardGold: 45 * lv, rewardXp: 65 * lv, claimed: false },
+        { id: "b_" + Date.now() + "_3", desc: "Defeat 1 Region Boss or Rift Wave", descZh: "击败 1 名区域首领或无尽裂隙波次", targetBoss: 1, progress: 0, rewardGold: 120 * lv, rewardXp: 160 * lv, claimed: false }
+      ];
+      addLog(
+        "📜 Fresh Guild Bounty contracts posted!",
+        "world",
+        "text-purple-300",
+        "📜 公会悬赏板已刷新最新契约任务！"
+      );
+      renderAll();
+    }
+
+    function startRiftWaveChallenge() {
+      state.telemetry.activeRiftWave += 1;
+      const wave = state.telemetry.activeRiftWave;
+      const scale = 1 + wave * 0.35;
+      state.combat.inCombat = true;
+      state.combat.enemy = {
+        id: "rift_archon_" + wave,
+        name: `Astral Rift Archon (Wave ${wave})`,
+        nameZh: `星界裂隙执政官（第 ${wave} 波）`,
+        level: Math.max(state.player.level, wave + 2),
+        boss: true,
+        isRiftWave: true,
+        hp: Math.round(140 * scale),
+        maxHp: Math.round(140 * scale),
+        atk: Math.round(22 * scale),
+        def: Math.round(10 * scale),
+        xp: Math.round(180 * scale),
+        gold: Math.round(110 * scale),
+        drops: ["Star-Metal", "Aether Crystal", "Elixir of the Titans"],
+        statuses: []
+      };
+      SynthAudio.play("skill");
+      addLog(
+        `🌀 ENDLESS RIFT WAVE ${wave} BEGINS! [${state.combat.enemy.name}] materializes from the singularity!`,
+        "combat",
+        "text-purple-300 font-bold",
+        `🌀 无尽星界裂隙第 ${wave} 波开启！【${state.combat.enemy.nameZh}】从奇点中降临！`
+      );
+      processCombatRound();
+      renderAll();
+    }
+
+    // =========================================================================
+    // 9. NAVIGATION, BFS PATHFINDING, MAP ZOOM & BILINGUAL COMMAND PARSER
+    // =========================================================================
+    function adjustMapZoom(delta) {
+      state.mapZoom = Math.max(0.55, Math.min(2.0, (state.mapZoom || 1.0) + delta));
+      renderWorldMinimap();
+    }
+
+    function resetMapZoom() {
+      state.mapZoom = 1.0;
+      renderWorldMinimap();
+      const r = WORLD_ROOMS[state.world.currentRoom];
+      if (r) {
+        addLog(
+          `🎯 World Atlas camera centered on [${r.title}] (${r.x}, ${r.y}).`,
+          "world",
+          "text-amber-300",
+          `🎯 世界星图镜头已居中锁定于【${r.titleZh}】（坐标 ${r.x}, ${r.y}）。`
+        );
+      }
+    }
+
+    function moveDirection(dir) {
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!room || !room.exits[dir]) {
+        addLog(
+          `You cannot travel '${dir.toUpperCase()}' from ${room ? room.title : "here"}.`,
+          "world",
+          "text-slate-400",
+          `无法从【${room ? room.titleZh : "当前位置"}】向 ${DIR_ZH[dir] || dir.toUpperCase()} 移动。`
+        );
+        return false;
+      }
+      if (state.combat.inCombat) {
+        addLog(
+          "⚠️ You are locked in combat! Defeat your foe or use 'flee' before moving.",
+          "combat",
+          "text-amber-300",
+          "⚠️ 你正处于战斗中！请先击败敌人或输入 'flee'（逃跑）脱离战斗。"
+        );
+        return false;
+      }
+      const nextRoomId = room.exits[dir];
+      const nextRoom = WORLD_ROOMS[nextRoomId];
+      if (!nextRoom) return false;
+
+      state.world.currentRoom = nextRoomId;
+      if (!state.world.visitedRooms.includes(nextRoomId)) {
+        state.world.visitedRooms.push(nextRoomId);
+      }
+      SynthAudio.play("step");
+      describeCurrentRoom();
+      checkAchievements();
+      renderAll();
+      return true;
+    }
+
+    function findShortestPath(startId, goalId) {
+      if (startId === goalId) return [];
+      const queue = [[startId, []]];
+      const visited = new Set([startId]);
+      while (queue.length > 0) {
+        const [curr, path] = queue.shift();
+        const r = WORLD_ROOMS[curr];
+        if (!r) continue;
+        for (const [dir, neighbor] of Object.entries(r.exits)) {
+          if (neighbor === goalId) return [...path, dir];
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push([neighbor, [...path, dir]]);
+          }
+        }
+      }
+      return null;
+    }
+
+    function travelToRoomByClick(targetRoomId) {
+      if (targetRoomId === state.world.currentRoom) {
+        describeCurrentRoom();
+        return;
+      }
+      if (state.combat.inCombat) {
+        addLog(
+          "⚠️ Cannot fast-travel while engaged in combat! Use 'flee' first.",
+          "combat",
+          "text-amber-300",
+          "⚠️ 战斗中无法快速寻路移动！请先击败敌人或撤退。"
+        );
+        return;
+      }
+      const path = findShortestPath(state.world.currentRoom, targetRoomId);
+      if (!path || path.length === 0) return;
+
+      if (autoWalkHandle) clearInterval(autoWalkHandle);
+      if (path.length === 1) {
+        moveDirection(path[0]);
+        return;
+      }
+
+      const targetRoom = WORLD_ROOMS[targetRoomId];
+      addLog(
+        `🧭 Auto-pathing to [${targetRoom.title}] (${path.length} steps)...`,
+        "world",
+        "text-sky-300",
+        `🧭 正在自动寻路前往【${targetRoom.titleZh}】（共 ${path.length} 步）……`
+      );
+      let stepIdx = 0;
+      autoWalkHandle = setInterval(() => {
+        if (stepIdx >= path.length || state.combat.inCombat) {
+          clearInterval(autoWalkHandle);
+          autoWalkHandle = null;
+          return;
+        }
+        moveDirection(path[stepIdx]);
+        stepIdx += 1;
+      }, 180);
+    }
+
+    function revealAtlasHint() {
+      const allIds = Object.keys(WORLD_ROOMS);
+      let added = 0;
+      allIds.forEach((id) => {
+        if (!state.world.visitedRooms.includes(id) && added < 6) {
+          state.world.visitedRooms.push(id);
+          added += 1;
+        }
+      });
+      if (added > 0) {
+        addLog(
+          `🧭 Guild scouts charted ${added} new locations on your World Atlas!`,
+          "world",
+          "text-amber-300",
+          `🧭 公会斥候在你的世界星图上标绘了 ${added} 处新区域！`
+        );
+      } else {
+        addLog(
+          "🧭 Every region of Aethelgard is already charted on your World Atlas!",
+          "world",
+          "text-emerald-300",
+          "🧭 艾瑟尔加德的全部 32 个区域均已标绘在你的世界星图上！"
+        );
+      }
+      checkAchievements();
+      renderAll();
+    }
+
+    function describeCurrentRoom() {
+      const r = WORLD_ROOMS[state.world.currentRoom];
+      if (!r) return;
+      const bMeta = BIOME_META[r.biome] || { zh: r.biome };
+      const exitNamesEn = Object.entries(r.exits).map(([d, id]) => `${d.toUpperCase()}→${WORLD_ROOMS[id].title}`).join(", ");
+      const exitNamesZh = Object.entries(r.exits).map(([d, id]) => `${DIR_ZH[d] || d.toUpperCase()}(${d.toUpperCase()})→${WORLD_ROOMS[id].titleZh}`).join("，");
+
+      addLog(
+        `📍 [${r.title}] (${r.biome}) — ${r.desc}`,
+        "world",
+        "text-amber-200 font-semibold",
+        `📍 【${r.titleZh}】（${bMeta.zh}）—— ${r.descZh}`
+      );
+      addLog(
+        `   Exits: ${exitNamesEn}`,
+        "world",
+        "text-slate-400",
+        `   出口方向：${exitNamesZh}`
+      );
+      if (r.npcs && r.npcs.length > 0) {
+        addLog(
+          `   NPCs: ${r.npcs.map((n) => n.name).join(", ")}`,
+          "world",
+          "text-sky-300",
+          `   人物角色：${r.npcs.map((n) => n.nameZh || n.name).join("，")}`
+        );
+      }
+      if (r.mobs && r.mobs.length > 0) {
+        const mobNamesEn = r.mobs.map((m) => `${MOB_TEMPLATES[m].name} (Lv.${MOB_TEMPLATES[m].level})`).join(", ");
+        const mobNamesZh = r.mobs.map((m) => `${MOB_TEMPLATES[m].nameZh} (Lv.${MOB_TEMPLATES[m].level})`).join("，");
+        addLog(
+          `   Hostiles: ${mobNamesEn}`,
+          "combat",
+          "text-rose-300",
+          `   敌对生物：${mobNamesZh}`
+        );
+      }
+    }
+
+    function handleCommandSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("cmd-input");
+      if (!input) return;
+      const raw = input.value.trim();
+      if (!raw) return;
+      state.cmdHistory.unshift(raw);
+      if (state.cmdHistory.length > 40) state.cmdHistory.pop();
+      state.cmdHistoryIdx = -1;
+      input.value = "";
+      executeCommand(raw);
+    }
+
+    function executeCommand(rawCmd) {
+      const clean = String(rawCmd || "").trim();
+      if (!clean) return;
+      addLog(`> ${clean}`, "world", "text-amber-400/90", `> 执行指令：${clean}`);
+
+      const parts = clean.split(/\s+/);
+      const verb = parts[0].toLowerCase();
+      const arg = parts.slice(1).join(" ");
+
+      if (verb === "lang" || verb === "language" || verb === "locale" || verb === "语言") {
+        setLanguage(arg || "en");
+        return;
+      }
+      if (verb === "next" || verb === "proceed" || verb === "hint" || verb === "推进") {
+        proceedNextStep();
+        return;
+      }
+      if (verb === "expand" || verb === "frontier" || verb === "开拓") {
+        expandProceduralFrontier(3, false);
+        return;
+      }
+      if (verb === "pet" || verb === "companion" || verb === "伙伴") {
+        cycleCompanion();
+        return;
+      }
+      if (verb === "ult" || verb === "overdrive" || verb === "必杀") {
+        castOverdriveUltimate();
+        return;
+      }
+      if (verb === "chest" || verb === "shrine" || verb === "宝箱") {
+        openMysteryChestOrShrine();
+        return;
+      }
+      if (verb === "affix" || verb === "roll" || verb === "词缀") {
+        rollDiabloAffixLoot(false);
+        return;
+      }
+      if (verb === "online" || verb === "mp" || verb === "联机") {
+        openOnlineModal();
+        return;
+      }
+      if (verb === "raid" || verb === "团本") {
+        startOnlineCoopRaid();
+        return;
+      }
+      const dirMap = {
+        n: "n", north: "n", "北": "n", norte: "n", nord: "n", norden: "n", "북": "n", "север": "n", "شمال": "n",
+        s: "s", south: "s", "南": "s", sur: "s", sud: "s", "süden": "s", sul: "s", "남": "s", "юг": "s", "جنوب": "s",
+        e: "e", east: "e", "东": "e", "東": "e", este: "e", est: "e", osten: "e", leste: "e", "동": "e", "восток": "e", "شرق": "e",
+        w: "w", west: "w", "西": "w", oeste: "w", ouest: "w", westen: "w", "서": "w", "запад": "w", "غرب": "w",
+        u: "u", up: "u", "上": "u", arriba: "u", haut: "u", oben: "u", cima: "u", "위": "u", "вверх": "u", "أعلى": "u",
+        d: "d", down: "d", "下": "d", abajo: "d", bas: "d", unten: "d", baixo: "d", "아래": "d", "вниз": "d", "أسفل": "d"
+      };
+      if (dirMap[verb]) {
+        moveDirection(dirMap[verb]);
+        return;
+      }
+
+      if (verb === "l" || verb === "look" || verb === "examine" || verb === "x" || verb === "看" || verb === "观察") {
+        describeCurrentRoom();
+      } else if (verb === "k" || verb === "kill" || verb === "attack" || verb === "fight" || verb === "攻击" || verb === "战") {
+        engageMob(arg);
+      } else if (verb === "skill" || verb === "cast" || verb === "技能") {
+        const idx = Math.max(0, (parseInt(arg, 10) || 1) - 1);
+        useSkill(Math.min(2, idx));
+      } else if (verb === "flee" || verb === "run" || verb === "retreat" || verb === "逃跑" || verb === "撤退") {
+        if (!state.combat.inCombat) {
+          addLog("You are not currently in combat.", "combat", "text-slate-400", "你当前并未处于战斗状态。");
+        } else {
+          state.combat.inCombat = false;
+          state.combat.enemy = null;
+          addLog("🏃 You disengage from combat and catch your breath!", "combat", "text-amber-300", "🏃 你成功脱离了战斗，稍作喘息！");
+          renderAll();
+        }
+      } else if (verb === "harvest" || verb === "mine" || verb === "gather" || verb === "forage" || verb === "采集" || verb === "挖矿") {
+        harvestRoomNodes();
+      } else if (verb === "rest" || verb === "sleep" || verb === "heal" || verb === "休息") {
+        const p = state.player;
+        p.hp = p.maxHp;
+        p.mp = p.maxMp;
+        p.sta = p.maxSta;
+        SynthAudio.play("loot");
+        addLog("💤 You rest by the camp-light, restoring 100% HP, MP, and Stamina!", "world", "text-emerald-300 font-semibold", "💤 你在营火旁静心休息，100% 恢复了生命、法力与体力！");
+        renderAll();
+      } else if (verb === "talk" || verb === "ask" || verb === "speak" || verb === "对话" || verb === "交谈") {
+        const room = WORLD_ROOMS[state.world.currentRoom];
+        if (!room || !room.npcs || room.npcs.length === 0) {
+          askNpcAi(arg || "Look around");
+        } else {
+          const npc = room.npcs.find((n) => n.name.toLowerCase().includes(arg.toLowerCase()) || (n.nameZh && n.nameZh.includes(arg))) || room.npcs[0];
+          addLog(
+            `💬 ${npc.name} (${npc.role.split("·")[0].trim()}): "${npc.dialogue}"`,
+            "world",
+            "text-sky-300",
+            `💬 ${npc.nameZh}（${npc.role.split("·")[1] || npc.role}）：“${npc.dialogueZh}”`
+          );
+          checkStoryQuests();
+        }
+      } else if (verb === "ai" || verb === "llm" || verb === "oracle" || verb === "问" || verb === "智脑") {
+        switchRightTab("ai");
+        askNpcAi(arg || "Give me guidance for this area");
+      } else if (verb === "use" || verb === "quaff" || verb === "drink" || verb === "equip" || verb === "eq" || verb === "使用" || verb === "装备") {
+        if (!arg) {
+          useQuickPotion();
+        } else {
+          const match = Object.keys(state.player.inventory).find((k) => {
+            const it = ITEM_CATALOG[k];
+            return k.toLowerCase().includes(arg.toLowerCase()) || (it && it.nameZh && it.nameZh.includes(arg));
+          });
+          if (match) equipOrUseItem(match);
+          else addLog(`Item '${arg}' not found in your backpack.`, "world", "text-slate-400", `背包中未找到物品“${arg}”。`);
+        }
+      } else if (verb === "craft" || verb === "forge" || verb === "锻造" || verb === "合成") {
+        if (!arg) {
+          switchRightTab("crafting");
+          addLog("Opened the Artisan Forge tab. Click any recipe or type 'craft <item>'.", "world", "text-emerald-300", "已打开工匠锻造面板。点击任意配方或输入 'craft <物品>' 即可制作。");
+        } else {
+          craftRecipe(arg);
+        }
+      } else if (verb === "upgrade" || verb === "refine" || verb === "精炼" || verb === "强化") {
+        refineEquippedGear();
+      } else if (verb === "buy" || verb === "购买") {
+        const match = SHOP_ITEMS.find((k) => k.toLowerCase().includes(arg.toLowerCase())) || SHOP_ITEMS[0];
+        buyShopItem(match);
+      } else if (verb === "sell" || verb === "出售") {
+        const match = Object.keys(state.player.inventory).find((k) => k.toLowerCase().includes(arg.toLowerCase()));
+        if (match) sellInventoryItem(match);
+        else sellAllCommonLoot();
+      } else if (verb === "stance" || verb === "姿态") {
+        const s = arg.toLowerCase();
+        if (["balanced", "aggressive", "defensive"].includes(s)) setStance(s);
+        else addLog("Usage: stance balanced | aggressive | defensive", "world", "text-slate-400", "用法：stance balanced（均衡）| aggressive（狂攻）| defensive（守护）");
+      } else if (verb === "alloc" || verb === "stat" || verb === "加点") {
+        const st = arg.toLowerCase();
+        if (["str", "int", "agi", "vit"].includes(st)) allocateStat(st);
+        else addLog("Usage: alloc str | int | agi | vit", "world", "text-slate-400", "用法：alloc str（力量）| int（智力）| agi（敏捷）| vit（体质）");
+      } else if (verb === "quest" || verb === "quests" || verb === "任务") {
+        switchRightTab("quests");
+        checkStoryQuests();
+        addLog(`Opened Chronicles Quests (${state.quests.completed.length}/${STORY_QUESTS.length} completed).`, "loot", "text-amber-300", `已打开主线史诗任务面板（已完成 ${state.quests.completed.length}/${STORY_QUESTS.length}）。`);
+      } else if (verb === "bounty" || verb === "bounties" || verb === "悬赏") {
+        switchRightTab("quests");
+        state.quests.bounties.forEach((b) => claimBounty(b.id));
+        addLog("Checked Guild Bounty board.", "loot", "text-purple-300", "已检查并结算公会悬赏契约板。");
+      } else if (verb === "rift" || verb === "裂隙") {
+        switchRightTab("achievements");
+        startRiftWaveChallenge();
+      } else if (verb === "autohunt" || verb === "自动") {
+        toggleAutoHunt();
+      } else if (verb === "save" || verb === "保存") {
+        saveGameState(true);
+      } else if (verb === "load" || verb === "读取") {
+        loadGameState(true);
+      } else if (verb === "export" || verb === "import") {
+        openSaveModal();
+      } else if (verb === "clear" || verb === "清空") {
+        clearTerminalLog();
+      } else if (verb === "help" || verb === "?" || verb === "帮助") {
+        openModal("help-modal");
+        addLog(
+          "📖 Commands: n/s/e/w/u/d, look, attack, skill 1/2/3, flee, harvest, craft, upgrade, buy, sell, talk, ai <prompt>, rest, quest, bounty, rift, autohunt, save, load.",
+          "world",
+          "text-amber-300",
+          "📖 常用指令：n/s/e/w/u/d(方向), look(看), attack(攻击), skill 1/2/3(技能), harvest(采集), craft(锻造), upgrade(精炼), ai <问题>(问智脑), rest(休息), quest(任务), rift(裂隙)。"
+        );
+      } else {
+        askNpcAi(clean);
+      }
+    }
+
+    function triggerAutocomplete() {
+      const input = document.getElementById("cmd-input");
+      if (!input) return;
+      const val = input.value.trim().toLowerCase();
+      const candidates = [
+        "north", "south", "east", "west", "up", "down",
+        "look", "attack", "skill 1", "skill 2", "skill 3",
+        "harvest", "rest", "craft", "upgrade", "quest",
+        "bounty", "rift", "ai Where is Mythril?", "autohunt", "flee", "save", "help"
+      ];
+      const match = candidates.find((c) => c.startsWith(val) && c !== val) || candidates[0];
+      input.value = match;
+      input.focus();
+    }
+
+    // =========================================================================
+    // 10. UI ACTIONS, MODALS, SAVE/LOAD & BILINGUAL RENDERERS
+    // =========================================================================
+    function setStance(stance) {
+      state.player.stance = stance;
+      computeDerivedStats();
+      addLog(
+        `🛡️ Combat Stance switched to: ${stance.toUpperCase()}.`,
+        "combat",
+        "text-sky-300",
+        `🛡️ 战斗姿态已切换为：【${translateStanceZh(stance)}姿态】。`
+      );
+      renderAll();
+    }
+
+    function allocateStat(statKey) {
+      if (state.player.statPoints <= 0) {
+        addLog("No unspent Attribute Points available. Level up to earn more!", "world", "text-slate-400", "当前没有可用属性点，提升等级可获得更多属性点！");
+        return;
+      }
+      state.player.statPoints -= 1;
+      state.player.stats[statKey] += 1;
+      computeDerivedStats();
+      SynthAudio.play("loot");
+      addLog(
+        `📈 Allocated +1 to ${statKey.toUpperCase()} (Now ${state.player.stats[statKey]}).`,
+        "world",
+        "text-amber-300",
+        `📈 已分配 +1 点至 ${statKey.toUpperCase()}（当前为 ${state.player.stats[statKey]}）。`
+      );
+      renderAll();
+    }
+
+    function learnTalent(tree) {
+      if (state.player.talentPoints <= 0) {
+        addLog("No unspent Talent Points available. Level up to earn more!", "world", "text-slate-400", "当前没有可用天赋点，提升等级可获得更多天赋点！");
+        return;
+      }
+      state.player.talentPoints -= 1;
+      state.player.talents[tree] += 1;
+      computeDerivedStats();
+      SynthAudio.play("levelup");
+      addLog(
+        `🌟 Learned Talent [${tree.toUpperCase()} Rank ${state.player.talents[tree]}]!`,
+        "loot",
+        "text-purple-300 font-bold",
+        `🌟 成功领悟专精天赋：【${tree.toUpperCase()} 第 ${state.player.talents[tree]} 阶】！`
+      );
+      renderAll();
+    }
+
+    function toggleAudio() {
+      SynthAudio.enabled = !SynthAudio.enabled;
+      const icon = document.getElementById("audio-icon");
+      const label = document.getElementById("audio-label");
+      if (icon) icon.textContent = SynthAudio.enabled ? "🔊" : "🔇";
+      if (label) label.textContent = SynthAudio.enabled ? "SFX On" : "Muted";
+    }
+
+    function toggleAutoHunt() {
+      state.autoHunt = !state.autoHunt;
+      addLog(
+        `🤖 Auto-Hunt mode is now ${state.autoHunt ? "ENABLED" : "DISABLED"}.`,
+        "combat",
+        state.autoHunt ? "text-emerald-300" : "text-slate-400",
+        `🤖 自动狩猎模式已${state.autoHunt ? "开启" : "关闭"}。`
+      );
+      renderAll();
+    }
+
+    function setLogFilter(filter) {
+      state.logFilter = filter;
+      renderTerminalLog();
+    }
+
+    function clearTerminalLog() {
+      state.logs = [];
+      addLog("Terminal log cleared.", "world", "text-slate-400", "终端交互记录已清空。");
+    }
+
+    function switchRightTab(tab) {
+      state.rightTab = tab;
+      ["inventory", "crafting", "quests", "achievements", "ai"].forEach((t) => {
+        const panel = document.getElementById(`panel-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (panel) panel.classList.toggle("hidden", t !== tab);
+        if (btn) {
+          btn.className = t === tab
+            ? "bi-btn py-1 px-1 border-b-2 border-amber-400 text-amber-300 bg-amber-500/10"
+            : "bi-btn py-1 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200";
+        }
+      });
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("hidden");
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("hidden");
+    }
+
+    function openSaveModal() {
+      const ta = document.getElementById("save-json-textarea");
+      if (ta) {
+        ta.value = JSON.stringify(state);
+      }
+      openModal("save-modal");
+    }
+
+    function saveGameState(notify = true) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (notify) {
+          showToast("💾 Game Saved · 存档已保存", "Saved to browser storage · 已保存至本地浏览器", "border-emerald-500");
+          addLog("💾 Game state saved to browser storage.", "world", "text-emerald-300", "💾 游戏进度已保存至浏览器本地存储。");
+        }
+      } catch (e) {
+        if (notify) {
+          showToast("⚠️ Use JSON Export · 请使用JSON导出", "Copy the JSON string in the Save modal.", "border-amber-500");
+        }
+      }
+    }
+
+    function loadGameState(notify = true) {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          if (notify) addLog("No saved state found in browser storage.", "world", "text-slate-400", "未在浏览器存储中找到存档记录。");
+          return false;
+        }
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.player && parsed.world) {
+          state = parsed;
+          state.aiLogs = state.aiLogs || [];
+          state.mapZoom = state.mapZoom || 1.0;
+          if (notify) {
+            showToast("📂 Game Loaded · 读档成功", `Restored ${state.player.name} (Lv.${state.player.level})`, "border-sky-500");
+            addLog(
+              `📂 Loaded hero [${state.player.name}] at [${WORLD_ROOMS[state.world.currentRoom].title}].`,
+              "world",
+              "text-sky-300",
+              `📂 已读取英雄【${state.player.name}】，当前位于【${WORLD_ROOMS[state.world.currentRoom].titleZh}】。`
+            );
+          }
+          renderAll();
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function copySaveJson() {
+      const ta = document.getElementById("save-json-textarea");
+      if (!ta) return;
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast("📋 JSON Copied · 已复制", "Portable save JSON copied to clipboard.", "border-amber-400");
+      } catch (e) {}
+    }
+
+    function importSaveJson() {
+      const ta = document.getElementById("save-json-textarea");
+      if (!ta || !ta.value.trim()) return;
+      try {
+        const parsed = JSON.parse(ta.value.trim());
+        if (parsed && parsed.player && parsed.world) {
+          state = parsed;
+          state.aiLogs = state.aiLogs || [];
+          state.mapZoom = state.mapZoom || 1.0;
+          saveGameState(false);
+          closeModal("save-modal");
+          showToast("📥 Save Imported · 导入成功", `Restored ${state.player.name} (Lv.${state.player.level})`, "border-emerald-400");
+          addLog(
+            `📥 Imported portable JSON state for [${state.player.name}].`,
+            "world",
+            "text-emerald-300",
+            `📥 已成功导入英雄【${state.player.name}】的便携式JSON存档。`
+          );
+          renderAll();
+        }
+      } catch (e) {
+        showToast("⚠️ Invalid JSON · 格式错误", "Could not parse JSON string.", "border-rose-500");
+      }
+    }
+
+    function selectClassOption(classId) {
+      selectedClassOption = classId;
+      ["vanguard", "arcanist", "shadowblade"].forEach((cid) => {
+        const btn = document.getElementById(`select-class-${cid}`);
+        if (btn) {
+          btn.className = cid === classId
+            ? "p-3 rounded-xl border border-amber-500 bg-amber-500/10 text-left space-y-1"
+            : "p-3 rounded-xl border border-slate-700 bg-slate-900/80 text-left space-y-1";
+        }
+      });
+    }
+
+    function applyCharacterConfig() {
+      const nameInput = document.getElementById("input-hero-name");
+      const newName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Kaelen";
+      state.player.name = newName;
+      if (state.player.classId !== selectedClassOption) {
+        state.player.classId = selectedClassOption;
+        const cfg = CLASS_CONFIG[selectedClassOption];
+        state.player.stats = { ...cfg.baseStats };
+        computeDerivedStats();
+        state.player.hp = state.player.maxHp;
+        state.player.mp = state.player.maxMp;
+        state.player.sta = state.player.maxSta;
+      }
+      closeModal("char-modal");
+      const cfg = CLASS_CONFIG[state.player.classId];
+      addLog(
+        `🧙 Hero identity updated: [${state.player.name}] — ${cfg.name}!`,
+        "world",
+        "text-amber-300 font-semibold",
+        `🧙 英雄身份已更新：【${state.player.name}】—— ${cfg.nameZh}！`
+      );
+      saveGameState(false);
+      renderAll();
+    }
+
+    function resetNewGame() {
+      state = createInitialState();
+      saveGameState(false);
+      closeModal("char-modal");
+      addLog(
+        "🌅 A new chronicle begins in Oakhaven Town Square!",
+        "world",
+        "text-amber-300 font-bold",
+        "🌅 新的传奇篇章在橡木港城镇广场拉开帷幕！"
+      );
+      describeCurrentRoom();
+      renderAll();
+    }
+
+    // =========================================================================
+    // 11. COMPLETE DOM & PLAYER-CENTERED SVG RENDERING ENGINE
+    // =========================================================================
+
+    // =========================================================================
+    // 10-LANGUAGE SINGLE-LOCALE ENGINE (en, zh, es, ja, ko, fr, de, pt, ru, ar)
+    // =========================================================================
+    const SUPPORTED_LANGUAGES = [
+      { code: "en", label: "🇺🇸 English", native: "English" },
+      { code: "zh", label: "🇨🇳 简体中文", native: "简体中文" },
+      { code: "es", label: "🇪🇸 Español", native: "Español" },
+      { code: "ja", label: "🇯🇵 日本語", native: "日本語" },
+      { code: "ko", label: "🇰🇷 한국어", native: "한국어" },
+      { code: "fr", label: "🇫🇷 Français", native: "Français" },
+      { code: "de", label: "🇩🇪 Deutsch", native: "Deutsch" },
+      { code: "pt", label: "🇧🇷 Português", native: "Português" },
+      { code: "ru", label: "🇷🇺 Русский", native: "Русский" },
+      { code: "ar", label: "🇸🇦 العربية", native: "العربية" }
+    ];
+
+    const UI_I18N = {
+      en: {
+        appTitle: "AETHELGARD",
+        aiReady: "🧠 CPU TinyLM Ready",
+        turnBtn: "Turn",
+        sfxOn: "SFX On",
+        sfxMuted: "Muted",
+        aiDmBtn: "🧠 AI DM",
+        heroBtn: "🧙 Hero / Class",
+        saveBtn: "💾 Save / JSON",
+        guideBtn: "? Guide",
+        hp: "HP", mp: "MP", sta: "STA", xp: "XP",
+        stanceSkillsTitle: "Stance & Skills",
+        peaceful: "Peaceful", inCombat: "In Combat",
+        stanceBalanced: "⚖️ Balanced", stanceAggro: "🔥 Aggro", stanceGuard: "🛡️ Guard",
+        ready: "READY",
+        strikeBtn: "⚔️ Strike", potionBtn: "🧪 Potion", fleeBtn: "🏃 Flee",
+        statsTalentsTitle: "Stats & Talents",
+        ptsPrefix: "Pts", talPrefix: "Tal",
+        atk: "ATK ", mag: "MAG ", def: "DEF ", crit: "CRIT ",
+        warlordTitle: "Warlord", warlordDesc: "+8%DMG/Leech",
+        mysticTitle: "Mystic", mysticDesc: "+10%MAG/Regen",
+        pathfinderTitle: "Pathfinder", pathfinderDesc: "+15%Gold/XP",
+        safe: "Safe", dangerPrefix: "Lv.",
+        aiNpcBtn: "🧠 AI NPC", lookBtn: "👁️ Look",
+        engagedLabel: "⚔️ ENGAGED:",
+        exitsLabel: "Exits:", interactLabel: "Interact:",
+        quietSurroundings: "Quiet surroundings",
+        filterAll: "All", filterCombat: "Combat", filterWorld: "Lore/World", filterLoot: "Loot/Quests", filterAi: "🧠 AI",
+        autoHuntPrefix: "🤖 Auto-Hunt", on: "ON", off: "OFF", clearBtn: "Clear",
+        cmdPlaceholder: "Type command (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <question>, lang <code>)...",
+        sendBtn: "Send",
+        macroLook: "👁️ Look", macroHarvest: "🌿 Harvest", macroRest: "💤 Rest", macroBounty: "📜 Bounty", macroRift: "🌀 Endless Rift", macroAi: "🧠 AI Event", macroHelp: "❓ Commands",
+        atlasTitle: "World Atlas", autoCentered: "🎯 Auto-Centered", scoutBtn: "🧭 Scout Region",
+        legHaven: "● Haven", legWilds: "● Wilds", legCrypt: "● Crypt", legForge: "● Forge", legRift: "● Rift",
+        tabPack: "🎒 Pack", tabForge: "⚒️ Forge", tabQuests: "📜 Quests", tabCodex: "🏆 Codex", tabAi: "🧠 AI DM",
+        backpackTitle: "Backpack & Materials", sellExtraBtn: "🪙 Sell Extra Gear", emptyPack: "Backpack is empty",
+        quartermasterTitle: "🛒 Quartermaster Shop", instantSupply: "Instant Supply",
+        useAction: "Use", equipAction: "Equip", infoAction: "Info", buyAction: "Buy",
+        equippedTitle: "Equipped Slots", starRefineBtn: "✨ Star-Refine", emptySlot: "Empty Slot",
+        recipesTitle: "⚒️ Forge & Alchemy Recipes", craftAction: "⚒️ Craft", reqPrefix: "Req:",
+        campaignTitle: "📖 Campaign Quests", completeSuffix: "Complete", doneBadge: "DONE", rewardPrefix: "Reward:",
+        bountiesTitle: "🎯 Guild Bounties", newContractsBtn: "🔄 New Contracts",
+        claimedBtn: "Claimed", claimBtn: "Claim!", activeBtn: "Active",
+        endlessRiftTitle: "🌀 Endless Astral Rift", bestPrefix: "Best:",
+        endlessRiftDesc: "Face escalating Void Waves for Mythic gear & Shards.",
+        summonRiftBtn: "⚔️ Summon Next Rift Wave",
+        slainLabel: "Slain", craftedLabel: "Crafted", bossesLabel: "Bosses",
+        achievementsTitle: "🏅 Achievements & Passive Bonuses",
+        aiPanelTitle: "🧠 CPU Small LLM Trial",
+        aiPanelDesc: "Runs 100% on normal laptop CPUs without a GPU. Generates NPC dialogue, dynamic encounters & tactical advice.",
+        aiRoleplayTitle: "🎭 NPC Roleplay", aiRoleplaySub: "Deep NPC Dialogue",
+        aiEncounterTitle: "🎲 AI Encounter", aiEncounterSub: "Dynamic World Event",
+        aiAdvisorTitle: "🧭 AI Advisor", aiAdvisorSub: "Build & Combat Tactics",
+        aiEmptyHint: "Click [🎭 NPC Roleplay], [🎲 AI Encounter], or [🧭 AI Advisor] above, or type a question below!",
+        aiInputPlaceholder: "Ask NPC or AI DM (e.g. Where is Mythril Ore?)",
+        askBtn: "Ask",
+        stanceLabel: "Stance", refineLabel: "Refine", statusLabel: "Status", normalStatus: "Normal",
+        slot_weapon: "Weapon", slot_armor: "Armor", slot_helm: "Helm", slot_ring: "Ring", slot_relic: "Relic",
+        langSwitched: "🌐 Language set to English. Only English will be displayed."
+      },
+      zh: {
+        appTitle: "艾瑟尔加德",
+        aiReady: "🧠 本地智脑就绪",
+        turnBtn: "回合",
+        sfxOn: "音效开启",
+        sfxMuted: "已静音",
+        aiDmBtn: "🧠 智脑DM",
+        heroBtn: "🧙 英雄/职业",
+        saveBtn: "💾 存档/JSON",
+        guideBtn: "? 指南",
+        hp: "生命", mp: "法力", sta: "体力", xp: "经验",
+        stanceSkillsTitle: "战斗姿态与技能",
+        peaceful: "和平状态", inCombat: "战斗中",
+        stanceBalanced: "⚖️ 均衡", stanceAggro: "🔥 狂攻", stanceGuard: "🛡️ 守护",
+        ready: "就绪",
+        strikeBtn: "⚔️ 攻击", potionBtn: "🧪 药水", fleeBtn: "🏃 撤退",
+        statsTalentsTitle: "属性与专精天赋",
+        ptsPrefix: "属性点", talPrefix: "天赋点",
+        atk: "物攻 ", mag: "法强 ", def: "防御 ", crit: "暴击 ",
+        warlordTitle: "战神专精", warlordDesc: "+8%伤害/吸血",
+        mysticTitle: "秘法专精", mysticDesc: "+10%法强/回蓝",
+        pathfinderTitle: "寻路专精", pathfinderDesc: "+15%金币/经验",
+        safe: "安全区", dangerPrefix: "危险 Lv.",
+        aiNpcBtn: "🧠 智脑对话", lookBtn: "👁️ 观察",
+        engagedLabel: "⚔️ 交战中：",
+        exitsLabel: "出口：", interactLabel: "交互：",
+        quietSurroundings: "周围十分宁静",
+        filterAll: "全部", filterCombat: "战斗", filterWorld: "世界/探索", filterLoot: "战利品/任务", filterAi: "🧠 智脑",
+        autoHuntPrefix: "🤖 自动狩猎", on: "开启", off: "关闭", clearBtn: "清空",
+        cmdPlaceholder: "输入指令 (n/北, s/南, e/东, w/西, look/观察, attack/攻击, harvest/采集, rest/休息, ai <问题>, lang <code>)...",
+        sendBtn: "发送",
+        macroLook: "👁️ 观察", macroHarvest: "🌿 采集", macroRest: "💤 休息", macroBounty: "📜 悬赏", macroRift: "🌀 无尽裂隙", macroAi: "🧠 智脑奇遇", macroHelp: "❓ 指令帮助",
+        atlasTitle: "世界星图", autoCentered: "🎯 自动居中", scoutBtn: "🧭 侦察区域",
+        legHaven: "● 圣所", legWilds: "● 荒野", legCrypt: "● 地宫", legForge: "● 熔炉", legRift: "● 裂隙",
+        tabPack: "🎒 背包", tabForge: "⚒️ 锻造", tabQuests: "📜 任务", tabCodex: "🏆 法典", tabAi: "🧠 智脑",
+        backpackTitle: "背包与材料", sellExtraBtn: "🪙 出售多余装备", emptyPack: "背包为空",
+        quartermasterTitle: "🛒 军需官商店", instantSupply: "即时补给",
+        useAction: "使用", equipAction: "穿戴", infoAction: "详情", buyAction: "购买",
+        equippedTitle: "已装备栏位", starRefineBtn: "✨ 星辰精炼", emptySlot: "空栏位",
+        recipesTitle: "⚒️ 锻造与炼金配方", craftAction: "⚒️ 合成", reqPrefix: "材料：",
+        campaignTitle: "📖 主线史诗任务", completeSuffix: "已完成", doneBadge: "已完成", rewardPrefix: "奖励：",
+        bountiesTitle: "🎯 公会悬赏契约", newContractsBtn: "🔄 刷新契约",
+        claimedBtn: "已领取", claimBtn: "领取!", activeBtn: "进行中",
+        endlessRiftTitle: "🌀 无尽星界裂隙", bestPrefix: "最高波次：",
+        endlessRiftDesc: "挑战不断增强的虚空波次，赢取神话装备与裂隙碎片。",
+        summonRiftBtn: "⚔️ 召唤下一波裂隙领主",
+        slainLabel: "击杀", craftedLabel: "锻造", bossesLabel: "首领",
+        achievementsTitle: "🏅 成就与被动增益",
+        aiPanelTitle: "🧠 轻量级CPU本地小模型",
+        aiPanelDesc: "专为无独立显卡的普通笔记本CPU设计，实时生成NPC角色扮演、动态奇遇与战术建议。",
+        aiRoleplayTitle: "🎭 NPC深度对话", aiRoleplaySub: "智能角色互动",
+        aiEncounterTitle: "🎲 动态奇遇事件", aiEncounterSub: "实时生成奇遇",
+        aiAdvisorTitle: "🧭 战术顾问分析", aiAdvisorSub: "配装与打法建议",
+        aiEmptyHint: "点击上方【🎭 NPC深度对话】、【🎲 动态奇遇事件】或【🧭 战术顾问分析】，或在下方输入任何问题！",
+        aiInputPlaceholder: "向NPC或AI智脑提问（例如：秘银矿在哪里？）",
+        askBtn: "提问",
+        stanceLabel: "姿态", refineLabel: "精炼", statusLabel: "状态", normalStatus: "正常",
+        slot_weapon: "武器", slot_armor: "护甲", slot_helm: "头盔", slot_ring: "戒指", slot_relic: "圣物",
+        langSwitched: "🌐 语言已切换为简体中文，界面将仅显示中文内容。"
+      },
+      es: {
+        appTitle: "AETHELGARD",
+        aiReady: "🧠 IA CPU Lista",
+        turnBtn: "Turno",
+        sfxOn: "Audio Sí",
+        sfxMuted: "Silencio",
+        aiDmBtn: "🧠 IA DM",
+        heroBtn: "🧙 Héroe / Clase",
+        saveBtn: "💾 Guardar / JSON",
+        guideBtn: "? Guía",
+        hp: "PV", mp: "PM", sta: "VIG", xp: "EXP",
+        stanceSkillsTitle: "Postura y Habilidades",
+        peaceful: "Pacífico", inCombat: "En Combate",
+        stanceBalanced: "⚖️ Equilibrio", stanceAggro: "🔥 Furia", stanceGuard: "🛡️ Guardia",
+        ready: "LISTO",
+        strikeBtn: "⚔️ Atacar", potionBtn: "🧪 Poción", fleeBtn: "🏃 Huir",
+        statsTalentsTitle: "Atributos y Talentos",
+        ptsPrefix: "Pts", talPrefix: "Tal",
+        atk: "ATQ ", mag: "MAG ", def: "DEF ", crit: "CRÍT ",
+        warlordTitle: "Señor de Guerra", warlordDesc: "+8%Daño/Robo",
+        mysticTitle: "Místico", mysticDesc: "+10%MAG/Regen",
+        pathfinderTitle: "Explorador", pathfinderDesc: "+15%Oro/EXP",
+        safe: "Seguro", dangerPrefix: "Nv.",
+        aiNpcBtn: "🧠 PNJ IA", lookBtn: "👁️ Mirar",
+        engagedLabel: "⚔️ EN COMBATE:",
+        exitsLabel: "Salidas:", interactLabel: "Interactuar:",
+        quietSurroundings: "Entorno tranquilo",
+        filterAll: "Todo", filterCombat: "Combate", filterWorld: "Mundo", filterLoot: "Botín/Misiones", filterAi: "🧠 IA",
+        autoHuntPrefix: "🤖 Auto-Caza", on: "SÍ", off: "NO", clearBtn: "Limpiar",
+        cmdPlaceholder: "Comando (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <pregunta>, lang <code>)...",
+        sendBtn: "Enviar",
+        macroLook: "👁️ Mirar", macroHarvest: "🌿 Recolectar", macroRest: "💤 Descansar", macroBounty: "📜 Contratos", macroRift: "🌀 Fisura", macroAi: "🧠 Evento IA", macroHelp: "❓ Comandos",
+        atlasTitle: "Atlas del Mundo", autoCentered: "🎯 Auto-Centrado", scoutBtn: "🧭 Explorar",
+        legHaven: "● Santuario", legWilds: "● Selva", legCrypt: "● Cripta", legForge: "● Forja", legRift: "● Fisura",
+        tabPack: "🎒 Mochila", tabForge: "⚒️ Forja", tabQuests: "📜 Misiones", tabCodex: "🏆 Códice", tabAi: "🧠 IA DM",
+        backpackTitle: "Mochila y Materiales", sellExtraBtn: "🪙 Vender Equipo Extra", emptyPack: "La mochila está vacía",
+        quartermasterTitle: "🛒 Intendente Mercader", instantSupply: "Suministro",
+        useAction: "Usar", equipAction: "Equipar", infoAction: "Info", buyAction: "Comprar",
+        equippedTitle: "Equipo Activo", starRefineBtn: "✨ Refinar Estrella", emptySlot: "Vacío",
+        recipesTitle: "⚒️ Recetas de Forja y Alquimia", craftAction: "⚒️ Forjar", reqPrefix: "Req:",
+        campaignTitle: "📖 Campaña Épica", completeSuffix: "Completas", doneBadge: "LISTO", rewardPrefix: "Recompensa:",
+        bountiesTitle: "🎯 Contratos del Gremio", newContractsBtn: "🔄 Nuevos Contratos",
+        claimedBtn: "Reclamado", claimBtn: "¡Reclamar!", activeBtn: "Activo",
+        endlessRiftTitle: "🌀 Fisura Astral Infinita", bestPrefix: "Récord:",
+        endlessRiftDesc: "Enfrenta oleadas del Vacío para obtener equipo Mítico y Fragmentos.",
+        summonRiftBtn: "⚔️ Invocar Oleada de la Fisura",
+        slainLabel: "Bajas", craftedLabel: "Forjados", bossesLabel: "Jefes",
+        achievementsTitle: "🏅 Logros y Bonos Pasivos",
+        aiPanelTitle: "🧠 Motor IA Ligero en CPU",
+        aiPanelDesc: "Funciona 100% en CPU portátil sin GPU. Genera diálogos de PNJ, eventos dinámicos y tácticas.",
+        aiRoleplayTitle: "🎭 Rol con PNJ", aiRoleplaySub: "Diálogo Inteligente",
+        aiEncounterTitle: "🎲 Encuentro IA", aiEncounterSub: "Evento Dinámico",
+        aiAdvisorTitle: "🧭 Consejero IA", aiAdvisorSub: "Tácticas y Equipo",
+        aiEmptyHint: "¡Pulsa [🎭 Rol con PNJ], [🎲 Encuentro IA] o [🧭 Consejero IA], o escribe una pregunta abajo!",
+        aiInputPlaceholder: "Pregunta al PNJ o IA DM (ej. ¿Dónde hay Mithril?)",
+        askBtn: "Preguntar",
+        stanceLabel: "Postura", refineLabel: "Refinado", statusLabel: "Estado", normalStatus: "Normal",
+        slot_weapon: "Arma", slot_armor: "Armadura", slot_helm: "Yelmo", slot_ring: "Anillo", slot_relic: "Reliquia",
+        langSwitched: "🌐 Idioma cambiado a Español. Solo se mostrará Español."
+      },
+      ja: {
+        appTitle: "エセルガルド",
+        aiReady: "🧠 CPU AI 準備完了",
+        turnBtn: "ターン",
+        sfxOn: "効果音 ON",
+        sfxMuted: "ミュート",
+        aiDmBtn: "🧠 AI DM",
+        heroBtn: "🧙 英雄 / クラス",
+        saveBtn: "💾 保存 / JSON",
+        guideBtn: "? ガイド",
+        hp: "HP", mp: "MP", sta: "STA", xp: "EXP",
+        stanceSkillsTitle: "構え＆スキル",
+        peaceful: "非戦闘", inCombat: "戦闘中",
+        stanceBalanced: "⚖️ 均衡", stanceAggro: "🔥 猛攻", stanceGuard: "🛡️ 鉄壁",
+        ready: "発動可",
+        strikeBtn: "⚔️ 攻撃", potionBtn: "🧪 薬", fleeBtn: "🏃 撤退",
+        statsTalentsTitle: "能力値＆タレント",
+        ptsPrefix: "Pt", talPrefix: "天賦",
+        atk: "物攻 ", mag: "魔力 ", def: "防御 ", crit: "会心 ",
+        warlordTitle: "ウォーロード", warlordDesc: "+8%ダメ/吸収",
+        mysticTitle: "ミスティック", mysticDesc: "+10%魔力/MP回復",
+        pathfinderTitle: "パスファインダー", pathfinderDesc: "+15%金貨/EXP",
+        safe: "安全地帯", dangerPrefix: "危険 Lv.",
+        aiNpcBtn: "🧠 AI会話", lookBtn: "👁️ 調査",
+        engagedLabel: "⚔️ 交戦中:",
+        exitsLabel: "移動先:", interactLabel: "行動:",
+        quietSurroundings: "周囲は静まり返っている",
+        filterAll: "全て", filterCombat: "戦闘", filterWorld: "世界", filterLoot: "戦利品/任務", filterAi: "🧠 AI",
+        autoHuntPrefix: "🤖 自動狩猟", on: "ON", off: "OFF", clearBtn: "消去",
+        cmdPlaceholder: "コマンド入力 (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <質問>, lang <code>)...",
+        sendBtn: "送信",
+        macroLook: "👁️ 調査", macroHarvest: "🌿 採取", macroRest: "💤 休息", macroBounty: "📜 賞金首", macroRift: "🌀 無限裂け目", macroAi: "🧠 AI奇遇", macroHelp: "❓ コマンド",
+        atlasTitle: "世界星図", autoCentered: "🎯 自動中央追従", scoutBtn: "🧭 周辺偵察",
+        legHaven: "● 聖域", legWilds: "● 荒野", legCrypt: "● 地下墓地", legForge: "● 溶鉱炉", legRift: "● 裂け目",
+        tabPack: "🎒 鞄", tabForge: "⚒️ 鍛冶", tabQuests: "📜 任務", tabCodex: "🏆 図鑑", tabAi: "🧠 AI DM",
+        backpackTitle: "バックパック＆素材", sellExtraBtn: "🪙 余剰装備を売却", emptyPack: "バックパックは空です",
+        quartermasterTitle: "🛒 補給官ショップ", instantSupply: "即時補給",
+        useAction: "使用", equipAction: "装備", infoAction: "詳細", buyAction: "購入",
+        equippedTitle: "装備スロット", starRefineBtn: "✨ 星辰精錬", emptySlot: "空き",
+        recipesTitle: "⚒️ 鍛造＆錬金レシピ", craftAction: "⚒️ 製作", reqPrefix: "素材:",
+        campaignTitle: "📖 メインクエスト", completeSuffix: "完了", doneBadge: "達成", rewardPrefix: "報酬:",
+        bountiesTitle: "🎯 ギルド討伐依頼", newContractsBtn: "🔄 依頼更新",
+        claimedBtn: "受取済", claimBtn: "報酬受取!", activeBtn: "進行中",
+        endlessRiftTitle: "🌀 無限アストラル・リフト", bestPrefix: "最高記録:",
+        endlessRiftDesc: "強化され続ける虚空の波に挑み、神話装備と破片を獲得せよ。",
+        summonRiftBtn: "⚔️ 次のリフトウェーブを召喚",
+        slainLabel: "討伐数", craftedLabel: "製作数", bossesLabel: "ボス討伐",
+        achievementsTitle: "🏅 実績＆パッシブ恩恵",
+        aiPanelTitle: "🧠 軽量CPUローカルAI",
+        aiPanelDesc: "GPU不要でノートPCのCPUのみで高速動作。NPC対話、ランダム奇遇、戦術助言を生成します。",
+        aiRoleplayTitle: "🎭 NPC対話", aiRoleplaySub: "AIロールプレイ",
+        aiEncounterTitle: "🎲 AI奇遇イベント", aiEncounterSub: "動的イベント生成",
+        aiAdvisorTitle: "🧭 AI戦術参謀", aiAdvisorSub: "装備と攻略アドバイス",
+        aiEmptyHint: "上の［🎭 NPC対話］［🎲 AI奇遇イベント］［🧭 AI戦術参謀］を押すか、下に質問を入力してください！",
+        aiInputPlaceholder: "NPCやAI DMに質問する（例：ミスリル鉱石はどこ？）",
+        askBtn: "質問",
+        stanceLabel: "構え", refineLabel: "精錬", statusLabel: "状態", normalStatus: "通常",
+        slot_weapon: "武器", slot_armor: "防具", slot_helm: "兜", slot_ring: "指輪", slot_relic: "聖遺物",
+        langSwitched: "🌐 言語を日本語に設定しました。日本語のみ表示されます。"
+      },
+      ko: {
+        appTitle: "아이텔가드",
+        aiReady: "🧠 CPU AI 준비됨",
+        turnBtn: "턴제",
+        sfxOn: "효과음 켜짐",
+        sfxMuted: "음소거",
+        aiDmBtn: "🧠 AI DM",
+        heroBtn: "🧙 영웅 / 직업",
+        saveBtn: "💾 저장 / JSON",
+        guideBtn: "? 가이드",
+        hp: "생명", mp: "마나", sta: "기력", xp: "경험",
+        stanceSkillsTitle: "태세 및 스킬",
+        peaceful: "평화", inCombat: "전투 중",
+        stanceBalanced: "⚖️ 균형", stanceAggro: "🔥 맹공", stanceGuard: "🛡️ 수호",
+        ready: "준비됨",
+        strikeBtn: "⚔️ 공격", potionBtn: "🧪 물약", fleeBtn: "🏃 도주",
+        statsTalentsTitle: "능력치 및 특성",
+        ptsPrefix: "스탯", talPrefix: "특성",
+        atk: "공격 ", mag: "마력 ", def: "방어 ", crit: "치명 ",
+        warlordTitle: "전쟁군주", warlordDesc: "+8%피해/흡혈",
+        mysticTitle: "비전술사", mysticDesc: "+10%마력/마나회복",
+        pathfinderTitle: "개척자", pathfinderDesc: "+15%골드/경험치",
+        safe: "안전 지대", dangerPrefix: "위험 Lv.",
+        aiNpcBtn: "🧠 AI 대화", lookBtn: "👁️ 관찰",
+        engagedLabel: "⚔️ 교전 중:",
+        exitsLabel: "출구:", interactLabel: "상호작용:",
+        quietSurroundings: "주변이 고요합니다",
+        filterAll: "전체", filterCombat: "전투", filterWorld: "세계", filterLoot: "전리품/퀘스트", filterAi: "🧠 AI",
+        autoHuntPrefix: "🤖 자동사냥", on: "켜짐", off: "꺼짐", clearBtn: "지우기",
+        cmdPlaceholder: "명령어 입력 (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <질문>, lang <code>)...",
+        sendBtn: "전송",
+        macroLook: "👁️ 관찰", macroHarvest: "🌿 채집", macroRest: "💤 휴식", macroBounty: "📜 현상수배", macroRift: "🌀 무한균열", macroAi: "🧠 AI 기연", macroHelp: "❓ 명령어",
+        atlasTitle: "세계 성도", autoCentered: "🎯 자동 중앙 고정", scoutBtn: "🧭 지역 정찰",
+        legHaven: "● 성소", legWilds: "● 황야", legCrypt: "● 지하묘지", legForge: "● 용광로", legRift: "● 균열",
+        tabPack: "🎒 가방", tabForge: "⚒️ 대장간", tabQuests: "📜 퀘스트", tabCodex: "🏆 도감", tabAi: "🧠 AI DM",
+        backpackTitle: "가방 및 재료", sellExtraBtn: "🪙 여분 장비 판매", emptyPack: "가방이 비어 있습니다",
+        quartermasterTitle: "🛒 병참장교 상점", instantSupply: "즉시 보급",
+        useAction: "사용", equipAction: "장착", infoAction: "정보", buyAction: "구매",
+        equippedTitle: "장착 장비", starRefineBtn: "✨ 성진 제련", emptySlot: "비어 있음",
+        recipesTitle: "⚒️ 단조 및 연금술 도안", craftAction: "⚒️ 제작", reqPrefix: "재료:",
+        campaignTitle: "📖 메인 캠페인", completeSuffix: "완료", doneBadge: "완료됨", rewardPrefix: "보상:",
+        bountiesTitle: "🎯 길드 현상수배", newContractsBtn: "🔄 의뢰 갱신",
+        claimedBtn: "수령됨", claimBtn: "보상 수령!", activeBtn: "진행 중",
+        endlessRiftTitle: "🌀 무한 아스트랄 균열", bestPrefix: "최고 기록:",
+        endlessRiftDesc: "점점 강해지는 공허의 웨이브에 맞서 신화 장비와 파편을 획득하세요.",
+        summonRiftBtn: "⚔️ 다음 균열 웨이브 소환",
+        slainLabel: "처치", craftedLabel: "제작", bossesLabel: "보스",
+        achievementsTitle: "🏅 업적 및 지속 효과",
+        aiPanelTitle: "🧠 초경량 CPU 로컬 AI",
+        aiPanelDesc: "GPU 없는 일반 노트북 CPU에서 100% 작동합니다. NPC 대화, 기연 이벤트, 전술 조언을 생성합니다.",
+        aiRoleplayTitle: "🎭 NPC 롤플레잉", aiRoleplaySub: "지능형 NPC 대화",
+        aiEncounterTitle: "🎲 AI 기연 이벤트", aiEncounterSub: "동적 이벤트 생성",
+        aiAdvisorTitle: "🧭 AI 전술 고문", aiAdvisorSub: "장비 및 공략 분석",
+        aiEmptyHint: "위의 [🎭 NPC 롤플레잉], [🎲 AI 기연 이벤트], [🧭 AI 전술 고문]을 누르거나 아래에 질문을 입력하세요!",
+        aiInputPlaceholder: "NPC나 AI DM에게 질문하세요 (예: 미스릴 광석은 어디 있나요?)",
+        askBtn: "질문",
+        stanceLabel: "태세", refineLabel: "제련", statusLabel: "상태", normalStatus: "정상",
+        slot_weapon: "무기", slot_armor: "갑옷", slot_helm: "투구", slot_ring: "반지", slot_relic: "성물",
+        langSwitched: "🌐 언어가 한국어로 설정되었습니다. 한국어만 표시됩니다."
+      },
+      fr: {
+        appTitle: "AETHELGARD",
+        aiReady: "🧠 IA CPU Prête",
+        turnBtn: "Tour",
+        sfxOn: "Audio ON",
+        sfxMuted: "Muet",
+        aiDmBtn: "🧠 IA MJ",
+        heroBtn: "🧙 Héros / Classe",
+        saveBtn: "💾 Sauver / JSON",
+        guideBtn: "? Guide",
+        hp: "PV", mp: "PM", sta: "END", xp: "EXP",
+        stanceSkillsTitle: "Posture et Compétences",
+        peaceful: "Paisible", inCombat: "En Combat",
+        stanceBalanced: "⚖️ Équilibré", stanceAggro: "🔥 Assaut", stanceGuard: "🛡️ Garde",
+        ready: "PRÊT",
+        strikeBtn: "⚔️ Frapper", potionBtn: "🧪 Potion", fleeBtn: "🏃 Fuir",
+        statsTalentsTitle: "Attributs et Talents",
+        ptsPrefix: "Pts", talPrefix: "Tal",
+        atk: "ATQ ", mag: "MAG ", def: "DÉF ", crit: "CRIT ",
+        warlordTitle: "Seigneur de Guerre", warlordDesc: "+8%Dégâts/Vol",
+        mysticTitle: "Mystique", mysticDesc: "+10%MAG/Régén",
+        pathfinderTitle: "Éclaireur", pathfinderDesc: "+15%Or/EXP",
+        safe: "Sûr", dangerPrefix: "Niv.",
+        aiNpcBtn: "🧠 PNJ IA", lookBtn: "👁️ Observer",
+        engagedLabel: "⚔️ ENGAGÉ :",
+        exitsLabel: "Sorties :", interactLabel: "Interagir :",
+        quietSurroundings: "Alentours paisibles",
+        filterAll: "Tout", filterCombat: "Combat", filterWorld: "Monde", filterLoot: "Butin/Quêtes", filterAi: "🧠 IA",
+        autoHuntPrefix: "🤖 Chasse Auto", on: "OUI", off: "NON", clearBtn: "Effacer",
+        cmdPlaceholder: "Commande (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <question>, lang <code>)...",
+        sendBtn: "Envoyer",
+        macroLook: "👁️ Observer", macroHarvest: "🌿 Récolter", macroRest: "💤 Repos", macroBounty: "📜 Primes", macroRift: "🌀 Faille", macroAi: "🧠 Événement IA", macroHelp: "❓ Commandes",
+        atlasTitle: "Atlas du Monde", autoCentered: "🎯 Auto-Centré", scoutBtn: "🧭 Éclairer",
+        legHaven: "● Sanctuaire", legWilds: "● Terres", legCrypt: "● Crypte", legForge: "● Forge", legRift: "● Faille",
+        tabPack: "🎒 Sac", tabForge: "⚒️ Forge", tabQuests: "📜 Quêtes", tabCodex: "🏆 Codex", tabAi: "🧠 IA MJ",
+        backpackTitle: "Sac à Dos et Matériaux", sellExtraBtn: "🪙 Vendre Surplus", emptyPack: "Le sac est vide",
+        quartermasterTitle: "🛒 Intendant Marchand", instantSupply: "Ravitaillement",
+        useAction: "Utiliser", equipAction: "Équiper", infoAction: "Info", buyAction: "Acheter",
+        equippedTitle: "Équipement Porté", starRefineBtn: "✨ Raffiner Étoile", emptySlot: "Vide",
+        recipesTitle: "⚒️ Recettes de Forge et Alchimie", craftAction: "⚒️ Forger", reqPrefix: "Req :",
+        campaignTitle: "📖 Quêtes de Campagne", completeSuffix: "Terminées", doneBadge: "FAIT", rewardPrefix: "Récompense :",
+        bountiesTitle: "🎯 Contrats de Guilde", newContractsBtn: "🔄 Nouveaux Contrats",
+        claimedBtn: "Reçu", claimBtn: "Réclamer !", activeBtn: "Actif",
+        endlessRiftTitle: "🌀 Faille Astrale Infinie", bestPrefix: "Record :",
+        endlessRiftDesc: "Affrontez des vagues du Vide pour obtenir de l'équipement Mythique.",
+        summonRiftBtn: "⚔️ Invoquer la Prochaine Vague",
+        slainLabel: "Vaincus", craftedLabel: "Forgés", bossesLabel: "Boss",
+        achievementsTitle: "🏅 Hauts Faits et Bonus Passifs",
+        aiPanelTitle: "🧠 Moteur IA Léger sur CPU",
+        aiPanelDesc: "Tourne à 100% sur CPU portable sans GPU. Génère dialogues PNJ, rencontres et conseils tactiques.",
+        aiRoleplayTitle: "🎭 Dialogue PNJ", aiRoleplaySub: "Jeu de Rôle IA",
+        aiEncounterTitle: "🎲 Rencontre IA", aiEncounterSub: "Événement Dynamique",
+        aiAdvisorTitle: "🧭 Conseiller IA", aiAdvisorSub: "Tactiques et Équipement",
+        aiEmptyHint: "Cliquez sur [🎭 Dialogue PNJ], [🎲 Rencontre IA] ou [🧭 Conseiller IA], ou posez une question ci-dessous !",
+        aiInputPlaceholder: "Demandez au PNJ ou à l'IA MJ (ex. Où trouver du Mithril ?)",
+        askBtn: "Demander",
+        stanceLabel: "Posture", refineLabel: "Raffinage", statusLabel: "Statut", normalStatus: "Normal",
+        slot_weapon: "Arme", slot_armor: "Armure", slot_helm: "Casque", slot_ring: "Anneau", slot_relic: "Relique",
+        langSwitched: "🌐 Langue définie sur Français. Seul le français sera affiché."
+      },
+      de: {
+        appTitle: "AETHELGARD",
+        aiReady: "🧠 CPU-KI Bereit",
+        turnBtn: "Runde",
+        sfxOn: "Ton AN",
+        sfxMuted: "Stumm",
+        aiDmBtn: "🧠 KI-SL",
+        heroBtn: "🧙 Held / Klasse",
+        saveBtn: "💾 Speichern / JSON",
+        guideBtn: "? Hilfe",
+        hp: "LP", mp: "MP", sta: "AUS", xp: "EP",
+        stanceSkillsTitle: "Haltung & Fertigkeiten",
+        peaceful: "Friedlich", inCombat: "Im Kampf",
+        stanceBalanced: "⚖️ Ausgewogen", stanceAggro: "🔥 Offensiv", stanceGuard: "🛡️ Defensiv",
+        ready: "BEREIT",
+        strikeBtn: "⚔️ Schlag", potionBtn: "🧪 Trank", fleeBtn: "🏃 Fliehen",
+        statsTalentsTitle: "Attribute & Talente",
+        ptsPrefix: "Pkt", talPrefix: "Tal",
+        atk: "ANG ", mag: "MAG ", def: "ABW ", crit: "KRIT ",
+        warlordTitle: "Kriegsherr", warlordDesc: "+8%Schaden/Raub",
+        mysticTitle: "Mystiker", mysticDesc: "+10%MAG/Regen",
+        pathfinderTitle: "Pfadfinder", pathfinderDesc: "+15%Gold/EP",
+        safe: "Sicher", dangerPrefix: "St.",
+        aiNpcBtn: "🧠 KI-NSC", lookBtn: "👁️ Spähen",
+        engagedLabel: "⚔️ IM KAMPF:",
+        exitsLabel: "Ausgänge:", interactLabel: "Aktionen:",
+        quietSurroundings: "Ruhige Umgebung",
+        filterAll: "Alle", filterCombat: "Kampf", filterWorld: "Welt", filterLoot: "Beute/Quests", filterAi: "🧠 KI",
+        autoHuntPrefix: "🤖 Auto-Jagd", on: "AN", off: "AUS", clearBtn: "Leeren",
+        cmdPlaceholder: "Befehl eingeben (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <Frage>, lang <Code>)...",
+        sendBtn: "Senden",
+        macroLook: "👁️ Spähen", macroHarvest: "🌿 Sammeln", macroRest: "💤 Rasten", macroBounty: "📜 Kopfgeld", macroRift: "🌀 Endlosriss", macroAi: "🧠 KI-Event", macroHelp: "❓ Befehle",
+        atlasTitle: "Weltatlas", autoCentered: "🎯 Zentriert", scoutBtn: "🧭 Erkunden",
+        legHaven: "● Zuflucht", legWilds: "● Wildnis", legCrypt: "● Krypta", legForge: "● Schmiede", legRift: "● Riss",
+        tabPack: "🎒 Rucksack", tabForge: "⚒️ Schmiede", tabQuests: "📜 Quests", tabCodex: "🏆 Kodex", tabAi: "🧠 KI-SL",
+        backpackTitle: "Rucksack & Materialien", sellExtraBtn: "🪙 Überschuss verkaufen", emptyPack: "Rucksack ist leer",
+        quartermasterTitle: "🛒 Quartiermeister", instantSupply: "Sofortvorrat",
+        useAction: "Nutzen", equipAction: "Anlegen", infoAction: "Info", buyAction: "Kaufen",
+        equippedTitle: "Ausgerüstet", starRefineBtn: "✨ Stern-Veredeln", emptySlot: "Leer",
+        recipesTitle: "⚒️ Schmiede- & Alchemierezepte", craftAction: "⚒️ Fertigen", reqPrefix: "Benötigt:",
+        campaignTitle: "📖 Hauptkampagne", completeSuffix: "Fertig", doneBadge: "ERLEDIGT", rewardPrefix: "Belohnung:",
+        bountiesTitle: "🎯 Gildenaufträge", newContractsBtn: "🔄 Neue Aufträge",
+        claimedBtn: "Erhalten", claimBtn: "Abholen!", activeBtn: "Aktiv",
+        endlessRiftTitle: "🌀 Endloser Astralriss", bestPrefix: "Rekord:",
+        endlessRiftDesc: "Bekämpfe eskalierende Leerenwellen für mythische Ausrüstung.",
+        summonRiftBtn: "⚔️ Nächste Risswelle beschwören",
+        slainLabel: "Besiegt", craftedLabel: "Gefertigt", bossesLabel: "Bosse",
+        achievementsTitle: "🏅 Erfolge & Passive Boni",
+        aiPanelTitle: "🧠 Lokale CPU-KI",
+        aiPanelDesc: "Läuft zu 100 % auf normalen Laptop-CPUs ohne GPU. Erzeugt NSC-Dialoge, Begegnungen & Taktiken.",
+        aiRoleplayTitle: "🎭 NSC-Rollenspiel", aiRoleplaySub: "KI-Dialog",
+        aiEncounterTitle: "🎲 KI-Begegnung", aiEncounterSub: "Dynamisches Event",
+        aiAdvisorTitle: "🧭 KI-Berater", aiAdvisorSub: "Kampf- & Build-Rat",
+        aiEmptyHint: "Klicke oben auf [🎭 NSC-Rollenspiel], [🎲 KI-Begegnung] oder [🧭 KI-Berater] oder stelle unten eine Frage!",
+        aiInputPlaceholder: "Frage den NSC oder KI-SL (z.B. Wo gibt es Mithril?)",
+        askBtn: "Fragen",
+        stanceLabel: "Haltung", refineLabel: "Veredelung", statusLabel: "Status", normalStatus: "Normal",
+        slot_weapon: "Waffe", slot_armor: "Rüstung", slot_helm: "Helm", slot_ring: "Ring", slot_relic: "Relikt",
+        langSwitched: "🌐 Sprache auf Deutsch eingestellt. Es wird nur Deutsch angezeigt."
+      },
+      pt: {
+        appTitle: "AETHELGARD",
+        aiReady: "🧠 IA CPU Pronta",
+        turnBtn: "Turno",
+        sfxOn: "Som ON",
+        sfxMuted: "Mudo",
+        aiDmBtn: "🧠 IA Mestre",
+        heroBtn: "🧙 Herói / Classe",
+        saveBtn: "💾 Salvar / JSON",
+        guideBtn: "? Guia",
+        hp: "PV", mp: "PM", sta: "VIG", xp: "EXP",
+        stanceSkillsTitle: "Postura e Habilidades",
+        peaceful: "Pacífico", inCombat: "Em Combate",
+        stanceBalanced: "⚖️ Equilíbrio", stanceAggro: "🔥 Fúria", stanceGuard: "🛡️ Guarda",
+        ready: "PRONTO",
+        strikeBtn: "⚔️ Golpear", potionBtn: "🧪 Poção", fleeBtn: "🏃 Fugir",
+        statsTalentsTitle: "Atributos e Talentos",
+        ptsPrefix: "Pts", talPrefix: "Tal",
+        atk: "ATQ ", mag: "MAG ", def: "DEF ", crit: "CRÍT ",
+        warlordTitle: "Senhor da Guerra", warlordDesc: "+8%Dano/Roubo",
+        mysticTitle: "Místico", mysticDesc: "+10%MAG/Regen",
+        pathfinderTitle: "Desbravador", pathfinderDesc: "+15%Ouro/EXP",
+        safe: "Seguro", dangerPrefix: "Nv.",
+        aiNpcBtn: "🧠 NPC IA", lookBtn: "👁️ Olhar",
+        engagedLabel: "⚔️ EM COMBATE:",
+        exitsLabel: "Saídas:", interactLabel: "Interagir:",
+        quietSurroundings: "Arredores tranquilos",
+        filterAll: "Tudo", filterCombat: "Combate", filterWorld: "Mundo", filterLoot: "Saque/Missões", filterAi: "🧠 IA",
+        autoHuntPrefix: "🤖 Auto-Caça", on: "SIM", off: "NÃO", clearBtn: "Limpar",
+        cmdPlaceholder: "Comando (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <pergunta>, lang <código>)...",
+        sendBtn: "Enviar",
+        macroLook: "👁️ Olhar", macroHarvest: "🌿 Coletar", macroRest: "💤 Descansar", macroBounty: "📜 Contratos", macroRift: "🌀 Fenda", macroAi: "🧠 Evento IA", macroHelp: "❓ Comandos",
+        atlasTitle: "Atlas do Mundo", autoCentered: "🎯 Auto-Centralizado", scoutBtn: "🧭 Explorar",
+        legHaven: "● Santuário", legWilds: "● Selva", legCrypt: "● Cripta", legForge: "● Forja", legRift: "● Fenda",
+        tabPack: "🎒 Mochila", tabForge: "⚒️ Forja", tabQuests: "📜 Missões", tabCodex: "🏆 Códice", tabAi: "🧠 IA Mestre",
+        backpackTitle: "Mochila e Materiais", sellExtraBtn: "🪙 Vender Extras", emptyPack: "Mochila vazia",
+        quartermasterTitle: "🛒 Intendente Mercador", instantSupply: "Suprimento",
+        useAction: "Usar", equipAction: "Equipar", infoAction: "Info", buyAction: "Comprar",
+        equippedTitle: "Equipamento Ativo", starRefineBtn: "✨ Refinar Estrela", emptySlot: "Vazio",
+        recipesTitle: "⚒️ Receitas de Forja e Alquimia", craftAction: "⚒️ Forjar", reqPrefix: "Req:",
+        campaignTitle: "📖 Missões de Campanha", completeSuffix: "Completas", doneBadge: "FEITO", rewardPrefix: "Recompensa:",
+        bountiesTitle: "🎯 Contratos da Guilda", newContractsBtn: "🔄 Novos Contratos",
+        claimedBtn: "Resgatado", claimBtn: "Resgatar!", activeBtn: "Ativo",
+        endlessRiftTitle: "🌀 Fenda Astral Infinita", bestPrefix: "Recorde:",
+        endlessRiftDesc: "Enfrente ondas crescentes do Vazio por itens Míticos e Fragmentos.",
+        summonRiftBtn: "⚔️ Invocar Próxima Onda da Fenda",
+        slainLabel: "Abates", craftedLabel: "Forjados", bossesLabel: "Chefes",
+        achievementsTitle: "🏅 Conquistas e Bônus Passivos",
+        aiPanelTitle: "🧠 Motor IA Leve em CPU",
+        aiPanelDesc: "Roda 100% em CPU de notebook sem GPU. Gera diálogos de NPC, encontros dinâmicos e táticas.",
+        aiRoleplayTitle: "🎭 RPG com NPC", aiRoleplaySub: "Diálogo Inteligente",
+        aiEncounterTitle: "🎲 Encontro IA", aiEncounterSub: "Evento Dinâmico",
+        aiAdvisorTitle: "🧭 Consultor IA", aiAdvisorSub: "Táticas e Build",
+        aiEmptyHint: "Clique em [🎭 RPG com NPC], [🎲 Encontro IA] ou [🧭 Consultor IA] acima, ou digite uma pergunta abaixo!",
+        aiInputPlaceholder: "Pergunte ao NPC ou IA Mestre (ex. Onde encontrar Mithril?)",
+        askBtn: "Perguntar",
+        stanceLabel: "Postura", refineLabel: "Refino", statusLabel: "Estado", normalStatus: "Normal",
+        slot_weapon: "Arma", slot_armor: "Armadura", slot_helm: "Elmo", slot_ring: "Anel", slot_relic: "Relíquia",
+        langSwitched: "🌐 Idioma definido para Português. Apenas Português será exibido."
+      },
+      ru: {
+        appTitle: "ЭТЕЛЬГАРД",
+        aiReady: "🧠 CPU ИИ Готов",
+        turnBtn: "Ход",
+        sfxOn: "Звук ВКЛ",
+        sfxMuted: "Без звука",
+        aiDmBtn: "🧠 ИИ Мастер",
+        heroBtn: "🧙 Герой / Класс",
+        saveBtn: "💾 Сохр. / JSON",
+        guideBtn: "? Гайд",
+        hp: "ОЗ", mp: "ОМ", sta: "ВЫН", xp: "ОПЫТ",
+        stanceSkillsTitle: "Стойка и Навыки",
+        peaceful: "Мирно", inCombat: "В Бою",
+        stanceBalanced: "⚖️ Баланс", stanceAggro: "🔥 Натиск", stanceGuard: "🛡️ Защита",
+        ready: "ГОТОВО",
+        strikeBtn: "⚔️ Удар", potionBtn: "🧪 Зелье", fleeBtn: "🏃 Побег",
+        statsTalentsTitle: "Характеристики и Таланты",
+        ptsPrefix: "Очк", talPrefix: "Тал",
+        atk: "АТК ", mag: "МАГ ", def: "ЗАЩ ", crit: "КРИТ ",
+        warlordTitle: "Полководец", warlordDesc: "+8%Урон/Вампиризм",
+        mysticTitle: "Мистик", mysticDesc: "+10%МАГ/Реген",
+        pathfinderTitle: "Следопыт", pathfinderDesc: "+15%Золото/ОПЫТ",
+        safe: "Безопасно", dangerPrefix: "Ур.",
+        aiNpcBtn: "🧠 ИИ НПС", lookBtn: "👁️ Осмотр",
+        engagedLabel: "⚔️ В БОЮ:",
+        exitsLabel: "Выходы:", interactLabel: "Действия:",
+        quietSurroundings: "Вокруг спокойно",
+        filterAll: "Все", filterCombat: "Бой", filterWorld: "Мир", filterLoot: "Добыча/Квесты", filterAi: "🧠 ИИ",
+        autoHuntPrefix: "🤖 Авто-Охота", on: "ВКЛ", off: "ВЫКЛ", clearBtn: "Очистить",
+        cmdPlaceholder: "Команда (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <вопрос>, lang <код>)...",
+        sendBtn: "Ввод",
+        macroLook: "👁️ Осмотр", macroHarvest: "🌿 Сбор", macroRest: "💤 Отдых", macroBounty: "📜 Контракты", macroRift: "🌀 Разлом", macroAi: "🧠 ИИ Событие", macroHelp: "❓ Команды",
+        atlasTitle: "Атлас Мира", autoCentered: "🎯 На Герое", scoutBtn: "🧭 Разведка",
+        legHaven: "● Оплот", legWilds: "● Дебри", legCrypt: "● Катакомбы", legForge: "● Кузня", legRift: "● Разлом",
+        tabPack: "🎒 Сумка", tabForge: "⚒️ Кузня", tabQuests: "📜 Квесты", tabCodex: "🏆 Кодекс", tabAi: "🧠 ИИ Мастер",
+        backpackTitle: "Рюкзак и Материалы", sellExtraBtn: "🪙 Продать Лишнее", emptyPack: "Рюкзак пуст",
+        quartermasterTitle: "🛒 Лавка Интенданта", instantSupply: "Снабжение",
+        useAction: "Исп.", equipAction: "Надеть", infoAction: "Инфо", buyAction: "Купить",
+        equippedTitle: "Снаряжение", starRefineBtn: "✨ Звездная Заточка", emptySlot: "Пусто",
+        recipesTitle: "⚒️ Рецепты Кузни и Алхимии", craftAction: "⚒️ Создать", reqPrefix: "Треб.:",
+        campaignTitle: "📖 Сюжетная Кампания", completeSuffix: "Готово", doneBadge: "ГОТОВО", rewardPrefix: "Награда:",
+        bountiesTitle: "🎯 Контракты Гильдии", newContractsBtn: "🔄 Обновить",
+        claimedBtn: "Получено", claimBtn: "Забрать!", activeBtn: "Активно",
+        endlessRiftTitle: "🌀 Бесконечный Разлом", bestPrefix: "Рекорд:",
+        endlessRiftDesc: "Сражайтесь с волнами Бездны за мифическое снаряжение и осколки.",
+        summonRiftBtn: "⚔️ Призвать Волну Разлома",
+        slainLabel: "Убито", craftedLabel: "Создано", bossesLabel: "Боссы",
+        achievementsTitle: "🏅 Достижения и Бонусы",
+        aiPanelTitle: "🧠 Локальный CPU ИИ",
+        aiPanelDesc: "Работает на 100% на обычном процессоре ноутбука без GPU. Генерирует диалоги, события и тактику.",
+        aiRoleplayTitle: "🎭 Диалог с НПС", aiRoleplaySub: "Ролевая беседа",
+        aiEncounterTitle: "🎲 Событие ИИ", aiEncounterSub: "Динамическая встреча",
+        aiAdvisorTitle: "🧭 Советник ИИ", aiAdvisorSub: "Тактика и сборка",
+        aiEmptyHint: "Нажмите [🎭 Диалог с НПС], [🎲 Событие ИИ] или [🧭 Советник ИИ] выше, или введите вопрос ниже!",
+        aiInputPlaceholder: "Спросите НПС или ИИ Мастера (напр. Где найти мифрил?)",
+        askBtn: "Спросить",
+        stanceLabel: "Стойка", refineLabel: "Заточка", statusLabel: "Статус", normalStatus: "Норма",
+        slot_weapon: "Оружие", slot_armor: "Броня", slot_helm: "Шлем", slot_ring: "Кольцо", slot_relic: "Реликвия",
+        langSwitched: "🌐 Язык переключен на Русский. Отображается только русский язык."
+      },
+      ar: {
+        appTitle: "إيثيلغارد",
+        aiReady: "🧠 ذكاء المعالج جاهز",
+        turnBtn: "تناوب",
+        sfxOn: "الصوت مفعل",
+        sfxMuted: "صامت",
+        aiDmBtn: "🧠 راوي الذكاء",
+        heroBtn: "🧙 البطل / الفئة",
+        saveBtn: "💾 حفظ / JSON",
+        guideBtn: "؟ الدليل",
+        hp: "الصحة", mp: "الطاقة", sta: "التحمل", xp: "الخبرة",
+        stanceSkillsTitle: "الوضعية والمهارات",
+        peaceful: "مسالم", inCombat: "في قتال",
+        stanceBalanced: "⚖️ متوازن", stanceAggro: "🔥 هجومي", stanceGuard: "🛡️ دفاعي",
+        ready: "جاهز",
+        strikeBtn: "⚔️ هجوم", potionBtn: "🧪 جرعة", fleeBtn: "🏃 انسحاب",
+        statsTalentsTitle: "السمات والمواهب",
+        ptsPrefix: "نقاط", talPrefix: "مواهب",
+        atk: "هجوم ", mag: "سحر ", def: "دفاع ", crit: "حرج ",
+        warlordTitle: "سيد الحرب", warlordDesc: "+8%ضرر/استنزاف",
+        mysticTitle: "العارف", mysticDesc: "+10%سحر/تجدد",
+        pathfinderTitle: "المستكشف", pathfinderDesc: "+15%ذهب/خبرة",
+        safe: "آمن", dangerPrefix: "خطر ",
+        aiNpcBtn: "🧠 حوار ذكي", lookBtn: "👁️ استطلاع",
+        engagedLabel: "⚔️ اشتباك:",
+        exitsLabel: "المخارج:", interactLabel: "تفاعل:",
+        quietSurroundings: "الأجواء هادئة",
+        filterAll: "الكل", filterCombat: "القتال", filterWorld: "العالم", filterLoot: "الغنائم/المهام", filterAi: "🧠 الذكاء",
+        autoHuntPrefix: "🤖 صيد تلقائي", on: "مفعل", off: "معطل", clearBtn: "مسح",
+        cmdPlaceholder: "أدخل أمراً (n, s, e, w, look, attack, harvest, rest, quest, rift, ai <سؤال>, lang <رمز>)...",
+        sendBtn: "إرسال",
+        macroLook: "👁️ استطلاع", macroHarvest: "🌿 حصاد", macroRest: "💤 راحة", macroBounty: "📜 عقود", macroRift: "🌀 الصدع", macroAi: "🧠 حدث ذكي", macroHelp: "❓ الأوامر",
+        atlasTitle: "أطلس العالم", autoCentered: "🎯 تمركز تلقائي", scoutBtn: "🧭 كشف المنطقة",
+        legHaven: "● الملاذ", legWilds: "● البراري", legCrypt: "● السرداب", legForge: "● المصهر", legRift: "● الصدع",
+        tabPack: "🎒 الحقيبة", tabForge: "⚒️ الحدادة", tabQuests: "📜 المهام", tabCodex: "🏆 السجل", tabAi: "🧠 الذكاء",
+        backpackTitle: "الحقيبة والموارد", sellExtraBtn: "🪙 بيع الفائض", emptyPack: "الحقيبة فارغة",
+        quartermasterTitle: "🛒 متجر الإمداد", instantSupply: "إمداد فوري",
+        useAction: "استخدام", equipAction: "تجهيز", infoAction: "معلومات", buyAction: "شراء",
+        equippedTitle: "العتاد المجهز", starRefineBtn: "✨ صقل نجمي", emptySlot: "فارغ",
+        recipesTitle: "⚒️ وصفات الحدادة والخيمياء", craftAction: "⚒️ تصنيع", reqPrefix: "يتطلب:",
+        campaignTitle: "📖 مهام القصة", completeSuffix: "مكتملة", doneBadge: "مكتمل", rewardPrefix: "المكافأة:",
+        bountiesTitle: "🎯 عقود النقابة", newContractsBtn: "🔄 عقود جديدة",
+        claimedBtn: "تم الاستلام", claimBtn: "استلام!", activeBtn: "جاري",
+        endlessRiftTitle: "🌀 الصدع النجمي اللانهائي", bestPrefix: "الأفضل:",
+        endlessRiftDesc: "واجه موجات الفراغ المتصاعدة للحصول على عتاد أسطوري وشظايا.",
+        summonRiftBtn: "⚔️ استدعاء موجة الصدع التالية",
+        slainLabel: "القتلى", craftedLabel: "المصنوعات", bossesLabel: "الزعماء",
+        achievementsTitle: "🏅 الإنجازات والمكافآت",
+        aiPanelTitle: "🧠 نموذج ذكاء محلي للمعالج",
+        aiPanelDesc: "يعمل بالكامل على معالج الحاسوب المحمول بدون بطاقة رسوميات لتوليد الحوارات والأحداث والتكتيكات.",
+        aiRoleplayTitle: "🎭 حوار الشخصيات", aiRoleplaySub: "محادثة تفاعلية",
+        aiEncounterTitle: "🎲 حدث ذكي", aiEncounterSub: "مغامرة ديناميكية",
+        aiAdvisorTitle: "🧭 المستشار التكتيكي", aiAdvisorSub: "تحليل العتاد والقتال",
+        aiEmptyHint: "اضغط على [🎭 حوار الشخصيات] أو [🎲 حدث ذكي] أو [🧭 المستشار التكتيكي] أعلاه أو اكتب سؤالك بالأسفل!",
+        aiInputPlaceholder: "اسأل الشخصية أو الذكاء الاصطناعي (مثال: أين أجد خام الميثريل؟)",
+        askBtn: "اسأل",
+        stanceLabel: "الوضعية", refineLabel: "الصقل", statusLabel: "الحالة", normalStatus: "طبيعي",
+        slot_weapon: "سلاح", slot_armor: "درع", slot_helm: "خوذة", slot_ring: "خاتم", slot_relic: "أثر",
+        langSwitched: "🌐 تم ضبط اللغة إلى العربية. سيتم عرض اللغة العربية فقط."
+      }
+    };
+
+    const BIOME_I18N = {
+      "Oakhaven Sanctuary": {
+        en: "Oakhaven Sanctuary", zh: "橡木港圣所", es: "Santuario de Oakhaven", ja: "オークヘイヴン聖域",
+        ko: "오크헤이븐 성소", fr: "Sanctuaire d'Oakhaven", de: "Eichenhafen-Zuflucht", pt: "Santuário de Oakhaven",
+        ru: "Святилище Оукхейвен", ar: "ملاذ أوكهافن"
+      },
+      "Whispering Wilds": {
+        en: "Whispering Wilds", zh: "低语荒野", es: "Selva Susurrante", ja: "囁きの荒野",
+        ko: "속삭이는 황야", fr: "Terres Murmurantes", de: "Flüsternde Wildnis", pt: "Selva Sussurrante",
+        ru: "Шепчущие Дебри", ar: "البراري الهامسة"
+      },
+      "Sunken Catacombs": {
+        en: "Sunken Catacombs", zh: "沉没地下墓穴", es: "Catacumbas Hundidas", ja: "水没した地下墓地",
+        ko: "가라앉은 지하묘지", fr: "Catacombes Englouties", de: "Versunkene Katakomben", pt: "Catacumbas Submersas",
+        ru: "Затопленные Катакомбы", ar: "السراديب الغارقة"
+      },
+      "Emberpeak Forge-Ruins": {
+        en: "Emberpeak Forge-Ruins", zh: "烬峰熔炉遗迹", es: "Ruinas de Forja Brasa", ja: "エンバーピーク鍛冶遺跡",
+        ko: "엠버피크 용광로 유적", fr: "Ruines-Forges de Braise", de: "Glutgipfel-Schmiederuinen", pt: "Ruínas da Forja Brasa",
+        ru: "Кузни Пика Пепла", ar: "أطلال مصهر الجمر"
+      },
+      "Astral Rift Citadel": {
+        en: "Astral Rift Citadel", zh: "星界裂隙堡垒", es: "Ciudadela de la Fisura Astral", ja: "アストラル・リフト城塞",
+        ko: "아스트랄 균열 성채", fr: "Citadelle de la Faille Astrale", de: "Astralriss-Zitadelle", pt: "Cidadela da Fenda Astral",
+        ru: "Цитадель Астрального Разлома", ar: "قلعة الصدع النجمي"
+      }
+    };
+
+    const DIR_I18N = {
+      n: { en: "N", zh: "北", es: "N", ja: "北", ko: "북", fr: "N", de: "N", pt: "N", ru: "С", ar: "ش" },
+      s: { en: "S", zh: "南", es: "S", ja: "南", ko: "남", fr: "S", de: "S", pt: "S", ru: "Ю", ar: "ج" },
+      e: { en: "E", zh: "东", es: "E", ja: "東", ko: "동", fr: "E", de: "O", pt: "L", ru: "В", ar: "شر" },
+      w: { en: "W", zh: "西", es: "O", ja: "西", ko: "서", fr: "O", de: "W", pt: "O", ru: "З", ar: "غ" },
+      u: { en: "U", zh: "上", es: "Arr", ja: "上", ko: "위", fr: "H", de: "Ob", pt: "Cim", ru: "Вв", ar: "أع" },
+      d: { en: "D", zh: "下", es: "Abj", ja: "下", ko: "아래", fr: "B", de: "Un", pt: "Bxo", ru: "Вн", ar: "أس" }
+    };
+
+    const TIME_I18N = {
+      Dawn: { en: "Dawn", zh: "黎明", es: "alba", ja: "夜明け", ko: "새벽", fr: "Aube", de: "Morgengrauen", pt: "Aurora", ru: "Рассвет", ar: "الفجر" },
+      Day: { en: "Day", zh: "白昼", es: "Día", ja: "昼", ko: "낮", fr: "Jour", de: "Tag", pt: "Dia", ru: "День", ar: "النهار" },
+      Dusk: { en: "Dusk", zh: "黄昏", es: "Ocaso", ja: "夕暮れ", ko: "황혼", fr: "Crépuscule", de: "Dämmerung", pt: "Crepúsculo", ru: "Сумерки", ar: "الغسق" },
+      Midnight: { en: "Midnight", zh: "午夜", es: "Medianoche", ja: "真夜中", ko: "자정", fr: "Minuit", de: "Mitternacht", pt: "Meia-noite", ru: "Полночь", ar: "منتصف الليل" }
+    };
+
+    const WEATHER_I18N = {
+      "Clear Skies": { en: "Clear Skies", zh: "万里晴空", es: "Cielo Despejado", ja: "快晴", ko: "맑은 하늘", fr: "Ciel Dégagé", de: "Klarer Himmel", pt: "Céu Limpo", ru: "Ясное небо", ar: "سماء صافية" },
+      "Emerald Mist": { en: "Emerald Mist", zh: "翡翠迷雾", es: "Niebla Esmeralda", ja: "翠の霧", ko: "에메랄드 안개", fr: "Brume d'Émeraude", de: "Smaragdnebel", pt: "Névoa Esmeralda", ru: "Изумрудный туман", ar: "ضباب زمردي" },
+      "Arcane Storm": { en: "Arcane Storm", zh: "奥术风暴", es: "Tormenta Arcana", ja: "秘術の嵐", ko: "비전 폭풍", fr: "Tempête Arcanique", de: "Arkaner Sturm", pt: "Tempestade Arcana", ru: "Арканный шторм", ar: "عاصفة سحرية" },
+      "Blood Moon": { en: "Blood Moon", zh: "血月降临", es: "Luna de Sangre", ja: "ブラッドムーン", ko: "붉은 달", fr: "Lune de Sang", de: "Blutmond", pt: "Lua de Sangue", ru: "Кровавая луна", ar: "القمر الدموي" }
+    };
+
+    const STANCE_I18N = {
+      balanced: { en: "Balanced", zh: "均衡", es: "Equilibrado", ja: "均衡", ko: "균형", fr: "Équilibré", de: "Ausgewogen", pt: "Equilibrado", ru: "Баланс", ar: "متوازن" },
+      aggressive: { en: "Aggressive", zh: "狂攻", es: "Agresivo", ja: "猛攻", ko: "맹공", fr: "Offensif", de: "Offensiv", pt: "Agressivo", ru: "Натиск", ar: "هجومي" },
+      defensive: { en: "Defensive", zh: "守护", es: "Defensivo", ja: "鉄壁", ko: "수호", fr: "Défensif", de: "Defensiv", pt: "Defensivo", ru: "Защита", ar: "دفاعي" }
+    };
+
+    const CLASS_I18N = {
+      vanguard: { en: "Vanguard", zh: "先锋卫士", es: "Vanguardia", ja: "ヴァンガード", ko: "선봉장", fr: "Avant-garde", de: "Vorhut", pt: "Vanguarda", ru: "Авангард", ar: "الطليعة" },
+      arcanist: { en: "Arcanist", zh: "裂隙奥术师", es: "Arcanista", ja: "アルカニスト", ko: "비전술사", fr: "Arcaniste", de: "Arkanist", pt: "Arcanista", ru: "Арканист", ar: "ساحر الصدع" },
+      shadowblade: { en: "Shadowblade", zh: "暗影刺客", es: "Hoja Sombría", ja: "シャドウブレイド", ko: "그림자 자객", fr: "Lame d'Ombre", de: "Schattenklinge", pt: "Lâmina Sombria", ru: "Клинок Тени", ar: "نصل الظل" }
+    };
+
+    const ROOM_TITLE_I18N = {
+      r_town_square: { es: "Plaza de Oakhaven", ja: "オークヘイヴン広場", ko: "오크헤이븐 광장", fr: "Place d'Oakhaven", de: "Platz von Eichenhafen", pt: "Praça de Oakhaven", ru: "Площадь Оукхейвена", ar: "ساحة أوكهافن" },
+      r_blacksmith: { es: "Herrería Corazón de Hierro", ja: "アイアンハート鍛冶場", ko: "강철심장 대장간", fr: "Forge Cœur-de-Fer", de: "Eisenherz-Schmiede", pt: "Ferraria Coração de Ferro", ru: "Кузня Железного Сердца", ar: "محددة قلب الحديد" },
+      r_alchemist: { es: "Botica Pétalo Lunar", ja: "月花弁の調合所", ko: "달꽃잎 연금공방", fr: "Apothicairerie Pétale-de-Lune", de: "Mondblüten-Apotheke", pt: "Botica Pétala Lunar", ru: "Аптека Лунного Лепестка", ar: "معمل بتلة القمر" },
+      r_guild_hall: { es: "Salón del Gremio", ja: "冒険者ギルドホール", ko: "모험가 길드 전당", fr: "Hall de la Guilde", de: "Abenteurergilde", pt: "Salão da Guilda", ru: "Зал Гильдии Искателей", ar: "قاعة نقابة المغامرين" },
+      r_tavern: { es: "Taberna del Grifo Dorado", ja: "黄金グリフィン酒場", ko: "황금 그리핀 주점", fr: "Taverne du Griffon Doré", de: "Taverne zum Goldenen Greif", pt: "Taverna do Grifo Dourado", ru: "Таверна Золотого Грифона", ar: "حانة الغريفين المذهب" },
+      r_north_gate: { es: "Puerta Norte de Oakhaven", ja: "オークヘイヴン北門", ko: "오크헤이븐 북문 초소", fr: "Porte Nord d'Oakhaven", de: "Nordtor von Eichenhafen", pt: "Portão Norte de Oakhaven", ru: "Северные Врата Оукхейвена", ar: "البوابة الشمالية لأوكهافن" },
+      r_wilds_trail: { es: "Sendero del Bosque Musgoso", ja: "苔むした森の小道", ko: "이끼 낀 숲길", fr: "Sentier de la Forêt Moussue", de: "Moosiger Waldpfad", pt: "Trilha da Floresta Musgosa", ru: "Мшистая лесная тропа", ar: "درب الغابة الطحلبية" },
+      r_old_mill: { es: "Molino de Agua Abandonado", ja: "廃れた水車小屋", ko: "버려진 물레방앗간", fr: "Moulin à Eau Abandonné", de: "Verlassene Wassermühle", pt: "Moinho de Água Abandonado", ru: "Заброшенная водяная мельница", ar: "طاحونة الماء المهجورة" },
+      r_mushroom_grove: { es: "Arboleda de Esporas Luminosas", ja: "発光胞子の森", ko: "형광 포자 숲", fr: "Bosquet de Spores Luminescentes", de: "Leuchtender Sporenhain", pt: "Bosque de Esporos Luminosos", ru: "Роща светящихся спор", ar: "أيكة الأبواغ المضيئة" },
+      r_hunter_camp: { es: "Puesto de Avanzada Guardabosques", ja: "レンジャーの前哨基地", ko: "순찰자 전초기지", fr: "Avant-poste des Rôdeurs", de: "Waldläufer-Außenposten", pt: "Posto Avançado dos Patrulheiros", ru: "Аванпост Следопытов", ar: "معسكر الجوالة المتقدم" },
+      r_ancient_menhir: { es: "Círculo de Piedras Antiguas", ja: "古代の立石陣", ko: "고대 선돌 마법진", fr: "Cercle de Menhirs Anciens", de: "Kreis der Stehenden Steine", pt: "Círculo de Pedras Antigas", ru: "Круг древних менгиров", ar: "دائرة الأحجار القديمة" },
+      r_river_ford: { es: "Vado de Arroyo Plateado", ja: "銀の小川の浅瀬", ko: "은빛시내 여울", fr: "Gué de Ruisseau-d'Argent", de: "Silberbach-Furt", pt: "Vau do Riacho Prateado", ru: "Брод Серебряного Ручья", ar: "مخاضة الجدول الفضي" },
+      r_bandit_stronghold: { es: "Empalizada del Rey Bandido", ja: "茨木の山賊砦", ko: "가시나무 산적 요새", fr: "Palissade des Brigands", de: "Dornwald-Banditenpalisade", pt: "Paliçada dos Bandidos", ru: "Частокол Короля Бандитов", ar: "معقل ملك قطاع الطرق" },
+      r_catacomb_stairs: { es: "Escalera de la Cripta Inundada", ja: "水没した墓地の階段", ko: "침수된 지하묘지 계단", fr: "Escalier de la Crypte Inondée", de: "Überflutete Kryptatreppe", pt: "Escadaria da Cripta Inundada", ru: "Затопленная лестница склепа", ar: "درج السرداب الغارق" },
+      r_ossuary: { es: "Salón de los Diez Mil Huesos", ja: "万骨の回廊", ko: "만골의 회랑", fr: "Salle des Dix Mille Os", de: "Halle der Zehntausend Knochen", pt: "Salão dos Dez Mil Ossos", ru: "Зал Десяти Тысяч Костей", ar: "قاعة العشرة آلاف عظمة" },
+      r_drowned_nave: { es: "Nave de la Catedral Ahogada", ja: "水没した大聖堂の身廊", ko: "수몰된 대성당 본당", fr: "Nef de la Cathédrale Engloutie", de: "Versunkenes Kirchenschiff", pt: "Nave da Catedral Submersa", ru: "Неф Затопленного Собора", ar: "صحن الكاتدرائية الغارقة" },
+      r_scriptorium: { es: "Scriptorium Prohibido", ja: "禁じられた写本室", ko: "금지된 필사실", fr: "Scriptorium Interdit", de: "Verbotenes Skriptorium", pt: "Scriptorium Proibido", ru: "Запретный Скрипторий", ar: "قاعة المخطوطات المحرمة" },
+      r_reliquary: { es: "Bóveda del Relicario Sellado", ja: "封印された聖遺物庫", ko: "봉인된 성물 보관소", fr: "Voûte du Reliquaire Scellé", de: "Versiegeltes Reliquiengewölbe", pt: "Cofre do Relicário Selado", ru: "Запечатанное Хранилище Реликвий", ar: "خزانة الذخائر المختومة" },
+      r_lich_sanctum: { es: "Santuario del Inmortal", ja: "不死の聖所", ko: "불사자의 성소", fr: "Sanctuaire de l'Immortel", de: "Sanktum des Untoten", pt: "Santuário do Imortal", ru: "Святилище Бессмертного Лича", ar: "قدس اللتش الخالد" },
+      r_cinder_pass: { es: "Paso de Montaña Viento Ceniza", ja: "灰風の山道", ko: "잿바람 산길", fr: "Col de Vent-Cendre", de: "Aschenwind-Gebirgspass", pt: "Passo da Montanha Vento Cinza", ru: "Перевал Пепельного Ветра", ar: "ممر رياح الرماد" },
+      r_dwarven_gate: { es: "Puerta de Obsidiana Quebrada", ja: "砕けた黒曜石の門", ko: "부서진 흑요석 대문", fr: "Porte d'Obsidienne Brisée", de: "Zerschmettertes Obsidiantor", pt: "Portão de Obsidiana Partido", ru: "Разбитые Обсидиановые Врата", ar: "بوابة السبج المحطمة" },
+      r_slag_foundry: { es: "Gran Fundición de Escoria", ja: "大熔滓鋳造所", ko: "거대 용암 주조소", fr: "Grande Fonderie de Scories", de: "Große Schlackengießerei", pt: "Grande Fundição de Escória", ru: "Великая Литейная Шлака", ar: "مسبك الحمم العظيم" },
+      r_obsidian_barracks: { es: "Cuartel de Guardia Obsidiana", ja: "黒曜石の兵舎", ko: "흑요석 수비대 막사", fr: "Caserne d'Obsidienne", de: "Obsidian-Wachkaserne", pt: "Quartel de Obsidiana", ru: "Обсидиановые Казармы", ar: "ثكنات الحرس السبجي" },
+      r_lava_bridge: { es: "Puente de Cadenas Fundidas", ja: "溶岩鎖の吊り橋", ko: "용암 사슬 다리", fr: "Pont des Chaînes en Fusion", de: "Brücke der Geschmolzenen Ketten", pt: "Ponte das Correntes Fundidas", ru: "Мост Раскаленных Цепей", ar: "جسر السلاسل المنصهرة" },
+      r_crystal_cavern: { es: "Caverna de Geoda Estelar", ja: "星光の晶洞", ko: "별빛 정동 동굴", fr: "Caverne de la Géode Stellaire", de: "Sternenlicht-Geodenhöhle", pt: "Caverna do Geodo Estelar", ru: "Пещера Звездной Жеоды", ar: "كهف البلورات النجمية" },
+      r_caldera_throne: { es: "Trono de la Caldera Fundida", ja: "溶암カルデラの玉座", ko: "용암 칼데라 왕좌", fr: "Trône de la Caldeira en Fusion", de: "Thron der Geschmolzenen Caldera", pt: "Trono da Caldeira Fundida", ru: "Трон Раскаленной Кальдеры", ar: "عرش الفوهة البركانية" },
+      r_rift_breach: { es: "Brecha del Horizonte Quebrado", ja: "砕けた地平の裂け目", ko: "부서진 지평선 균열구", fr: "Brèche de l'Horizon Brisé", de: "Bruch des Zerschmetterten Horizonts", pt: "Brecha do Horizonte Partido", ru: "Пролом Расколотого Горизонта", ar: "ثغرة الأفق المحطم" },
+      r_chrono_gallery: { es: "Galería del Tiempo Fracturado", ja: "砕けた時の回廊", ko: "부서진 시간의 회랑", fr: "Galerie du Temps Fracturé", de: "Galerie der Gebrochenen Zeit", pt: "Galeria do Tempo Fraturado", ru: "Галерея Расколотого Времени", ar: "رواق الزمن المتصدع" },
+      r_celestial_observatory: { es: "Observatorio Celestial en Ruinas", ja: "荒廃した天体観測所", ko: "파괴된 천체 관측소", fr: "Observatoire Céleste en Ruines", de: "Ruiniertes Himmels-Observatorium", pt: "Observatório Celestial em Ruínas", ru: "Разрушенная Небесная Обсерватория", ar: "المرصد السماوي المتهدم" },
+      r_void_conduit: { es: "Nexo de Estrellas Sangrantes", ja: "血涙の星々の枢軸", ko: "피 흘리는 별들의 중추", fr: "Nexus des Étoiles Saignantes", de: "Nexus der Blutenden Sterne", pt: "Nexo das Estrelas Sangrentas", ru: "Нексус Кровоточащих Звезд", ar: "محور النجوم النازفة" },
+      r_throne_approach: { es: "Escalera de Soles Eclipsados", ja: "日食の階段", ko: "일식의 계단", fr: "Escalier des Soleils Éclipsés", de: "Treppe der Verfinsterten Sonnen", pt: "Escadaria dos Sóis Eclipsados", ru: "Ступени Затменных Солнц", ar: "مدرج الشموس الكاسفة" },
+      r_astral_core: { es: "Corazón de la Fisura Quebrada", ja: "砕けた裂け目の心臓部", ko: "부서진 균열의 심장", fr: "Cœur de la Faille Brisée", de: "Herz des Zerschmetterten Risses", pt: "Coração da Fenda Partida", ru: "Сердце Расколотого Разлома", ar: "قلب الصدع المحطم" }
+    };
+
+    function getLang() {
+      return (state && state.lang && UI_I18N[state.lang]) ? state.lang : "en";
+    }
+
+    function uiText(key) {
+      const lang = getLang();
+      return (UI_I18N[lang] && UI_I18N[lang][key]) || UI_I18N.en[key] || key;
+    }
+
+    function trBiome(biomeName) {
+      const lang = getLang();
+      return (BIOME_I18N[biomeName] && BIOME_I18N[biomeName][lang]) || biomeName;
+    }
+
+    function trDir(dirKey) {
+      const lang = getLang();
+      return (DIR_I18N[dirKey] && DIR_I18N[dirKey][lang]) || dirKey.toUpperCase();
+    }
+
+    function trTime(timeKey) {
+      const lang = getLang();
+      return (TIME_I18N[timeKey] && TIME_I18N[timeKey][lang]) || timeKey;
+    }
+
+    function trWeather(weatherKey) {
+      const lang = getLang();
+      return (WEATHER_I18N[weatherKey] && WEATHER_I18N[weatherKey][lang]) || weatherKey;
+    }
+
+    function trStance(stanceKey) {
+      const lang = getLang();
+      return (STANCE_I18N[stanceKey] && STANCE_I18N[stanceKey][lang]) || stanceKey;
+    }
+
+    function trClass(classId) {
+      const lang = getLang();
+      return (CLASS_I18N[classId] && CLASS_I18N[classId][lang]) || classId;
+    }
+
+    function trRoomTitle(room) {
+      if (!room) return "";
+      const lang = getLang();
+      if (lang === "en") return room.title;
+      if (lang === "zh") return room.titleZh || room.title;
+      return (ROOM_TITLE_I18N[room.id] && ROOM_TITLE_I18N[room.id][lang]) || room.title;
+    }
+
+    function trRoomDesc(room) {
+      if (!room) return "";
+      const lang = getLang();
+      if (lang === "en") return room.desc;
+      if (lang === "zh") return room.descZh || room.desc;
+      const tTitle = trRoomTitle(room);
+      const tBiome = trBiome(room.biome);
+      const descTemplates = {
+        es: `${tTitle} (${tBiome}): Explora los senderos ancestrales, recolecta recursos místicos y enfrenta a las criaturas de la región.`,
+        ja: `${tTitle}（${tBiome}）：古代の領域を探索し、神秘の素材を採取して領域の脅威に立ち向かえ。`,
+        ko: `${tTitle} (${tBiome}): 고대의 영역을 탐험하며 신비한 자원을 채집하고 지역의 위협에 맞서십시오.`,
+        fr: `${tTitle} (${tBiome}) : Explorez ces lieux anciens, récoltez des ressources rares et affrontez les menaces de la région.`,
+        de: `${tTitle} (${tBiome}): Erkunde dieses alte Gebiet, sammle seltene Ressourcen und stelle dich den Gefahren der Region.`,
+        pt: `${tTitle} (${tBiome}): Explore estes caminhos ancestrais, colete recursos místicos e enfrente as criaturas da região.`,
+        ru: `${tTitle} (${tBiome}): Исследуйте древние земли, собирайте редкие ресурсы и сражайтесь с врагами региона.`,
+        ar: `${tTitle} (${tBiome}): استكشف هذه الأرجاء القديمة واجمع الموارد النادرة وواجه المخاطر المحيطة.`
+      };
+      return descTemplates[lang] || room.desc;
+    }
+
+    function trEntityName(obj) {
+      if (!obj) return "";
+      const lang = getLang();
+      if (lang === "en") return obj.name || obj.title || "";
+      if (lang === "zh") return obj.nameZh || obj.titleZh || obj.name || obj.title || "";
+      if (obj.i18n && obj.i18n[lang]) return obj.i18n[lang];
+      const raw = obj.name || obj.title || "";
+      return raw.split("·")[0].trim();
+    }
+
+    function trEntityDesc(obj) {
+      if (!obj) return "";
+      const lang = getLang();
+      if (lang === "en") return obj.desc || "";
+      if (lang === "zh") return obj.descZh || obj.desc || "";
+      return (obj.descI18n && obj.descI18n[lang]) || obj.desc || "";
+    }
+
+    function localizeLogLine(entry) {
+      const lang = getLang();
+      if (lang === "en") return entry.text || "";
+      if (lang === "zh") return entry.textZh || entry.text || "";
+      const en = String(entry.text || "");
+      const mapPrefix = {
+        es: {
+          "⚔️ Welcome": "⚔️ ¡Bienvenido a AETHELGARD: CRÓNICAS DE LA FISURA QUEBRADA!",
+          "Type commands": "Escribe comandos o pulsa cualquier botón interactivo para explorar, combatir y forjar.",
+          "📍 ": en.replace("Exits:", "Salidas:"),
+          "   Exits:": en.replace("Exits:", "   Salidas:"),
+          "   NPCs:": en.replace("NPCs:", "   PNJ:"),
+          "   Hostiles:": en.replace("Hostiles:", "   Hostiles:"),
+          "⚔️ You engage": en.replace("You engage", "Entras en combate con"),
+          "🗡️ You strike": en.replace("You strike", "Golpeas a").replace("for", "por").replace("CRITICAL!", "¡CRÍTICO!"),
+          "💥 ": en.replace("hits you for", "te golpea por"),
+          "⚡ SKILL": en.replace("SKILL", "HABILIDAD").replace("blasts", "golpea a").replace("for", "por"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "¡Victoria! Derrotaste a").replace("and gained", "y ganaste"),
+          "🎁 Looted:": en.replace("Looted:", "Botín obtenido:"),
+          "🌿 Harvested": en.replace("Harvested", "Recolectaste").replace("from", "de"),
+          "⚒️ Crafted": en.replace("Crafted", "Forjaste"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "¡REFINADO ESTELAR! Equipo mejorado a"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "MISIÓN COMPLETADA:").replace("Reward:", "Recompensa:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "CONTRATO RECLAMADO:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "OLEADA DE LA FISURA").replace("BEGINS!", "¡COMIENZA!")
+        },
+        ja: {
+          "⚔️ Welcome": "⚔️ 『エセルガルド：砕けた裂け目の年代記』へようこそ！",
+          "Type commands": "コマンド入力またはボタンをクリックして探索・戦闘・鍛造を進めましょう。",
+          "⚔️ You engage": en.replace("You engage", "戦闘開始："),
+          "🗡️ You strike": en.replace("You strike", "あなたの攻撃：").replace("CRITICAL!", "会心の一撃！"),
+          "💥 ": en.replace("hits you for", "の反撃ダメージ："),
+          "⚡ SKILL": en.replace("SKILL", "スキル発動"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "勝利！討伐成功：").replace("and gained", "獲得："),
+          "🎁 Looted:": en.replace("Looted:", "戦利品獲得："),
+          "🌿 Harvested": en.replace("Harvested", "採取成功："),
+          "⚒️ Crafted": en.replace("Crafted", "製作完了："),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "星辰精錬成功！全装備が強化されました："),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "クエスト達成："),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "討伐依頼達成："),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "無限リフトウェーブ")
+        },
+        ko: {
+          "⚔️ Welcome": "⚔️ 『아이텔가드: 부서진 균열의 연대기』에 오신 것을 환영합니다!",
+          "Type commands": "명령어를 입력하거나 인터랙티브 버튼을 클릭해 탐험과 전투를 시작하세요.",
+          "⚔️ You engage": en.replace("You engage", "전투 돌입:"),
+          "🗡️ You strike": en.replace("You strike", "당신의 공격:").replace("CRITICAL!", "치명타!"),
+          "💥 ": en.replace("hits you for", "의 공격 피해:"),
+          "⚡ SKILL": en.replace("SKILL", "스킬 발동"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "승리! 처치 완료:").replace("and gained", "획득:"),
+          "🎁 Looted:": en.replace("Looted:", "전리품 획득:"),
+          "🌿 Harvested": en.replace("Harvested", "채집 성공:"),
+          "⚒️ Crafted": en.replace("Crafted", "제작 완료:"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "성진 제련 성공! 장착 장비 강화:"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "퀘스트 완료:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "현상수배 완료:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "무한 균열 웨이브")
+        },
+        fr: {
+          "⚔️ Welcome": "⚔️ Bienvenue dans AETHELGARD : CHRONIQUES DE LA FAILLE BRISÉE !",
+          "Type commands": "Entrez des commandes ou cliquez sur les boutons pour explorer, combattre et forger.",
+          "⚔️ You engage": en.replace("You engage", "Vous affrontez"),
+          "🗡️ You strike": en.replace("You strike", "Vous frappez").replace("CRITICAL!", "CRITIQUE !"),
+          "💥 ": en.replace("hits you for", "vous inflige"),
+          "⚡ SKILL": en.replace("SKILL", "COMPÉTENCE"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "Victoire ! Vous avez vaincu").replace("and gained", "et gagné"),
+          "🎁 Looted:": en.replace("Looted:", "Butin obtenu :"),
+          "🌿 Harvested": en.replace("Harvested", "Récolté :"),
+          "⚒️ Crafted": en.replace("Crafted", "Forgé :"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "RAFFINAGE ÉTOILÉ ! Équipement amélioré à"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "QUÊTE TERMINÉE :"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "PRIME RÉCLAMÉE :"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "VAGUE DE LA FAILLE")
+        },
+        de: {
+          "⚔️ Welcome": "⚔️ Willkommen in AETHELGARD: CHRONIKEN DES ZERSCHMETTERTEN RISSES!",
+          "Type commands": "Gib Befehle ein oder klicke auf die Schaltflächen, um zu erkunden und zu kämpfen.",
+          "⚔️ You engage": en.replace("You engage", "Kampf begonnen gegen"),
+          "🗡️ You strike": en.replace("You strike", "Du triffst").replace("CRITICAL!", "KRITISCH!"),
+          "💥 ": en.replace("hits you for", "trifft dich für"),
+          "⚡ SKILL": en.replace("SKILL", "FERTIGKEIT"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "Sieg! Besiegt:").replace("and gained", "und erhalten:"),
+          "🎁 Looted:": en.replace("Looted:", "Beute erhalten:"),
+          "🌿 Harvested": en.replace("Harvested", "Gesammelt:"),
+          "⚒️ Crafted": en.replace("Crafted", "Hergestellt:"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "STERN-VEREDELT! Ausrüstung verbessert auf"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "QUEST ABGESCHLOSSEN:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "KOPFGELD ERHALTEN:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "ENDLOSRISS-WELLE")
+        },
+        pt: {
+          "⚔️ Welcome": "⚔️ Bem-vindo a AETHELGARD: CRÔNICAS DA FENDA PARTIDA!",
+          "Type commands": "Digite comandos ou clique nos botões para explorar, lutar e forjar.",
+          "⚔️ You engage": en.replace("You engage", "Você enfrenta"),
+          "🗡️ You strike": en.replace("You strike", "Você golpeia").replace("CRITICAL!", "CRÍTICO!"),
+          "💥 ": en.replace("hits you for", "atinge você por"),
+          "⚡ SKILL": en.replace("SKILL", "HABILIDADE"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "Vitória! Você derrotou").replace("and gained", "e ganhou"),
+          "🎁 Looted:": en.replace("Looted:", "Saque obtido:"),
+          "🌿 Harvested": en.replace("Harvested", "Coletado:"),
+          "⚒️ Crafted": en.replace("Crafted", "Forjado:"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "REFINO ESTELAR! Equipamento aprimorado para"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "MISSÃO CONCLUÍDA:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "CONTRATO RESGATADO:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "ONDA DA FENDA")
+        },
+        ru: {
+          "⚔️ Welcome": "⚔️ Добро пожаловать в ЭТЕЛЬГАРД: ХРОНИКИ РАСКОЛОТОГО РАЗЛОМА!",
+          "Type commands": "Вводите команды или нажимайте на кнопки для исследования, боя и ковки.",
+          "⚔️ You engage": en.replace("You engage", "Вы вступаете в бой с"),
+          "🗡️ You strike": en.replace("You strike", "Вы атакуете").replace("CRITICAL!", "КРИТ!"),
+          "💥 ": en.replace("hits you for", "наносит вам урон:"),
+          "⚡ SKILL": en.replace("SKILL", "НАВЫК"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "Победа! Повержен:").replace("and gained", "получено:"),
+          "🎁 Looted:": en.replace("Looted:", "Добыча:"),
+          "🌿 Harvested": en.replace("Harvested", "Собрано:"),
+          "⚒️ Crafted": en.replace("Crafted", "Создано:"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "ЗВЕЗДНАЯ ЗАТОЧКА! Снаряжение улучшено до"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "КВЕСТ ЗАВЕРШЕН:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "КОНТРАКТ ВЫПОЛНЕН:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "ВОЛНА РАЗЛОМА")
+        },
+        ar: {
+          "⚔️ Welcome": "⚔️ مرحباً بك في إيثيلغارد: سجلات الصدع المحطم!",
+          "Type commands": "أدخل الأوامر أو اضغط على الأزرار التفاعلية للاستكشاف والقتال والحدادة.",
+          "⚔️ You engage": en.replace("You engage", "بدأت الاشتباك مع"),
+          "🗡️ You strike": en.replace("You strike", "هاجمت").replace("CRITICAL!", "ضربة حرجة!"),
+          "💥 ": en.replace("hits you for", "أصابك بضرر"),
+          "⚡ SKILL": en.replace("SKILL", "مهارة"),
+          "🏆 Victory!": en.replace("Victory! You slayed", "نصر! هزمت").replace("and gained", "وحصلت على"),
+          "🎁 Looted:": en.replace("Looted:", "غنيمة:"),
+          "🌿 Harvested": en.replace("Harvested", "تم حصاد"),
+          "⚒️ Crafted": en.replace("Crafted", "تم تصنيع"),
+          "✨ STAR-REFINED!": en.replace("STAR-REFINED! All equipped gear upgraded to", "صقل نجمي! تمت ترقية العتاد إلى"),
+          "📜 QUEST COMPLETED:": en.replace("QUEST COMPLETED:", "اكتملت المهمة:"),
+          "🎯 BOUNTY CLAIMED:": en.replace("BOUNTY CLAIMED:", "تم استلام مكافأة العقد:"),
+          "🌀 ENDLESS RIFT": en.replace("ENDLESS RIFT WAVE", "موجة الصدع اللانهائي")
+        }
+      }[lang] || {};
+
+      for (const [prefix, replacement] of Object.entries(mapPrefix)) {
+        if (en.startsWith(prefix)) return replacement;
+      }
+      if (entry.i18n && entry.i18n[lang]) return entry.i18n[lang];
+      return en;
+    }
+
+    function setLanguage(langCode) {
+      const clean = String(langCode || "").trim().toLowerCase();
+      const aliasMap = {
+        english: "en", en: "en",
+        chinese: "zh", zh: "zh", cn: "zh", "中文": "zh", "汉语": "zh",
+        spanish: "es", es: "es", espanol: "es", "español": "es",
+        japanese: "ja", ja: "ja", jp: "ja", "日本語": "ja",
+        korean: "ko", ko: "ko", kr: "ko", "한국어": "ko",
+        french: "fr", fr: "fr", francais: "fr", "français": "fr",
+        german: "de", de: "de", deutsch: "de",
+        portuguese: "pt", pt: "pt", portugues: "pt", "português": "pt",
+        russian: "ru", ru: "ru", "русский": "ru",
+        arabic: "ar", ar: "ar", "العربية": "ar"
+      };
+      const resolved = aliasMap[clean] || (UI_I18N[clean] ? clean : null);
+      if (!resolved) {
+        addLog(`Unknown language '${langCode}'. Supported: en, zh, es, ja, ko, fr, de, pt, ru, ar.`, "world", "text-amber-300");
+        return;
+      }
+      state.lang = resolved;
+      document.documentElement.lang = resolved;
+      document.documentElement.dir = resolved === "ar" ? "rtl" : "ltr";
+
+      const sel = document.getElementById("lang-select");
+      if (sel && sel.value !== resolved) sel.value = resolved;
+
+      const msg = UI_I18N[resolved].langSwitched;
+      addLog(msg, "world", "text-amber-300 font-semibold", msg);
+      saveGameState(false);
+      renderAll();
+    }
+
+    function renderStaticUILabels() {
+      const lang = getLang();
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const k = el.getAttribute("data-i18n");
+        if (k) el.textContent = uiText(k);
+      });
+      const sel = document.getElementById("lang-select");
+      if (sel && sel.value !== lang) sel.value = lang;
+
+      const h1 = document.querySelector("header h1");
+      if (h1) h1.textContent = uiText("appTitle");
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt("btn-tick-pause", uiText("turnBtn"));
+      setTxt("audio-label", SynthAudio.enabled ? uiText("sfxOn") : uiText("sfxMuted"));
+      setTxt("btn-open-ai-modal", uiText("aiDmBtn"));
+      setTxt("btn-open-char-modal", uiText("heroBtn"));
+      setTxt("btn-open-save-modal", uiText("saveBtn"));
+      setTxt("btn-open-help-modal", uiText("guideBtn"));
+
+      // Left column static labels
+      const stanceHeader = document.querySelector("#card-stance-skills h3");
+      if (stanceHeader) stanceHeader.textContent = uiText("stanceSkillsTitle");
+      setTxt("stance-balanced", uiText("stanceBalanced"));
+      setTxt("stance-aggressive", uiText("stanceAggro"));
+      setTxt("stance-defensive", uiText("stanceGuard"));
+      setTxt("btn-quick-attack", uiText("strikeBtn"));
+      setTxt("btn-quick-potion", uiText("potionBtn"));
+      setTxt("btn-quick-flee", uiText("fleeBtn"));
+
+      const statsHeader = document.querySelector("#card-stats-talents h3");
+      if (statsHeader) statsHeader.textContent = uiText("statsTalentsTitle");
+
+      // Center column static labels
+      const titleZhEl = document.getElementById("room-title-zh-display");
+      if (titleZhEl) {
+        titleZhEl.classList.add("hidden");
+        if (titleZhEl.previousElementSibling) titleZhEl.previousElementSibling.classList.add("hidden");
+      }
+      const descZhEl = document.getElementById("room-desc-zh-display");
+      if (descZhEl) descZhEl.classList.add("hidden");
+
+      setTxt("btn-room-ai-lore", uiText("aiNpcBtn"));
+      setTxt("btn-room-look", uiText("lookBtn"));
+      setTxt("filter-all", uiText("filterAll"));
+      setTxt("filter-combat", uiText("filterCombat"));
+      setTxt("filter-world", uiText("filterWorld"));
+      setTxt("filter-loot", uiText("filterLoot"));
+      setTxt("filter-ai", uiText("filterAi"));
+      setTxt("btn-clear-log", uiText("clearBtn"));
+
+      const cmdInput = document.getElementById("cmd-input");
+      if (cmdInput) cmdInput.placeholder = uiText("cmdPlaceholder");
+      setTxt("btn-cmd-send", uiText("sendBtn"));
+
+      setTxt("macro-look", uiText("macroLook"));
+      setTxt("macro-harvest", uiText("macroHarvest"));
+      setTxt("macro-rest", uiText("macroRest"));
+      setTxt("macro-bounty", uiText("macroBounty"));
+      setTxt("macro-rift", uiText("macroRift"));
+      setTxt("macro-ai", uiText("macroAi"));
+      setTxt("macro-help", uiText("macroHelp"));
+
+      // Right column World Atlas & Tabs
+      const atlasH3 = document.querySelector("#world-atlas-card h3");
+      if (atlasH3) {
+        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/32)`;
+      }
+      setTxt("btn-reveal-map", uiText("scoutBtn"));
+
+      const tabInv = document.getElementById("tab-btn-inventory");
+      if (tabInv) {
+        const entries = Object.entries(state.player.inventory).filter(([, q]) => q > 0);
+        const totalItems = entries.reduce((acc, [, q]) => acc + q, 0);
+        tabInv.innerHTML = `${escapeHtml(uiText("tabPack"))} (<span id="inv-count-badge">${totalItems}</span>)`;
+      }
+      setTxt("tab-btn-crafting", uiText("tabForge"));
+      setTxt("tab-btn-quests", uiText("tabQuests"));
+      setTxt("tab-btn-achievements", uiText("tabCodex"));
+      setTxt("tab-btn-ai", uiText("tabAi"));
+
+      setTxt("btn-sell-junk", uiText("sellExtraBtn"));
+      setTxt("btn-refresh-bounties", uiText("newContractsBtn"));
+      setTxt("btn-start-rift-wave", uiText("summonRiftBtn"));
+
+      const aiPromptInput = document.getElementById("ai-prompt-input");
+      if (aiPromptInput) aiPromptInput.placeholder = uiText("aiInputPlaceholder");
+      setTxt("btn-ai-prompt-send", uiText("askBtn"));
+    }
+
+
+    function renderHeader() {
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      const biomeBadge = document.getElementById("header-biome-badge");
+      if (biomeBadge && room) {
+        const meta = BIOME_META[room.biome] || BIOME_META["Oakhaven Sanctuary"];
+        biomeBadge.textContent = trBiome(room.biome);
+        biomeBadge.className = `text-[10px] font-medium px-2 py-0.5 rounded-full border ${meta.badgeBg}`;
+      }
+
+      const riftBadge = document.getElementById("header-rift-wave-badge");
+      if (riftBadge) {
+        if (state.telemetry.activeRiftWave > 0) {
+          riftBadge.classList.remove("hidden");
+          riftBadge.textContent = `Rift Wave ${state.telemetry.activeRiftWave}`;
+        } else {
+          riftBadge.classList.add("hidden");
+        }
+      }
+
+      const timeIcon = document.getElementById("world-time-icon");
+      const timeLabel = document.getElementById("world-time-label");
+      const weatherLabel = document.getElementById("world-weather-label");
+      const icons = { Dawn: "🌅", Day: "☀️", Dusk: "🌇", Midnight: "🌙" };
+      if (timeIcon) timeIcon.textContent = icons[state.timeOfDay] || "☀️";
+      if (timeLabel) timeLabel.textContent = `${trTime(state.timeOfDay)} • T${state.tickCount}`;
+      if (weatherLabel) weatherLabel.textContent = trWeather(state.weather);
+
+      ["normal", "fast", "paused"].forEach((sp) => {
+        const mapId = sp === "paused" ? "btn-tick-pause" : `btn-tick-${sp}`;
+        const btn = document.getElementById(mapId);
+        if (btn) {
+          btn.className = state.tickSpeed === sp
+            ? "px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40"
+            : "px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200";
+        }
+      });
+    }
+
+    function renderHeroPanel() {
+      const p = state.player;
+      const derived = computeDerivedStats();
+      const cfg = CLASS_CONFIG[p.classId] || CLASS_CONFIG.vanguard;
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt("hero-name-display", p.name);
+      setTxt("hero-level-badge", `Lv. ${p.level}`);
+      setTxt("hero-class-title", trClass(p.classId));
+      setTxt("hero-gold", p.gold);
+      setTxt("hero-shards", p.shards);
+      setTxt("hero-rep", p.rep);
+
+      setTxt("hero-hp-text", `${p.hp}/${p.maxHp}`);
+      setTxt("hero-mp-text", `${p.mp}/${p.maxMp}`);
+      setTxt("hero-sta-text", `${p.sta}/${p.maxSta}`);
+      setTxt("hero-xp-text", `${p.xp}/${p.xpNext}`);
+
+      const setWidth = (id, pct) => { const el = document.getElementById(id); if (el) el.style.width = `${Math.max(0, Math.min(100, pct))}%`; };
+      setWidth("hero-hp-bar", (p.hp / p.maxHp) * 100);
+      setWidth("hero-mp-bar", (p.mp / p.maxMp) * 100);
+      setWidth("hero-sta-bar", (p.sta / p.maxSta) * 100);
+      setWidth("hero-xp-bar", (p.xp / p.xpNext) * 100);
+
+      const statusEl = document.getElementById("hero-status-bar");
+      if (statusEl) {
+        if (p.buffs.length > 0) {
+          statusEl.innerHTML = p.buffs.map((b) => `<span class="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/50">✨ ${escapeHtml(b)}</span>`).join("");
+        } else {
+          statusEl.innerHTML = `<span class="text-slate-400">${escapeHtml(uiText("stanceLabel"))}: <strong class="text-amber-300 uppercase">${escapeHtml(trStance(p.stance))}</strong> • ${escapeHtml(uiText("refineLabel"))}: +${p.refineLevel}</span>`;
+        }
+      }
+
+      ["balanced", "aggressive", "defensive"].forEach((st) => {
+        const btn = document.getElementById(`stance-${st}`);
+        if (btn) {
+          btn.className = p.stance === st
+            ? "bi-inline px-1 py-0.5 rounded text-[10px] font-semibold border bg-amber-500/20 border-amber-500/50 text-amber-300"
+            : "bi-inline px-1 py-0.5 rounded text-[10px] font-semibold border bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200";
+        }
+      });
+
+      cfg.skills.forEach((sk, idx) => {
+        const btn = document.getElementById(`btn-skill-${idx}`);
+        if (btn) {
+          const cd = p.cooldowns[idx] || 0;
+          const skName = trEntityName(sk);
+          const skDesc = trEntityDesc(sk);
+          btn.innerHTML = `
+            <div class="leading-tight">
+              <div class="text-[10px] font-semibold text-amber-300">[${idx + 1}] ${escapeHtml(skName)}</div>
+              <div class="text-[9px] text-slate-400">${escapeHtml(skDesc)} (${sk.cost}${sk.costType.toUpperCase()})</div>
+            </div>
+            <span class="text-[9px] font-mono-mud px-1.5 py-0.2 rounded ${cd > 0 ? 'bg-slate-800 text-amber-300' : 'bg-emerald-950 text-emerald-300 border border-emerald-700/40'}">${cd > 0 ? cd + 't' : escapeHtml(uiText("ready"))}</span>
+          `;
+        }
+      });
+
+      setTxt("unspent-stat-badge", `${uiText("ptsPrefix")}: ${p.statPoints}`);
+      setTxt("unspent-talent-badge", `${uiText("talPrefix")}: ${p.talentPoints}`);
+      setTxt("stat-str", derived.str);
+      setTxt("stat-int", derived.intStat);
+      setTxt("stat-agi", derived.agi);
+      setTxt("stat-vit", derived.vit);
+      setTxt("derived-atk", derived.atk);
+      setTxt("derived-mag", derived.mag);
+      setTxt("derived-def", derived.def);
+      setTxt("derived-crit", `${derived.crit}%`);
+      setTxt("talent-lvl-warlord", p.talents.warlord);
+      setTxt("talent-lvl-mystic", p.talents.mystic);
+      setTxt("talent-lvl-pathfinder", p.talents.pathfinder);
+
+      const combatPill = document.getElementById("combat-state-pill");
+      if (combatPill) {
+        combatPill.textContent = state.combat.inCombat ? uiText("inCombat") : uiText("peaceful");
+        combatPill.className = state.combat.inCombat
+          ? "text-[9px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-700/60 font-bold"
+          : "text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400";
+      }
+    }
+
+    function renderBiomeBanner(room) {
+      const svg = document.getElementById("biome-svg-banner");
+      if (!svg || !room) return;
+      const palettes = {
+        "Oakhaven Sanctuary": ["#06281e", "#0f3d2e", "#f59e0b"],
+        "Whispering Wilds":   ["#092214", "#143d23", "#84cc16"],
+        "Sunken Catacombs":   ["#071929", "#0e2b44", "#38bdf8"],
+        "Emberpeak Forge-Ruins": ["#2a0e07", "#4c190c", "#f97316"],
+        "Astral Rift Citadel":   ["#1a0933", "#2e1059", "#c084fc"]
+      };
+      const [bg1, bg2, accent] = palettes[room.biome] || palettes["Oakhaven Sanctuary"];
+      const moonOrSun = state.timeOfDay === "Midnight" ? "#e2e8f0" : accent;
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${bg1}" />
+            <stop offset="100%" stop-color="${bg2}" />
+          </linearGradient>
+        </defs>
+        <rect width="800" height="120" fill="url(#bgGrad)" />
+        <circle cx="710" cy="30" r="18" fill="${moonOrSun}" opacity="0.3" />
+        <polygon points="0,120 0,70 130,38 260,85 390,32 540,80 670,42 800,75 800,120" fill="#090d16" opacity="0.55" />
+        <polygon points="0,120 90,78 220,96 350,60 490,92 630,66 800,92 800,120" fill="#05070c" opacity="0.85" />
+      `;
+    }
+
+    function renderRoomView() {
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!room) return;
+      renderBiomeBanner(room);
+
+      const meta = BIOME_META[room.biome] || BIOME_META["Oakhaven Sanctuary"];
+      const idPill = document.getElementById("room-id-pill");
+      const dangerPill = document.getElementById("room-danger-pill");
+      const titleEl = document.getElementById("room-title-display");
+      const titleZhEl = document.getElementById("room-title-zh-display");
+      const descEl = document.getElementById("room-desc-display");
+      const descZhEl = document.getElementById("room-desc-zh-display");
+
+      if (idPill) idPill.textContent = trBiome(room.biome);
+      if (dangerPill) {
+        dangerPill.textContent = room.safe ? uiText("safe") : `${uiText("dangerPrefix")}${room.danger}`;
+        dangerPill.className = `text-[9px] font-semibold px-1.5 py-0.2 rounded border ${meta.badgeBg}`;
+      }
+      if (titleEl) titleEl.textContent = trRoomTitle(room);
+      if (titleZhEl) {
+        titleZhEl.textContent = "";
+        titleZhEl.classList.add("hidden");
+        if (titleZhEl.previousElementSibling) titleZhEl.previousElementSibling.classList.add("hidden");
+      }
+      if (descEl) descEl.textContent = trRoomDesc(room);
+      if (descZhEl) {
+        descZhEl.textContent = "";
+        descZhEl.classList.add("hidden");
+      }
+
+      const combatCard = document.getElementById("combat-target-card");
+      if (combatCard) {
+        if (state.combat.inCombat && state.combat.enemy) {
+          const en = state.combat.enemy;
+          combatCard.classList.remove("hidden");
+          document.getElementById("enemy-name-display").textContent = trEntityName(en);
+          document.getElementById("enemy-level-display").textContent = `Lv. ${en.level}`;
+          document.getElementById("enemy-hp-text").textContent = `${en.hp}/${en.maxHp} ${uiText("hp")}`;
+          document.getElementById("enemy-hp-bar").style.width = `${Math.max(0, Math.min(100, (en.hp / en.maxHp) * 100))}%`;
+          document.getElementById("enemy-intent-text").textContent = `${uiText("atk")}${en.atk} • ${uiText("def")}${en.def} • ${uiText("statusLabel")}: ${en.statuses.length ? en.statuses.join(", ") : uiText("normalStatus")}`;
+        } else {
+          combatCard.classList.add("hidden");
+        }
+      }
+
+      const exitsContainer = document.getElementById("room-exits-chips");
+      if (exitsContainer) {
+        exitsContainer.innerHTML = Object.entries(room.exits).map(([dir, targetId]) => {
+          const target = WORLD_ROOMS[targetId];
+          return `
+            <button onclick="moveDirection('${dir}')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-amber-500/20 border border-slate-700 hover:border-amber-500/50 text-[10px] text-amber-200 font-medium leading-tight">
+              [${escapeHtml(trDir(dir))}] ${escapeHtml(target ? trRoomTitle(target) : targetId)}
+            </button>
+          `;
+        }).join("");
+      }
+
+      const entContainer = document.getElementById("room-entities-chips");
+      if (entContainer) {
+        const chips = [];
+        if (room.npcs) {
+          room.npcs.forEach((npc) => {
+            chips.push(`
+              <button onclick="executeCommand('talk ${npc.name}')" class="px-2 py-0.5 rounded bg-sky-950/75 hover:bg-sky-900 border border-sky-700/50 text-[10px] text-sky-200 font-medium leading-tight">
+                💬 ${escapeHtml(trEntityName(npc))}
+              </button>
+            `);
+          });
+        }
+        if (room.mobs) {
+          room.mobs.forEach((mobId) => {
+            const m = MOB_TEMPLATES[mobId];
+            if (m) {
+              chips.push(`
+                <button onclick="engageMob('${mobId}')" class="px-2 py-0.5 rounded bg-rose-950/85 hover:bg-rose-900 border border-rose-700/60 text-[10px] text-rose-200 font-semibold leading-tight">
+                  ${m.boss ? '👑' : '⚔️'} ${escapeHtml(trEntityName(m))} (Lv.${m.level})
+                </button>
+              `);
+            }
+          });
+        }
+        if (room.nodes) {
+          room.nodes.forEach((node) => {
+            const key = `${room.id}:${node.id}`;
+            const onCd = state.world.harvestedCooldowns[key];
+            chips.push(`
+              <button onclick="harvestRoomNodes()" class="px-2 py-0.5 rounded ${onCd ? 'bg-slate-900 text-slate-500 border-slate-800' : 'bg-emerald-950/85 hover:bg-emerald-900 text-emerald-200 border-emerald-700/60'} border text-[10px] font-medium leading-tight">
+                🌿 ${escapeHtml(trEntityName(node))} ${onCd ? '(' + onCd + 't)' : ''}
+              </button>
+            `);
+          });
+        }
+        if (room.station) {
+          const stParts = room.station.split("·");
+          const stName = getLang() === "zh" ? (stParts[1] || stParts[0]).trim() : stParts[0].trim();
+          chips.push(`
+            <button onclick="switchRightTab('crafting')" class="px-2 py-0.5 rounded bg-amber-950/75 hover:bg-amber-900 border border-amber-700/50 text-[10px] text-amber-200 font-medium leading-tight">
+              ⚒️ ${escapeHtml(stName)}
+            </button>
+          `);
+        }
+        if (room.riftPortal) {
+          chips.push(`
+            <button onclick="startRiftWaveChallenge()" class="px-2 py-0.5 rounded bg-purple-950/85 hover:bg-purple-900 border border-purple-500/60 text-[10px] text-purple-200 font-bold leading-tight">
+              ${escapeHtml(uiText("macroRift"))}
+            </button>
+          `);
+        }
+        entContainer.innerHTML = chips.length > 0 ? chips.join("") : `<span class="text-slate-500">${escapeHtml(uiText("quietSurroundings"))}</span>`;
+      }
+
+      const compassHint = document.getElementById("compass-exits-hint");
+      if (compassHint) {
+        compassHint.textContent = `${uiText("exitsLabel")} ` + Object.keys(room.exits).map((k) => trDir(k)).join(" ");
+      }
+    }
+
+    function renderTerminalLog() {
+      const container = document.getElementById("terminal-log");
+      if (!container) return;
+      const filtered = state.logs.filter((entry) => state.logFilter === "all" || entry.category === state.logFilter);
+      container.innerHTML = filtered.map((entry) => (
+        `<div class="${entry.colorClass} py-0.5 border-b border-slate-900/60">
+          <div><span class="text-slate-600 select-none mr-1.5">[T${entry.tick}]</span>${escapeHtml(localizeLogLine(entry))}</div>
+        </div>`
+      )).join("");
+      container.scrollTop = container.scrollHeight;
+
+      ["all", "combat", "world", "loot", "ai"].forEach((f) => {
+        const btn = document.getElementById(`filter-${f}`);
+        if (btn) {
+          btn.className = state.logFilter === f
+            ? "px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold"
+            : "px-2 py-0.5 rounded text-slate-400 hover:text-slate-200";
+        }
+      });
+
+      const autoBtn = document.getElementById("btn-autohunt-toggle");
+      if (autoBtn) {
+        autoBtn.textContent = `${uiText("autoHuntPrefix")}: ${state.autoHunt ? uiText("on") : uiText("off")}`;
+        autoBtn.className = state.autoHunt
+          ? "px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-600 font-semibold"
+          : "px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium";
+      }
+    }
+
+    function renderWorldMinimap() {
+      const svg = document.getElementById("world-minimap");
+      if (!svg) return;
+      const visited = new Set(state.world.visitedRooms);
+      const currId = state.world.currentRoom;
+      const currRoom = WORLD_ROOMS[currId] || WORLD_ROOMS.r_town_square;
+
+      const expBadge = document.getElementById("explored-count");
+      if (expBadge) expBadge.textContent = visited.size;
+
+      const zoom = state.mapZoom || 1.0;
+      const vw = Math.round(250 / zoom);
+      const vh = Math.round(150 / zoom);
+      const vx = Math.round(currRoom.x - vw / 2);
+      const vy = Math.round(currRoom.y - vh / 2);
+      svg.setAttribute("viewBox", `${vx} ${vy} ${vw} ${vh}`);
+      svg.setAttribute("data-center-x", String(currRoom.x));
+      svg.setAttribute("data-center-y", String(currRoom.y));
+
+      const radarGrid = `
+        <circle cx="${currRoom.x}" cy="${currRoom.y}" r="38" fill="none" stroke="#1e293b" stroke-width="0.8" stroke-dasharray="3,3" />
+        <circle cx="${currRoom.x}" cy="${currRoom.y}" r="76" fill="none" stroke="#1e293b" stroke-width="0.6" stroke-dasharray="2,4" />
+        <line x1="${currRoom.x - 120}" y1="${currRoom.y}" x2="${currRoom.x + 120}" y2="${currRoom.y}" stroke="#0f172a" stroke-width="0.8" />
+        <line x1="${currRoom.x}" y1="${currRoom.y - 90}" x2="${currRoom.x}" y2="${currRoom.y + 90}" stroke="#0f172a" stroke-width="0.8" />
+      `;
+
+      const edges = [];
+      const dirLabels = [];
+      const drawn = new Set();
+      const neighborsOfCurr = new Set(Object.values(currRoom.exits || {}));
+
+      Object.values(WORLD_ROOMS).forEach((r) => {
+        Object.entries(r.exits).forEach(([dir, targetId]) => {
+          const t = WORLD_ROOMS[targetId];
+          if (!t) return;
+          const key = [r.id, t.id].sort().join("--");
+          if (!drawn.has(key)) {
+            drawn.add(key);
+            const isCurrEdge = r.id === currId || t.id === currId;
+            const bothSeen = visited.has(r.id) || visited.has(t.id);
+            edges.push(
+              `<line x1="${r.x}" y1="${r.y}" x2="${t.x}" y2="${t.y}" stroke="${isCurrEdge ? '#fbbf24' : (bothSeen ? '#64748b' : '#1e293b')}" stroke-width="${isCurrEdge ? 2.4 : (bothSeen ? 1.8 : 1)}" stroke-opacity="${isCurrEdge ? '0.9' : '0.75'}" />`
+            );
+          }
+          if (r.id === currId) {
+            const mx = (r.x * 0.62 + t.x * 0.38);
+            const my = (r.y * 0.62 + t.y * 0.38);
+            dirLabels.push(
+              `<text x="${mx}" y="${my - 2}" text-anchor="middle" fill="#fde68a" font-size="6.5" font-weight="bold">${escapeHtml(trDir(dir))}</text>`
+            );
+          }
+        });
+      });
+
+      const nodes = Object.values(WORLD_ROOMS).map((r) => {
+        const isCurrent = r.id === currId;
+        const isNeighbor = neighborsOfCurr.has(r.id);
+        const isVisited = visited.has(r.id);
+        const color = (BIOME_META[r.biome] && BIOME_META[r.biome].color) || "#94a3b8";
+        const fill = isCurrent ? "#fbbf24" : (isVisited ? color : (isNeighbor ? "#475569" : "#1e293b"));
+        const radius = isCurrent ? 8.5 : (r.bossRoom ? 6.8 : (isNeighbor ? 6.0 : 5.0));
+        const stroke = isCurrent ? "#ffffff" : (isNeighbor ? "#fbbf24" : "#090b10");
+        const dist = Math.hypot(r.x - currRoom.x, r.y - currRoom.y);
+        const showLabel = isCurrent || isNeighbor || (isVisited && dist < 115);
+        const locTitle = trRoomTitle(r);
+        const shortTitle = locTitle.length > 18 ? locTitle.slice(0, 17) + "…" : locTitle;
+
+        return `
+          <g onclick="travelToRoomByClick('${r.id}')" class="cursor-pointer">
+            <title>${escapeHtml(locTitle)} (${escapeHtml(trBiome(r.biome))})</title>
+            ${isCurrent ? `<circle cx="${r.x}" cy="${r.y}" r="13" fill="none" stroke="#fbbf24" stroke-width="1.2" opacity="0.55" />` : ""}
+            <circle cx="${r.x}" cy="${r.y}" r="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="1.6" class="${isCurrent ? 'player-beacon' : ''}" />
+            ${isCurrent ? `<text x="${r.x}" y="${r.y + 2.5}" text-anchor="middle" fill="#090b10" font-size="7" font-weight="bold">★</text>` : ""}
+            ${r.bossRoom ? `<text x="${r.x}" y="${r.y - 9}" text-anchor="middle" fill="#f87171" font-size="8.5" font-weight="bold">☠</text>` : ""}
+            ${showLabel ? `
+              <text x="${r.x}" y="${r.y + radius + 8.5}" text-anchor="middle" fill="${isCurrent ? '#fef08a' : '#e2e8f0'}" font-size="${isCurrent ? '6.6' : '5.6'}" font-weight="${isCurrent ? 'bold' : 'normal'}">${escapeHtml(shortTitle)}</text>
+            ` : ""}
+          </g>
+        `;
+      });
+
+      svg.innerHTML = radarGrid + edges.join("") + dirLabels.join("") + nodes.join("");
+    }
+
+    function renderRightDrawers() {
+      const p = state.player;
+      const entries = Object.entries(p.inventory).filter(([, q]) => q > 0);
+      const totalItems = entries.reduce((acc, [, q]) => acc + q, 0);
+      const invBadge = document.getElementById("inv-count-badge");
+      if (invBadge) invBadge.textContent = totalItems;
+
+      const invList = document.getElementById("inventory-list");
+      if (invList) {
+        if (entries.length === 0) {
+          invList.innerHTML = `<div class="text-slate-500 py-2">${escapeHtml(uiText("emptyPack"))}</div>`;
+        } else {
+          invList.innerHTML = entries.map(([name, qty]) => {
+            const it = ITEM_CATALOG[name] || { name, nameZh: name, type: "material", rarity: "common", value: 10, desc: "", descZh: "" };
+            const actionLabel = it.type === "consumable" ? uiText("useAction") : (it.type === "equipment" ? uiText("equipAction") : uiText("infoAction"));
+            return `
+              <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1">
+                <div>
+                  <div class="font-semibold rarity-${it.rarity} text-[11px]">${escapeHtml(trEntityName(it))} <span class="text-slate-400 font-mono-mud">x${qty}</span></div>
+                  <div class="text-[10px] text-slate-300">${escapeHtml(trEntityDesc(it))}</div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="equipOrUseItem('${name.replace(/'/g, "\\'")}')" class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/40 text-[10px] font-semibold">${escapeHtml(actionLabel)}</button>
+                  <button onclick="sellInventoryItem('${name.replace(/'/g, "\\'")}')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px]" title="Sell">🪙</button>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      const shopList = document.getElementById("shop-list");
+      if (shopList) {
+        shopList.innerHTML = SHOP_ITEMS.map((name) => {
+          const it = ITEM_CATALOG[name];
+          return `
+            <div class="flex items-center justify-between bg-slate-950/80 border border-slate-800/80 rounded-lg px-2 py-1">
+              <div>
+                <div class="font-semibold rarity-${it.rarity} text-[11px]">${escapeHtml(trEntityName(it))}</div>
+                <div class="text-[10px] text-slate-400">${escapeHtml(trEntityDesc(it))}</div>
+              </div>
+              <button onclick="buyShopItem('${name.replace(/'/g, "\\'")}')" class="px-2 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/50 text-[10px] font-mono-mud font-semibold">
+                ${escapeHtml(uiText("buyAction"))} ${it.value}g
+              </button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const refineBtn = document.getElementById("btn-refine-weapon");
+      if (refineBtn) {
+        refineBtn.innerHTML = `${escapeHtml(uiText("starRefineBtn"))} (+<span id="refine-level-badge">${p.refineLevel}</span>)`;
+      }
+
+      const eqList = document.getElementById("equipment-slots-list");
+      if (eqList) {
+        const slots = ["weapon", "armor", "helm", "ring", "relic"];
+        eqList.innerHTML = slots.map((slot) => {
+          const eqName = p.equipment[slot];
+          const it = eqName ? ITEM_CATALOG[eqName] : null;
+          return `
+            <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-1">
+              <span class="uppercase text-[10px] font-bold text-slate-400 w-20">${escapeHtml(uiText("slot_" + slot))}</span>
+              <div class="flex-1">
+                <div class="font-semibold text-[11px] ${it ? 'rarity-' + it.rarity : 'text-slate-500'}">${escapeHtml(it ? trEntityName(it) : uiText("emptySlot"))}</div>
+              </div>
+              <span class="text-[10px] font-mono-mud text-slate-400">${it ? `+${it.atk || 0}ATK/+${it.def || 0}DEF` : ""}</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const craftList = document.getElementById("crafting-recipes-list");
+      if (craftList) {
+        craftList.innerHTML = CRAFTING_RECIPES.map((rec) => {
+          const outItem = ITEM_CATALOG[rec.output] || { name: rec.output, nameZh: rec.output };
+          const reqStr = Object.entries(rec.ingredients).map(([m, c]) => {
+            const matItem = ITEM_CATALOG[m] || { name: m, nameZh: m };
+            return `${c}x ${trEntityName(matItem)}`;
+          }).join(", ");
+          return `
+            <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1">
+              <div>
+                <div class="font-semibold text-emerald-300 text-[11px]">${escapeHtml(trEntityName(outItem))} (x${rec.qty})</div>
+                <div class="text-[10px] text-slate-400">${escapeHtml(uiText("reqPrefix"))} ${escapeHtml(reqStr)}</div>
+              </div>
+              <button onclick="craftRecipe('${rec.id}')" class="px-2 py-0.5 rounded bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/40 text-[10px] font-semibold">
+                ${escapeHtml(uiText("craftAction"))}
+              </button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const qCompBadge = document.getElementById("quest-completed-badge");
+      if (qCompBadge) qCompBadge.textContent = `${state.quests.completed.length} / ${STORY_QUESTS.length} ${uiText("completeSuffix")}`;
+
+      const storyList = document.getElementById("story-quests-list");
+      if (storyList) {
+        storyList.innerHTML = STORY_QUESTS.map((q) => {
+          const done = state.quests.completed.includes(q.id);
+          const rewItem = ITEM_CATALOG[q.rewardItem] || { name: q.rewardItem, nameZh: q.rewardItem };
+          const giverParts = q.giver.split("·");
+          const giverName = getLang() === "zh" ? (giverParts[1] || giverParts[0]).trim() : giverParts[0].trim();
+          return `
+            <div class="p-2 rounded-lg border ${done ? 'bg-emerald-950/30 border-emerald-700/50' : 'bg-slate-900/90 border-slate-800'}">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-[11px] ${done ? 'text-emerald-300' : 'text-amber-300'}">${escapeHtml(trEntityName(q))}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded ${done ? 'bg-emerald-900/70 text-emerald-200' : 'bg-slate-800 text-slate-300'}">${done ? escapeHtml(uiText("doneBadge")) : escapeHtml(giverName)}</span>
+              </div>
+              <p class="text-[10px] text-slate-200 mt-0.5">${escapeHtml(trEntityDesc(q))}</p>
+              <div class="text-[9px] text-amber-200/90 mt-0.5 font-mono-mud">${escapeHtml(uiText("rewardPrefix"))} ${q.rewardXp} XP, ${q.rewardGold}g, [${escapeHtml(trEntityName(rewItem))}]</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const bountiesList = document.getElementById("bounties-list");
+      if (bountiesList) {
+        bountiesList.innerHTML = state.quests.bounties.map((b) => {
+          const target = b.targetKills || b.targetHarvests || b.targetBoss || 1;
+          const ready = b.progress >= target && !b.claimed;
+          return `
+            <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1">
+              <div>
+                <div class="font-semibold text-purple-200 text-[11px]">${escapeHtml(trEntityDesc(b))}</div>
+                <div class="text-[10px] text-slate-400">(${b.progress}/${target}) • +${b.rewardXp}XP, +${b.rewardGold}g</div>
+              </div>
+              <button onclick="claimBounty('${b.id}')" class="px-2 py-0.5 rounded text-[10px] font-semibold ${b.claimed ? 'bg-slate-800 text-slate-500' : (ready ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-purple-950 text-purple-300 border border-purple-700/50')}">
+                ${escapeHtml(b.claimed ? uiText("claimedBtn") : (ready ? uiText("claimBtn") : uiText("activeBtn")))}
+              </button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt("rift-best-wave", state.telemetry.riftBestWave);
+      setTxt("stat-kills", state.telemetry.kills);
+      setTxt("stat-crafted", state.telemetry.crafted);
+      setTxt("stat-bosses", state.telemetry.bossesKilled);
+
+      const achList = document.getElementById("achievements-list");
+      if (achList) {
+        achList.innerHTML = ACHIEVEMENT_DEFS.map((a) => {
+          const unlocked = Boolean(state.achievements[a.id]);
+          const titleParts = a.title.split("·");
+          const achTitle = getLang() === "zh" ? (titleParts[1] || titleParts[0]).trim() : titleParts[0].trim();
+          return `
+            <div class="flex items-center justify-between p-1.5 rounded-lg border ${unlocked ? 'bg-amber-500/10 border-amber-500/40' : 'bg-slate-900/60 border-slate-800 opacity-65'}">
+              <div>
+                <div class="font-semibold text-[11px] ${unlocked ? 'text-amber-300' : 'text-slate-400'}">${unlocked ? '🏅' : '🔒'} ${escapeHtml(achTitle)}</div>
+                <div class="text-[10px] text-slate-300">${escapeHtml(trEntityDesc(a))}</div>
+              </div>
+              <span class="text-[10px] font-mono-mud px-1.5 py-0.5 rounded bg-slate-950 text-emerald-300">${escapeHtml(a.bonus)}</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      renderAiPanel();
+    }
+
+
+    // =========================================================================
+    // V7 ENHANCEMENTS:
+    // 1. FOCUS UI & SETTINGS/BUILD DRAWER
+    // 2. SMART NEXT-STEP ASSISTANT & SCENARIO LOADOUT/SKILL/EXIT HIGHLIGHTER
+    // 3. ENDLESS PROCEDURAL OPEN-WORLD FRONTIER GENERATOR
+    // =========================================================================
+    const V7_UI_I18N = {
+      en: { nextStepBadge: "🧭 Next Step", proceedBtn: "⚡ Proceed Next", buildBtn: "📊 Build & Settings", frontierBtn: "🌌 +Frontier", wpnPrefix: "🗡️ Weapon", toolPrefix: "⛏️ Tool", skillPrefix: "⚡ Best Skill", sicklePick: "Sickle & Pickaxe", compassTool: "Astral Compass" },
+      zh: { nextStepBadge: "🧭 下一步指引", proceedBtn: "⚡ 一键推进", buildBtn: "📊 属性与设置", frontierBtn: "🌌 开拓新星区", wpnPrefix: "🗡️ 适用武器", toolPrefix: "⛏️ 适用工具", skillPrefix: "⚡ 推荐技能", sicklePick: "采集镰/矿镐", compassTool: "星图寻路罗盘" },
+      es: { nextStepBadge: "🧭 Siguiente Paso", proceedBtn: "⚡ Avanzar", buildBtn: "📊 Atributos/Ajustes", frontierBtn: "🌌 +Frontera", wpnPrefix: "🗡️ Arma", toolPrefix: "⛏️ Herramienta", skillPrefix: "⚡ Habilidad", sicklePick: "Hoz y Pico", compassTool: "Brújula Astral" },
+      ja: { nextStepBadge: "🧭 次のステップ", proceedBtn: "⚡ 次へ進む", buildBtn: "📊 能力＆設定", frontierBtn: "🌌 +新領域開拓", wpnPrefix: "🗡️ 推奨武器", toolPrefix: "⛏️ 推奨道具", skillPrefix: "⚡ 推奨スキル", sicklePick: "採取鎌＆ピッケル", compassTool: "星図コンパス" },
+      ko: { nextStepBadge: "🧭 다음 목표", proceedBtn: "⚡ 바로 진행", buildBtn: "📊 스탯/설정", frontierBtn: "🌌 +변경 개척", wpnPrefix: "🗡️ 추천 무기", toolPrefix: "⛏️ 추천 도구", skillPrefix: "⚡ 추천 스킬", sicklePick: "채집낫 & 곡괭이", compassTool: "성도 나침반" },
+      fr: { nextStepBadge: "🧭 Prochaine Étape", proceedBtn: "⚡ Continuer", buildBtn: "📊 Build & Options", frontierBtn: "🌌 +Frontière", wpnPrefix: "🗡️ Arme", toolPrefix: "⛏️ Outil", skillPrefix: "⚡ Compétence", sicklePick: "Faucille & Pioche", compassTool: "Boussole Astrale" },
+      de: { nextStepBadge: "🧭 Nächster Schritt", proceedBtn: "⚡ Weiter", buildBtn: "📊 Build & Optionen", frontierBtn: "🌌 +Grenzland", wpnPrefix: "🗡️ Waffe", toolPrefix: "⛏️ Werkzeug", skillPrefix: "⚡ Beste Fertigkeit", sicklePick: "Sichel & Spitzhacke", compassTool: "Astralkompass" },
+      pt: { nextStepBadge: "🧭 Próximo Passo", proceedBtn: "⚡ Avançar", buildBtn: "📊 Build e Ajustes", frontierBtn: "🌌 +Fronteira", wpnPrefix: "🗡️ Arma", toolPrefix: "⛏️ Ferramenta", skillPrefix: "⚡ Habilidade", sicklePick: "Foice e Picareta", compassTool: "Bússola Astral" },
+      ru: { nextStepBadge: "🧭 Следующий Шаг", proceedBtn: "⚡ Действовать", buildBtn: "📊 Билд и Опции", frontierBtn: "🌌 +Рубеж", wpnPrefix: "🗡️ Оружие", toolPrefix: "⛏️ Инструмент", skillPrefix: "⚡ Навык", sicklePick: "Серп и Кирка", compassTool: "Астральный Компас" },
+      ar: { nextStepBadge: "🧭 الخطوة التالية", proceedBtn: "⚡ تقدم الآن", buildBtn: "📊 السمات والإعدادات", frontierBtn: "🌌 +توسيع العالم", wpnPrefix: "🗡️ السلاح", toolPrefix: "⛏️ الأداة", skillPrefix: "⚡ أفضل مهارة", sicklePick: "منجل ومعول", compassTool: "البوصلة النجمية" }
+    };
+
+    function v7Text(key) {
+      const lang = getLang();
+      return (V7_UI_I18N[lang] && V7_UI_I18N[lang][key]) || V7_UI_I18N.en[key] || key;
+    }
+
+    const PROCEDURAL_BIOMES = [
+      { name: "Celestial Floating Isles", zh: "天界浮空群岛", es: "Islas Flotantes Celestiales", ja: "天界浮遊群島", ko: "천계 부유 군도", fr: "Îles Flottantes Célestes", de: "Himmlische Schwebeinseln", pt: "Ilhas Flutuantes Celestiais", ru: "Небесные Парящие Острова", ar: "الجزر السماوية العائمة", color: "#38bdf8", badgeBg: "bg-sky-950/80 text-sky-300 border-sky-700/50", palette: ["#08203e", "#133b6e", "#38bdf8"] },
+      { name: "Abyssal Crystal Trench", zh: "深渊晶簇海沟", es: "Fosa Abisal de Cristal", ja: "深淵結晶海溝", ko: "심연 수정 해구", fr: "Fosse Cristalline Abyssale", de: "Abyssaler Kristallgraben", pt: "Fossa Abissal de Cristal", ru: "Бездонная Кристальная Впадина", ar: "خندق البلورات السحيق", color: "#2dd4bf", badgeBg: "bg-teal-950/80 text-teal-300 border-teal-700/50", palette: ["#042f2e", "#115e59", "#2dd4bf"] },
+      { name: "Chrono-Shifted Sands", zh: "时空流沙荒漠", es: "Arenas Crono-Desplazadas", ja: "時空流砂の砂漠", ko: "시공 유사 사막", fr: "Sables Chrono-Décalés", de: "Chrono-Wüstensande", pt: "Areias Crono-Deslocadas", ru: "Пески Временного Сдвига", ar: "رمال الزمن المتحولة", color: "#fbbf24", badgeBg: "bg-amber-950/80 text-amber-300 border-amber-700/50", palette: ["#2e1a05", "#5c3409", "#fbbf24"] },
+      { name: "Nether-Forge Bastion", zh: "幽冥熔炉要塞", es: "Bastión de Forja Abisal", ja: "冥界鍛冶の要塞", ko: "황천 용광로 요새", fr: "Bastion de la Nécro-Forge", de: "Netherschmiede-Bastion", pt: "Bastião da Forja Abissal", ru: "Бастион Пустотной Кузни", ar: "معقل مصهر الهاوية", color: "#f43f5e", badgeBg: "bg-rose-950/80 text-rose-300 border-rose-700/50", palette: ["#2c0612", "#590d22", "#f43f5e"] },
+      { name: "Starfall Primeval Wilds", zh: "星落远古丛林", es: "Selva Primigenia Lluvia Estelar", ja: "星降りの太古密林", ko: "별똥별 태고 밀림", fr: "Jungle Primordiale Chute-d'Étoiles", de: "Sternenfall-Urwald", pt: "Selva Primordial Chuva Estelar", ru: "Первобытные Джунгли Звездопада", ar: "أدغال سقوط النجوم", color: "#a3e635", badgeBg: "bg-lime-950/80 text-lime-300 border-lime-700/50", palette: ["#0c2908", "#1a4d14", "#a3e635"] },
+      { name: "Void Singularity Expanse", zh: "虚空奇点荒原", es: "Expansión de Singularidad del Vacío", ja: "虚空特異点の荒原", ko: "공허 특이점 황원", fr: "Étendue de la Singularité du Vide", de: "Leeren-Singularitätsweite", pt: "Expansão da Singularidade do Vazio", ru: "Простор Сингулярности Бездны", ar: "امتداد تفرد الفراغ", color: "#e879f9", badgeBg: "bg-fuchsia-950/80 text-fuchsia-300 border-fuchsia-700/50", palette: ["#24052e", "#4a0e5c", "#e879f9"] }
+    ];
+
+    PROCEDURAL_BIOMES.forEach((pb) => {
+      BIOME_META[pb.name] = { zh: pb.zh, color: pb.color, badgeBg: pb.badgeBg, dangerText: "Endless Frontier" };
+      BIOME_I18N[pb.name] = {
+        en: pb.name, zh: pb.zh, es: pb.es, ja: pb.ja, ko: pb.ko, fr: pb.fr, de: pb.de, pt: pb.pt, ru: pb.ru, ar: pb.ar
+      };
+    });
+
+    const PROC_ROOM_PREFIXES = [
+      { en: "Shattered Spire", zh: "破碎尖塔", es: "Aguja Quebrada", ja: "砕けた尖塔", ko: "부서진 첨탑", fr: "Flèche Brisée", de: "Zerschmetterter Turm", pt: "Pináculo Partido", ru: "Расколотый Шпиль", ar: "المسلة المحطمة" },
+      { en: "Aether Sanctum", zh: "以太圣殿", es: "Santuario de Éter", ja: "エーテル聖堂", ko: "에테르 성전", fr: "Sanctuaire d'Éther", de: "Äther-Sanktum", pt: "Santuário de Éter", ru: "Эфирное Святилище", ar: "معبد الأثير" },
+      { en: "Starlight Rift-Gate", zh: "星光裂隙之门", es: "Puerta Estelar de la Fisura", ja: "星光のリフト門", ko: "별빛 균열문", fr: "Porte Stellaire de Faille", de: "Sternenlicht-Risstor", pt: "Portão Estelar da Fenda", ru: "Звездные Врата Разлома", ar: "بوابة الصدع النجمي" },
+      { en: "Forgotten Monolith", zh: "遗忘方尖碑", es: "Monolito Olvidado", ja: "忘却のモノリス", ko: "잊혀진 방첨탑", fr: "Monolithe Oublié", de: "Vergessener Monolith", pt: "Monólito Esquecido", ru: "Забытый Монолит", ar: "المسلة المنسية" },
+      { en: "Astral Nexus Bastion", zh: "星枢棱堡", es: "Bastión del Nexo Astral", ja: "星枢の稜堡", ko: "성추 보루", fr: "Bastion du Nexus Astral", de: "Astralnexus-Bastion", pt: "Bastião do Nexo Astral", ru: "Бастион Астрального Нексуса", ar: "حصن المحور النجمي" },
+      { en: "Crystal Anomaly Vault", zh: "晶簇异变宝库", es: "Bóveda de Anomalía Cristalina", ja: "結晶異変の宝庫", ko: "수정 이변 보물고", fr: "Voûte d'Anomalie Cristalline", de: "Kristallanomalie-Gewölbe", pt: "Cofre da Anomalia Cristalina", ru: "Хранилище Кристальной Аномалии", ar: "خزانة الشذوذ البلوري" }
+    ];
+
+    function getTotalWorldRooms() {
+      return Object.keys(WORLD_ROOMS).length;
+    }
+
+    function restoreProceduralWorld() {
+      state.world.proceduralRooms = state.world.proceduralRooms || [];
+      state.world.proceduralMobs = state.world.proceduralMobs || {};
+      state.world.proceduralItems = state.world.proceduralItems || {};
+      state.world.frontierGoalRoomId = state.world.frontierGoalRoomId || null;
+
+      Object.entries(state.world.proceduralMobs).forEach(([k, v]) => {
+        MOB_TEMPLATES[k] = v;
+      });
+      Object.entries(state.world.proceduralItems).forEach(([k, v]) => {
+        ITEM_CATALOG[k] = v;
+      });
+      state.world.proceduralRooms.forEach((pr) => {
+        WORLD_ROOMS[pr.id] = pr;
+        if (pr.i18nTitle) ROOM_TITLE_I18N[pr.id] = pr.i18nTitle;
+        if (pr.anchorId && WORLD_ROOMS[pr.anchorId] && pr.anchorDir) {
+          WORLD_ROOMS[pr.anchorId].exits[pr.anchorDir] = pr.id;
+        }
+      });
+    }
+
+    function expandProceduralFrontier(count = 3, silent = false) {
+      state.world.proceduralRooms = state.world.proceduralRooms || [];
+      state.world.proceduralMobs = state.world.proceduralMobs || {};
+      state.world.proceduralItems = state.world.proceduralItems || {};
+
+      const oppDir = { n: "s", s: "n", e: "w", w: "e", u: "d", d: "u" };
+      const dirOffsets = {
+        n: [0, -48], s: [0, 48], e: [62, 0], w: [-62, 0], u: [42, -38], d: [-42, 38]
+      };
+
+      let createdCount = 0;
+      let firstNewRoom = null;
+
+      for (let i = 0; i < count; i++) {
+        const idx = getTotalWorldRooms() + 1;
+        const roomId = `r_frontier_${idx}`;
+        if (WORLD_ROOMS[roomId]) continue;
+
+        const allRooms = Object.values(WORLD_ROOMS);
+        const candidates = [];
+        allRooms.forEach((rm) => {
+          ["n", "e", "w", "s", "u", "d"].forEach((d) => {
+            if (!rm.exits[d]) {
+              candidates.push({ rm, dir: d, score: rm.danger * 10 + (rm.id.startsWith("r_frontier_") ? 25 : 0) });
+            }
+          });
+        });
+        if (candidates.length === 0) break;
+        candidates.sort((a, b) => b.score - a.score);
+        const pick = candidates[(idx + i) % Math.min(candidates.length, 6)];
+        const anchor = pick.rm;
+        const dir = pick.dir;
+        const [dx, dy] = dirOffsets[dir];
+
+        let nx = anchor.x + dx;
+        let ny = anchor.y + dy;
+        let nudge = 0;
+        while (Object.values(WORLD_ROOMS).some((r) => Math.hypot(r.x - nx, r.y - ny) < 26) && nudge < 8) {
+          nx += (dir === "w" ? -28 : 28);
+          ny += (dir === "n" ? -28 : 28);
+          nudge++;
+        }
+
+        const bTpl = PROCEDURAL_BIOMES[(idx + i) % PROCEDURAL_BIOMES.length];
+        const pfx = PROC_ROOM_PREFIXES[(idx + i) % PROC_ROOM_PREFIXES.length];
+        const sectorNum = state.world.proceduralRooms.length + 1;
+        const dangerLv = Math.max(state.player.level + 1, anchor.danger + 1, Math.floor(idx / 3));
+        const isBoss = sectorNum % 3 === 0;
+
+        const mobId = `proc_mob_${idx}`;
+        const weaponName = `Astral Relic Blade +${dangerLv}`;
+        const weaponZh = `星界奇点神兵 +${dangerLv}`;
+        const newWeapon = {
+          name: weaponName,
+          nameZh: weaponZh,
+          type: "equipment",
+          slot: "weapon",
+          rarity: "mythic",
+          value: 200 + dangerLv * 65,
+          atk: 22 + dangerLv * 11,
+          mag: 18 + dangerLv * 9,
+          def: 5 + dangerLv * 3,
+          crit: Math.min(25, 8 + dangerLv),
+          desc: `+${22 + dangerLv * 11} ATK, +${18 + dangerLv * 9} MAG (Frontier Tier ${dangerLv})`,
+          descZh: `未知边境神兵 (+${22 + dangerLv * 11}物攻, +${18 + dangerLv * 9}法强)`
+        };
+        ITEM_CATALOG[weaponName] = newWeapon;
+        state.world.proceduralItems[weaponName] = newWeapon;
+
+        const matPool = ["Star-Metal", "Aether Crystal", "Mythril Ore", "Firebloom", "Luminous Cap"];
+        const chosenMat = matPool[idx % matPool.length];
+
+        const newMob = {
+          id: mobId,
+          name: isBoss ? `Sovereign of Sector ${sectorNum}` : `Frontier Warden Mk.${dangerLv}`,
+          nameZh: isBoss ? `第${sectorNum}星区主宰领主` : `未知边境守卫 Lv.${dangerLv}`,
+          level: dangerLv,
+          boss: isBoss,
+          hp: Math.round(65 * Math.pow(1.22, Math.min(18, dangerLv))),
+          atk: Math.round(14 + dangerLv * 7.5),
+          def: Math.round(6 + dangerLv * 3.8),
+          xp: Math.round(55 + dangerLv * 45),
+          gold: Math.round(35 + dangerLv * 28),
+          drops: [chosenMat, weaponName]
+        };
+        MOB_TEMPLATES[mobId] = newMob;
+        state.world.proceduralMobs[mobId] = newMob;
+
+        const i18nTitle = {
+          es: `${pfx.es} #${sectorNum}`,
+          ja: `${pfx.ja}・第${sectorNum}区`,
+          ko: `${pfx.ko} #${sectorNum}`,
+          fr: `${pfx.fr} #${sectorNum}`,
+          de: `${pfx.de} #${sectorNum}`,
+          pt: `${pfx.pt} #${sectorNum}`,
+          ru: `${pfx.ru} #${sectorNum}`,
+          ar: `${pfx.ar} #${sectorNum}`
+        };
+        ROOM_TITLE_I18N[roomId] = i18nTitle;
+
+        const newRoom = {
+          id: roomId,
+          title: `${pfx.en} #${sectorNum}`,
+          titleZh: `${pfx.zh}·第${sectorNum}星区`,
+          biome: bTpl.name,
+          danger: dangerLv,
+          bossRoom: isBoss,
+          x: nx,
+          y: ny,
+          anchorId: anchor.id,
+          anchorDir: dir,
+          i18nTitle,
+          desc: `Uncharted frontier sector #${sectorNum} in ${bTpl.name}. Ley-line anomalies pulse with Tier-${dangerLv} energy and rare [${chosenMat}] deposits.`,
+          descZh: `位于【${bTpl.zh}】的未知程序化边境星区 #${sectorNum}。地脉异变涌动着 ${dangerLv} 阶星界能量与珍稀的【${ITEM_CATALOG[chosenMat].nameZh}】矿床。`,
+          exits: { [oppDir[dir]]: anchor.id },
+          npcs: [],
+          mobs: [mobId],
+          nodes: [{ id: `node_proc_${idx}`, name: `${chosenMat} Anomaly`, nameZh: `${ITEM_CATALOG[chosenMat].nameZh}异变簇`, item: chosenMat, qty: 2 }],
+          riftPortal: isBoss
+        };
+
+        anchor.exits[dir] = roomId;
+        WORLD_ROOMS[roomId] = newRoom;
+        state.world.proceduralRooms.push(newRoom);
+        if (!firstNewRoom) firstNewRoom = newRoom;
+        createdCount++;
+      }
+
+      if (firstNewRoom) {
+        state.world.frontierGoalRoomId = firstNewRoom.id;
+        if (!silent) {
+          SynthAudio.play("levelup");
+          addLog(
+            `🌌 OPEN-WORLD FRONTIER EXPANDED! ${createdCount} new uncharted region(s) discovered starting at [${firstNewRoom.title}] (Total World Locations: ${getTotalWorldRooms()})!`,
+            "world",
+            "text-amber-300 font-bold",
+            `🌌 开放世界未知边境已扩展！发现了 ${createdCount} 处全新星区，始于【${firstNewRoom.titleZh}】（当前世界总区域：${getTotalWorldRooms()}）！`
+          );
+          showToast(
+            `🌌 World Expanded (${getTotalWorldRooms()} Regions)`,
+            `${trRoomTitle(firstNewRoom)}`,
+            "border-purple-400"
+          );
+        }
+      }
+      renderAll();
+      return createdCount;
+    }
+
+    function computeSmartGuidance() {
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+      const cfg = CLASS_CONFIG[p.classId] || CLASS_CONFIG.vanguard;
+
+      // 1. Evaluate Best Weapon/Gear in Pack vs Equipped
+      let upgradeItemName = null;
+      let upgradeGain = 0;
+
+      Object.keys(p.inventory).forEach((k) => {
+        if ((p.inventory[k] || 0) > 0 && ITEM_CATALOG[k] && ITEM_CATALOG[k].type === "equipment") {
+          const it = ITEM_CATALOG[k];
+          const slot = it.slot || "weapon";
+          const eqInSlot = p.equipment[slot] ? ITEM_CATALOG[p.equipment[slot]] : { atk: 0, mag: 0, def: 0 };
+          const scoreNew = (it.atk || 0) + (it.mag || 0) + (it.def || 0);
+          const scoreOld = (eqInSlot.atk || 0) + (eqInSlot.mag || 0) + (eqInSlot.def || 0);
+          if (scoreNew > scoreOld + upgradeGain) {
+            upgradeGain = scoreNew - scoreOld;
+            upgradeItemName = k;
+          }
+        }
+      });
+
+      // 2. Evaluate Ready Harvest Nodes in current room
+      const readyNode = (room.nodes || []).find((n) => !state.world.harvestedCooldowns[`${room.id}:${n.id}`]);
+
+      // 3. Evaluate Best Skill right now
+      let bestSkillIdx = 0;
+      if (p.hp < p.maxHp * 0.55 && (p.cooldowns[2] || 0) === 0) {
+        bestSkillIdx = 2;
+      } else if (state.combat.inCombat && state.combat.enemy && state.combat.enemy.hp > p.maxHp * 0.6 && (p.cooldowns[1] || 0) === 0) {
+        bestSkillIdx = 1;
+      } else if ((p.cooldowns[0] || 0) === 0) {
+        bestSkillIdx = 0;
+      }
+      const bestSkill = cfg.skills[bestSkillIdx] || cfg.skills[0];
+
+      // 4. Evaluate Recommended Stance
+      const bestStance = p.hp < p.maxHp * 0.45 ? "defensive" : (room.danger <= p.level ? "aggressive" : "balanced");
+
+      // 5. Determine Active Objective Target Room & Path
+      const activeQuest = STORY_QUESTS.find((q) => !state.quests.completed.includes(q.id));
+      let targetRoomId = "r_wilds_trail";
+      if (activeQuest) {
+        if (activeQuest.id === "q1_wilds") targetRoomId = (p.inventory["Moonpetal Herb"] || 0) < 1 ? "r_wilds_trail" : "r_old_mill";
+        else if (activeQuest.id === "q2_bandit_king") targetRoomId = "r_bandit_stronghold";
+        else if (activeQuest.id === "q3_sunken_lich") targetRoomId = "r_lich_sanctum";
+        else if (activeQuest.id === "q4_titan_forge") targetRoomId = "r_caldera_throne";
+        else if (activeQuest.id === "q5_astral_architect") targetRoomId = "r_astral_core";
+      } else {
+        const unvisited = Object.keys(WORLD_ROOMS).find((id) => !state.world.visitedRooms.includes(id));
+        targetRoomId = unvisited || state.world.frontierGoalRoomId || "r_astral_core";
+      }
+
+      const pathToGoal = findShortestPath(room.id, targetRoomId) || [];
+      const recommendedExitDir = pathToGoal.length > 0 ? pathToGoal[0] : null;
+
+      // 6. Decide Top Priority Next Action
+      let actionType = "move";
+      let stepText = "";
+
+      if (p.hp < p.maxHp * 0.42) {
+        const hasPot = ["Elixir of the Titans", "Greater Healing Elixir", "Minor Healing Draught"].some((k) => (p.inventory[k] || 0) > 0);
+        actionType = hasPot ? "potion" : "rest";
+        stepText = getLang() === "zh"
+          ? (hasPot ? "⚠️ 生命较低！建议立即饮用治疗药水或释放【3】号恢复技能。" : "⚠️ 生命较低！点击一键休息，100%恢复生命与法力。")
+          : (hasPot ? "⚠️ Low HP! Drink a Healing Potion or cast [3] Defensive Heal now." : "⚠️ Low HP! Click to Rest and restore 100% Vitals.");
+      } else if (state.combat.inCombat && state.combat.enemy) {
+        actionType = "combat_skill";
+        const enName = trEntityName(state.combat.enemy);
+        const skName = trEntityName(bestSkill);
+        stepText = getLang() === "zh"
+          ? `⚔️ 交战【${enName}】：推荐使用技能 [${bestSkillIdx + 1}] ${skName}！`
+          : `⚔️ Vs ${enName}: Cast [${bestSkillIdx + 1}] ${skName} (${trEntityDesc(bestSkill)})!`;
+      } else if (upgradeItemName) {
+        actionType = "equip_upgrade";
+        const upIt = ITEM_CATALOG[upgradeItemName];
+        stepText = getLang() === "zh"
+          ? `🛡️ 发现更强装备：立即穿戴背包中的【${trEntityName(upIt)}】（战力 +${upgradeGain}）！`
+          : `🛡️ Better Gear in Pack: Equip [${trEntityName(upIt)}] (+${upgradeGain} Power)!`;
+      } else if (readyNode) {
+        actionType = "harvest";
+        const nodeIt = ITEM_CATALOG[readyNode.item] || { name: readyNode.item, nameZh: readyNode.item };
+        stepText = getLang() === "zh"
+          ? `🌿 发现可采集资源：使用${v7Text("sicklePick")}收获当前房间的【${trEntityName(nodeIt)}】！`
+          : `🌿 Resource Ready: Use ${v7Text("sicklePick")} to harvest [${trEntityName(nodeIt)}] here!`;
+      } else if (room.id === targetRoomId && room.mobs && room.mobs.length > 0) {
+        const m = MOB_TEMPLATES[room.mobs[0]];
+        actionType = "engage_mob";
+        stepText = getLang() === "zh"
+          ? `🎯 已抵达目标地点：迎战【${trEntityName(m)}】(Lv.${m.level}) 推进任务！`
+          : `🎯 Objective Reached: Engage [${trEntityName(m)}] (Lv.${m.level})!`;
+      } else if (recommendedExitDir && room.exits[recommendedExitDir]) {
+        const nextR = WORLD_ROOMS[room.exits[recommendedExitDir]];
+        const goalR = WORLD_ROOMS[targetRoomId];
+        actionType = "move_dir";
+        stepText = getLang() === "zh"
+          ? `🧭 前往【${trRoomTitle(goalR)}】：向 [${trDir(recommendedExitDir)}] 移动至【${trRoomTitle(nextR)}】（余 ${pathToGoal.length} 步）`
+          : `🧭 Move [${trDir(recommendedExitDir)}] → ${trRoomTitle(nextR)} (Toward ${trRoomTitle(goalR)}, ${pathToGoal.length} step${pathToGoal.length > 1 ? "s" : ""})`;
+      } else {
+        actionType = "expand_frontier";
+        stepText = getLang() === "zh"
+          ? `🌌 已探索当前星区！点击开拓无尽开放世界新星区！`
+          : `🌌 Known regions charted! Click to expand the Endless Open-World Frontier!`;
+      }
+
+      const wpnItem = p.equipment.weapon ? ITEM_CATALOG[p.equipment.weapon] : null;
+      const wpnName = wpnItem ? trEntityName(wpnItem) : "Unarmed";
+      const toolLabel = readyNode
+        ? `${v7Text("toolPrefix")}: ${v7Text("sicklePick")} (🌿 ${trEntityName(ITEM_CATALOG[readyNode.item] || { name: readyNode.item })})`
+        : (room.station ? `⚒️ ${room.station.split("·")[getLang() === "zh" ? 1 : 0].trim()}` : `${v7Text("toolPrefix")}: ${v7Text("compassTool")}`);
+
+      return {
+        actionType,
+        stepText,
+        bestSkillIdx,
+        bestSkillName: trEntityName(bestSkill),
+        bestStance,
+        upgradeItemName,
+        readyNode,
+        recommendedExitDir,
+        targetRoomId,
+        pathToGoal,
+        wpnSummary: `${v7Text("wpnPrefix")}: ${wpnName} (+${p.refineLevel})${upgradeItemName ? " ★" : ""}`,
+        toolSummary: toolLabel,
+        skillSummary: `${v7Text("skillPrefix")}: [${bestSkillIdx + 1}] ${trEntityName(bestSkill)} • ${trStance(bestStance)}`
+      };
+    }
+
+    function proceedNextStep() {
+      const g = computeSmartGuidance();
+      if (g.actionType === "potion") {
+        useQuickPotion();
+      } else if (g.actionType === "rest") {
+        executeCommand("rest");
+      } else if (g.actionType === "combat_skill") {
+        useSkill(g.bestSkillIdx);
+      } else if (g.actionType === "equip_upgrade" && g.upgradeItemName) {
+        equipOrUseItem(g.upgradeItemName);
+      } else if (g.actionType === "harvest") {
+        harvestRoomNodes();
+      } else if (g.actionType === "engage_mob") {
+        const room = WORLD_ROOMS[state.world.currentRoom];
+        if (room && room.mobs && room.mobs.length > 0) engageMob(room.mobs[0]);
+      } else if (g.actionType === "move_dir" && g.recommendedExitDir) {
+        moveDirection(g.recommendedExitDir);
+      } else {
+        expandProceduralFrontier(3, false);
+      }
+    }
+
+    function toggleBuildSettingsDrawer() {
+      const card = document.getElementById("card-stats-talents");
+      const secBar = document.getElementById("secondary-header-controls");
+      if (card) card.classList.toggle("hidden");
+      if (secBar) secBar.classList.toggle("hidden");
+    }
+
+    function renderSmartAssistantAndHighlights() {
+      const g = computeSmartGuidance();
+      const badgeEl = document.getElementById("smart-assistant-badge");
+      if (badgeEl) badgeEl.textContent = v7Text("nextStepBadge");
+
+      const stepEl = document.getElementById("smart-next-step-text");
+      if (stepEl) stepEl.textContent = g.stepText;
+
+      const wEl = document.getElementById("hint-best-weapon");
+      const tEl = document.getElementById("hint-best-tool");
+      const sEl = document.getElementById("hint-best-skill");
+      if (wEl) wEl.textContent = g.wpnSummary;
+      if (tEl) tEl.textContent = g.toolSummary;
+      if (sEl) sEl.textContent = g.skillSummary;
+
+      const proceedBtn = document.getElementById("btn-proceed-next-step");
+      if (proceedBtn) proceedBtn.textContent = v7Text("proceedBtn");
+
+      const expBtn = document.getElementById("btn-expand-frontier");
+      if (expBtn) expBtn.textContent = v7Text("frontierBtn");
+
+      // Update Build/Stats toggle badge when unspent points exist
+      const buildBtn = document.getElementById("btn-toggle-build-drawer");
+      if (buildBtn) {
+        const totalPts = (state.player.statPoints || 0) + (state.player.talentPoints || 0);
+        buildBtn.innerHTML = `${escapeHtml(v7Text("buildBtn"))} ${totalPts > 0 ? `<span class="px-1 rounded bg-amber-500 text-slate-950 font-bold">+${totalPts}</span>` : ""}`;
+        buildBtn.classList.toggle("hint-pulse-gold", totalPts > 0);
+      }
+
+      // Highlight Recommended Skill Button
+      [0, 1, 2].forEach((idx) => {
+        const skBtn = document.getElementById(`btn-skill-${idx}`);
+        if (skBtn) {
+          const isBest = idx === g.bestSkillIdx;
+          skBtn.classList.toggle("hint-pulse-gold", isBest);
+        }
+      });
+
+      // Highlight Recommended Potion Button when low HP
+      const potBtn = document.getElementById("btn-quick-potion");
+      if (potBtn) {
+        potBtn.classList.toggle("hint-pulse-emerald", state.player.hp < state.player.maxHp * 0.45);
+      }
+
+      // Highlight Recommended Stance Button
+      ["balanced", "aggressive", "defensive"].forEach((st) => {
+        const stBtn = document.getElementById(`stance-${st}`);
+        if (stBtn) {
+          stBtn.classList.toggle("ring-1", st === g.bestStance && state.player.stance !== st);
+          stBtn.classList.toggle("ring-amber-400/70", st === g.bestStance && state.player.stance !== st);
+        }
+      });
+
+      // Highlight Recommended Exit Chip in #room-exits-chips
+      const exitButtons = document.querySelectorAll("#room-exits-chips button");
+      exitButtons.forEach((btn) => {
+        const oc = btn.getAttribute("onclick") || "";
+        const isRec = g.recommendedExitDir && oc.includes(`'${g.recommendedExitDir}'`) && !g.readyNode && !state.combat.inCombat;
+        btn.classList.toggle("hint-pulse-gold", Boolean(isRec));
+        if (isRec && !btn.innerHTML.includes("★")) {
+          btn.innerHTML += ` <span class="text-amber-300 font-bold">★</span>`;
+        }
+      });
+
+      // Highlight Recommended Entity/Node Chip in #room-entities-chips
+      const entButtons = document.querySelectorAll("#room-entities-chips button");
+      entButtons.forEach((btn) => {
+        const oc = btn.getAttribute("onclick") || "";
+        const isHarvestRec = g.actionType === "harvest" && oc.includes("harvestRoomNodes");
+        const isMobRec = g.actionType === "engage_mob" && oc.includes("engageMob");
+        btn.classList.toggle("hint-pulse-emerald", Boolean(isHarvestRec));
+        btn.classList.toggle("hint-pulse-gold", Boolean(isMobRec));
+      });
+
+      // Highlight Backpack Gear Upgrade if present
+      if (g.upgradeItemName) {
+        document.querySelectorAll("#inventory-list button").forEach((btn) => {
+          const oc = btn.getAttribute("onclick") || "";
+          if (oc.includes("equipOrUseItem") && oc.includes(g.upgradeItemName.slice(0, 10))) {
+            btn.classList.add("hint-pulse-gold");
+          }
+        });
+      }
+
+      // Update dynamic total room count in World Atlas header
+      const atlasH3 = document.querySelector("#world-atlas-card h3");
+      if (atlasH3) {
+        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/<span id="total-rooms-count">${getTotalWorldRooms()}</span>)`;
+      }
+
+      // Auto-expand procedural frontier if player has explored >= 75% of known world
+      if (state.world.visitedRooms.length >= Math.max(24, Math.floor(getTotalWorldRooms() * 0.75)) && getTotalWorldRooms() < 120) {
+        expandProceduralFrontier(3, true);
+      }
+    }
+
+
+    // =========================================================================
+    // V8 FUN PACK:
+    // 1. SPIRIT COMPANIONS / PETS SYSTEM
+    // 2. COMBO MULTIPLIER & ASTRAL OVERDRIVE ULTIMATE
+    // 3. INTERACTIVE MYSTERY CHESTS & AETHER SHRINE GAMBLING
+    // =========================================================================
+    const COMPANION_ROSTER = [
+      { id: "wolf", icon: "🐺", name: "Frostfang Wolf", nameZh: "霜牙魔狼", bonusEn: "+25% Pet Strike & Bleed", bonusZh: "协战撕咬+流血", dmgMult: 0.32, effect: "Bleeding" },
+      { id: "owl", icon: "🦉", name: "Astral Owl", nameZh: "星界灵鸮", bonusEn: "+20% Gold/XP & MP Regen", bonusZh: "+20%金币经验与回蓝", dmgMult: 0.24, effect: "Stunned" },
+      { id: "drake", icon: "🐉", name: "Ember Drake", nameZh: "余烬幼龙", bonusEn: "+35% Dragonfire Burn", bonusZh: "龙息烈焰灼烧", dmgMult: 0.40, effect: "Burning" },
+      { id: "golem", icon: "🤖", name: "Clockwork Golem", nameZh: "发条微缩魔像", bonusEn: "+18% Shield & Auto-Mine", bonusZh: "护盾减伤+自动采矿", dmgMult: 0.28, effect: "Stunned" }
+    ];
+
+    function ensureFunState() {
+      state.fun = state.fun || {
+        companionIdx: 0,
+        companionLevel: 1,
+        overdrive: 50,
+        comboCount: 0,
+        chestsOpened: 0
+      };
+    }
+
+    function getActiveCompanion() {
+      ensureFunState();
+      return COMPANION_ROSTER[state.fun.companionIdx % COMPANION_ROSTER.length];
+    }
+
+    function cycleCompanion() {
+      ensureFunState();
+      state.fun.companionIdx = (state.fun.companionIdx + 1) % COMPANION_ROSTER.length;
+      const pet = getActiveCompanion();
+      SynthAudio.play("skill");
+      addLog(
+        `🐾 Summoned Spirit Companion: ${pet.icon} [${pet.name}] (${pet.bonusEn})!`,
+        "world",
+        "text-indigo-300 font-semibold",
+        `🐾 已召唤灵魂伙伴：${pet.icon}【${pet.nameZh}】（${pet.bonusZh}）！`
+      );
+      renderAll();
+    }
+
+    function castOverdriveUltimate() {
+      ensureFunState();
+      if (state.fun.overdrive < 50) {
+        addLog(
+          `⚡ Astral Overdrive is charging (${state.fun.overdrive}% / 50% minimum required). Attack or cast skills to build charge!`,
+          "combat",
+          "text-slate-400",
+          `⚡ 星界超载能量蓄力中（当前 ${state.fun.overdrive}%，至少需 50%）。攻击或释放技能即可积攒！`
+        );
+        return;
+      }
+
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom];
+      if (!state.combat.inCombat && room && room.mobs && room.mobs.length > 0) {
+        engageMob(room.mobs[0]);
+      }
+
+      const chargeUsed = state.fun.overdrive;
+      state.fun.overdrive = 0;
+      state.fun.comboCount += 3;
+
+      const healAmt = Math.round(p.maxHp * 0.45);
+      p.hp = Math.min(p.maxHp, p.hp + healAmt);
+      p.mp = Math.min(p.maxMp, p.mp + Math.round(p.maxMp * 0.40));
+      p.sta = p.maxSta;
+
+      SynthAudio.play("levelup");
+
+      if (state.combat.inCombat && state.combat.enemy) {
+        const enemy = state.combat.enemy;
+        const derived = computeDerivedStats();
+        const ultDmg = Math.max(35, Math.round((derived.atk + derived.mag) * (2.6 + chargeUsed / 100)));
+        enemy.hp = Math.max(0, enemy.hp - ultDmg);
+        if (!enemy.statuses.includes("Stunned")) enemy.statuses.push("Stunned");
+
+        addLog(
+          `💥 ASTRAL OVERDRIVE ULTIMATE (${chargeUsed}% CHARGE, ${state.fun.comboCount}x COMBO)! You & ${getActiveCompanion().name} unleash ${ultDmg} Cataclysmic DMG on ${enemy.name}, stun it, and restore +${healAmt} HP!`,
+          "combat",
+          "text-amber-300 font-bold",
+          `💥 星界超载终极奥义（${chargeUsed}% 能量，${state.fun.comboCount}连击）！你与【${getActiveCompanion().nameZh}】对【${enemy.nameZh || enemy.name}】造成 ${ultDmg} 点毁天灭地伤害并眩晕目标，同时恢复 +${healAmt} 生命！`
+        );
+        showToast(`💥 Overdrive Ultimate! (${ultDmg} DMG)`, `${state.fun.comboCount}x Combo • +${healAmt} HP Restored`, "border-purple-400");
+        if (enemy.hp <= 0) {
+          handleEnemyDefeated(enemy);
+        }
+      } else {
+        addLog(
+          `💥 ASTRAL OVERDRIVE SURGE! Restored +${healAmt} HP, +40% MP, and 100% Stamina!`,
+          "world",
+          "text-purple-300 font-bold",
+          `💥 星界超载涌动！瞬间恢复 +${healAmt} 生命、40% 法力与 100% 体力！`
+        );
+      }
+      renderAll();
+    }
+
+    function openMysteryChestOrShrine() {
+      ensureFunState();
+      const p = state.player;
+      const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+      state.fun.chestsOpened += 1;
+      state.fun.overdrive = Math.min(100, state.fun.overdrive + 25);
+      SynthAudio.play("loot");
+
+      const roll = (state.tickCount + state.fun.chestsOpened) % 3;
+      if (roll === 0) {
+        const goldJackpot = 40 + p.level * 25;
+        p.gold += goldJackpot;
+        p.shards += 2;
+        addLog(
+          `🎁 [MYSTERY RUNE CHEST]: You crack the ancient seal in ${room.title} and discover +${goldJackpot} Gold, +2 Rift Shards, and +25% Overdrive!`,
+          "loot",
+          "text-amber-300 font-bold",
+          `🎁 【神秘符文宝箱】：你在【${room.titleZh}】解开了远古封印，获得 +${goldJackpot} 金币、+2 裂隙碎片与 +25% 超载能量！`
+        );
+        showToast("🎁 Mystery Chest Jackpot!", `+${goldJackpot}g & +2 Rift Shards`, "border-amber-400");
+      } else if (roll === 1) {
+        const rarePool = ["Viper Fang Dagger", "Oakhaven Tabard", "Archivist Tome Ring", "Soulfire Lantern", "Greater Healing Elixir"];
+        const prize = rarePool[(p.level + state.fun.chestsOpened) % rarePool.length];
+        addItemToInventory(prize, 1);
+        const prizeObj = ITEM_CATALOG[prize] || { nameZh: prize };
+        addLog(
+          `⛩️ [AETHER SHRINE BLESSING]: The Astral Shrine in ${room.title} bestows 1x [${prize}] and charges your Overdrive to ${state.fun.overdrive}%!`,
+          "loot",
+          "text-emerald-300 font-bold",
+          `⛩️ 【星界祭坛赐福】：【${room.titleZh}】的星界祭坛赐予了你 1件【${prizeObj.nameZh}】，并将超载能量充能至 ${state.fun.overdrive}%！`
+        );
+        showToast("⛩️ Aether Shrine Blessing!", `Received [${trEntityName(prizeObj)}]`, "border-emerald-400");
+      } else {
+        const xpBurst = 45 + p.level * 30;
+        p.xp += xpBurst;
+        state.fun.companionLevel += 1;
+        const pet = getActiveCompanion();
+        addLog(
+          `🌟 [SPIRIT RELIC RESONANCE]: You and ${pet.icon} ${pet.name} absorb ancient Aether (+${xpBurst} XP, Companion upgraded to Lv.${state.fun.companionLevel})!`,
+          "loot",
+          "text-sky-300 font-bold",
+          `🌟 【灵脉圣物共鸣】：你与 ${pet.icon}【${pet.nameZh}】汲取了远古以太（获得 +${xpBurst} 经验，伙伴升至 Lv.${state.fun.companionLevel}）！`
+        );
+        checkLevelUp();
+      }
+      renderAll();
+    }
+
+    function renderFunPackUI() {
+      ensureFunState();
+      const pet = getActiveCompanion();
+      const petBtn = document.getElementById("btn-cycle-companion");
+      if (petBtn) {
+        const petName = getLang() === "zh" ? pet.nameZh : pet.name;
+        const petPrefix = getLang() === "zh" ? "伙伴" : "Pet";
+        petBtn.textContent = `${pet.icon} ${petPrefix}: ${petName} (Lv.${state.fun.companionLevel + state.player.level - 1})`;
+      }
+
+      const ultBtn = document.getElementById("btn-ultimate-overdrive");
+      if (ultBtn) {
+        const ready = state.fun.overdrive >= 50;
+        const label = getLang() === "zh" ? "💥 超载必杀" : "💥 Overdrive";
+        ultBtn.innerHTML = `${label}: <span id="overdrive-pct">${state.fun.overdrive}</span>%${state.fun.comboCount > 0 ? ` (${state.fun.comboCount}x)` : ""}`;
+        ultBtn.classList.toggle("hint-pulse-gold", ready);
+      }
+
+      // Inject a Mystery Chest / Shrine interactive chip into #room-entities-chips so every room has an exciting surprise option
+      const entContainer = document.getElementById("room-entities-chips");
+      if (entContainer && !entContainer.innerHTML.includes("openMysteryChestOrShrine")) {
+        const chestLabel = getLang() === "zh" ? "🎁 探索神秘宝箱/祭坛" : "🎁 Mystery Chest / Shrine";
+        entContainer.innerHTML += `
+          <button onclick="openMysteryChestOrShrine()" class="px-2 py-0.5 rounded bg-amber-950/85 hover:bg-amber-900 border border-amber-500/60 text-[10px] text-amber-200 font-semibold leading-tight">
+            ${chestLabel}
+          </button>
+        `;
+      }
+    }
+
+
+    // =========================================================================
+    // V9 ENHANCEMENTS:
+    // 1. DIABLO-STYLE RANDOMIZED LOOT AFFIXES & 3 ICONIC EQUIPMENT SETS (2pc/4pc)
+    // 2. HYBRID OFFLINE / ONLINE MULTIPLAYER ENGINE (Cloudflare WS + P2P Mesh)
+    // =========================================================================
+    const DIABLO_PREFIXES = [
+      { en: "Vampiric", zh: "嗜血的", atk: 8, mag: 6, def: 2, crit: 3, lifesteal: 8 },
+      { en: "Thunder-Forged", zh: "雷铸的", atk: 12, mag: 12, def: 4, crit: 5, proc: "Chain-Lightning" },
+      { en: "Godslayer's", zh: "弑神者的", atk: 18, mag: 14, def: 6, crit: 8, proc: "Void-Rend" },
+      { en: "Chrono-Warped", zh: "时空扭曲的", atk: 10, mag: 16, def: 8, crit: 6, proc: "Time-Surge" },
+      { en: "Savage", zh: "狂野凶暴的", atk: 15, mag: 4, def: 5, crit: 7, lifesteal: 4 },
+      { en: "Celestial", zh: "天界星辉的", atk: 14, mag: 18, def: 12, crit: 6, proc: "Starfall" }
+    ];
+
+    const DIABLO_SUFFIXES = [
+      { en: "of the Void", zh: "之虚空奇点", atk: 10, mag: 12, def: 4, crit: 4 },
+      { en: "of the Titan", zh: "之泰坦巨力", atk: 14, mag: 6, def: 12, crit: 2 },
+      { en: "of Chain-Lightning", zh: "之连锁闪电", atk: 9, mag: 15, def: 5, crit: 6 },
+      { en: "of the Phoenix", zh: "之不死凤凰", atk: 8, mag: 10, def: 14, crit: 5 },
+      { en: "of Execution", zh: "之致命处决", atk: 16, mag: 8, def: 3, crit: 9 }
+    ];
+
+    const DIABLO_SETS = {
+      stormcaller: {
+        id: "stormcaller",
+        name: "Stormcaller's Regalia",
+        nameZh: "雷霆呼唤套装",
+        bonus2En: "(2pc) +25% ATK/MAG & Chain-Lightning on Hit",
+        bonus2Zh: "(2件套) +25% 攻魔 & 攻击触发连锁闪电",
+        bonus4En: "(4pc) +50% Skill DMG & Double-Cast Storm Nova",
+        bonus4Zh: "(4件套) +50% 技能伤害 & 双重风暴新星"
+      },
+      warlord: {
+        id: "warlord",
+        name: "Crimson Warlord's Battlegear",
+        nameZh: "猩红战神套装",
+        bonus2En: "(2pc) +30% DEF & +12% Vampiric Lifesteal",
+        bonus2Zh: "(2件套) +30% 防御 & +12% 嗜血生命偷取",
+        bonus4En: "(4pc) +45% Crit DMG & Unstoppable Bloodlust",
+        bonus4Zh: "(4件套) +45% 暴击伤害 & 战神狂血"
+      },
+      singularity: {
+        id: "singularity",
+        name: "Astral Singularity Vestments",
+        nameZh: "星界奇点套装",
+        bonus2En: "(2pc) +15% Crit & +30% Overdrive Charge Rate",
+        bonus2Zh: "(2件套) +15% 暴击 & +30% 超载充能速度",
+        bonus4En: "(4pc) +40% All Stats & Cataclysmic Void Nova",
+        bonus4Zh: "(4件套) +40% 全属性 & 虚空奇点爆发"
+      }
+    };
+
+    const SET_BASE_SLOTS = [
+      { slot: "weapon", en: "Runeblade", zh: "符文战刃" },
+      { slot: "armor", en: "Cuirass", zh: "重装胸甲" },
+      { slot: "helm", en: "Crown", zh: "星辰头冠" },
+      { slot: "ring", en: "Signet", zh: "秘法指环" },
+      { slot: "relic", en: "Core Relic", zh: "圣物核心" }
+    ];
+
+    function getEquippedSetCounts() {
+      const counts = { stormcaller: 0, warlord: 0, singularity: 0 };
+      Object.values(state.player.equipment || {}).forEach((itemName) => {
+        if (itemName && ITEM_CATALOG[itemName] && ITEM_CATALOG[itemName].setId) {
+          const sid = ITEM_CATALOG[itemName].setId;
+          counts[sid] = (counts[sid] || 0) + 1;
+        }
+      });
+      return counts;
+    }
+
+    function computeSetMultipliers() {
+      const counts = getEquippedSetCounts();
+      let atkMult = 1.0, magMult = 1.0, defMult = 1.0, critBonus = 0, lifestealBonus = 0, skillMult = 1.0, chainProc = false;
+      if (counts.stormcaller >= 2) { atkMult += 0.25; magMult += 0.25; chainProc = true; }
+      if (counts.stormcaller >= 4) { skillMult += 0.50; }
+      if (counts.warlord >= 2) { defMult += 0.30; lifestealBonus += 12; }
+      if (counts.warlord >= 4) { atkMult += 0.35; critBonus += 15; }
+      if (counts.singularity >= 2) { critBonus += 15; }
+      if (counts.singularity >= 4) { atkMult += 0.40; magMult += 0.40; defMult += 0.40; }
+      return { counts, atkMult, magMult, defMult, critBonus, lifestealBonus, skillMult, chainProc };
+    }
+
+    function rollDiabloAffixLoot(paidFromForge = false, forcedSlot = null, forcedSetId = null) {
+      const p = state.player;
+      state.world.proceduralItems = state.world.proceduralItems || {};
+
+      if (paidFromForge) {
+        if (p.gold < 35) {
+          addLog("⚠️ Rolling a Diablo Affix Set Item at the Forge costs 35 Gold.", "loot", "text-amber-300", "⚠️ 在锻造台随机打造一件暗黑词缀套装装备需要 35 金币。");
+          return null;
+        }
+        p.gold -= 35;
+      }
+
+      const seed = state.tickCount + Object.keys(state.world.proceduralItems).length + p.level;
+      const pfx = DIABLO_PREFIXES[seed % DIABLO_PREFIXES.length];
+      const sfx = DIABLO_SUFFIXES[(seed * 3 + 1) % DIABLO_SUFFIXES.length];
+      const setKeys = Object.keys(DIABLO_SETS);
+      const setId = forcedSetId || setKeys[seed % setKeys.length];
+      const setDef = DIABLO_SETS[setId];
+      const slotInfo = forcedSlot
+        ? (SET_BASE_SLOTS.find((s) => s.slot === forcedSlot) || SET_BASE_SLOTS[0])
+        : SET_BASE_SLOTS[seed % SET_BASE_SLOTS.length];
+
+      const tier = Math.max(1, p.level);
+      const itemName = `${pfx.en} ${setDef.name.split("'")[0]} ${slotInfo.en} ${sfx.en} +${tier}`;
+      const itemNameZh = `${pfx.zh}·${setDef.nameZh.slice(0, 4)}${slotInfo.zh}·${sfx.zh} +${tier}`;
+
+      const atk = Math.round((pfx.atk + sfx.atk) * (1 + tier * 0.25));
+      const mag = Math.round((pfx.mag + sfx.mag) * (1 + tier * 0.25));
+      const def = Math.round((pfx.def + sfx.def) * (1 + tier * 0.22));
+      const crit = Math.min(25, pfx.crit + sfx.crit);
+      const rarities = ["rare", "epic", "mythic"];
+      const rarity = rarities[Math.min(2, Math.floor((seed % 4) / 2) + (paidFromForge ? 1 : 0))];
+
+      const newItem = {
+        name: itemName,
+        nameZh: itemNameZh,
+        type: "equipment",
+        slot: slotInfo.slot,
+        rarity,
+        setId,
+        lifesteal: pfx.lifesteal || 0,
+        proc: pfx.proc || "Chain-Lightning",
+        value: 85 + tier * 40,
+        atk,
+        mag,
+        def,
+        crit,
+        desc: `[Set: ${setDef.name}] +${atk} ATK, +${mag} MAG, +${def} DEF, +${crit}% Crit${pfx.lifesteal ? `, +${pfx.lifesteal}% Leech` : ""}`,
+        descZh: `【套装：${setDef.nameZh}】+${atk}物攻, +${mag}法强, +${def}防御, +${crit}%暴击${pfx.lifesteal ? `, +${pfx.lifesteal}%吸血` : ""}`
+      };
+
+      ITEM_CATALOG[itemName] = newItem;
+      state.world.proceduralItems[itemName] = newItem;
+      addItemToInventory(itemName, 1);
+      SynthAudio.play("levelup");
+
+      addLog(
+        `🔥 DIABLO AFFIX LOOT ROLLED: [${itemName}] (${rarity.toUpperCase()} • ${setDef.name} • +${atk} ATK / +${mag} MAG / +${def} DEF)!`,
+        "loot",
+        `rarity-${rarity} font-bold`,
+        `🔥 暗黑随机词缀套装掉落：【${itemNameZh}】（${rarity.toUpperCase()} • ${setDef.nameZh} • +${atk}物攻 / +${mag}法强 / +${def}防御）！`
+      );
+      showToast(`🔥 ${trEntityName(newItem)}`, `${setDef.name} (+${atk} ATK / +${def} DEF)`, "border-amber-400");
+      renderAll();
+      return itemName;
+    }
+
+    // =========================================================================
+    // 2. HYBRID OFFLINE / ONLINE MULTIPLAYER ENGINE
+    // =========================================================================
+    // Live transport and server-owned battles are implemented in src/online.js.
+
+    function renderAll() {
+      restoreProceduralWorld();
+      renderStaticUILabels();
+      renderHeader();
+      renderHeroPanel();
+      renderRoomView();
+      renderWorldMinimap();
+      renderRightDrawers();
+      renderFunPackUI();
+      renderOnlineHubUI();
+      renderSmartAssistantAndHighlights();
+    }
+
+    // =========================================================================
+    // 12. KEYBOARD NAVIGATION & INITIALIZATION
+    // =========================================================================
+    window.addEventListener("keydown", (e) => {
+      const input = document.getElementById("cmd-input");
+      if (document.activeElement === input) {
+        if (e.key === "Tab") {
+          e.preventDefault();
+          triggerAutocomplete();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (state.cmdHistory.length > 0 && state.cmdHistoryIdx < state.cmdHistory.length - 1) {
+            state.cmdHistoryIdx += 1;
+            input.value = state.cmdHistory[state.cmdHistoryIdx];
+          }
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (state.cmdHistoryIdx > 0) {
+            state.cmdHistoryIdx -= 1;
+            input.value = state.cmdHistory[state.cmdHistoryIdx];
+          } else {
+            state.cmdHistoryIdx = -1;
+            input.value = "";
+          }
+        }
+      }
+    });
+
+    window.onload = function () {
+      const loaded = loadGameState(false);
+      if (!loaded) {
+        addLog(
+          "⚔️ Welcome to AETHELGARD: CHRONICLES OF THE SHATTERED RIFT (Living Chronicles Edition)!",
+          "world",
+          "text-amber-300 font-bold",
+          "⚔️ 欢迎来到《艾瑟尔加德：破碎裂隙编年史》（活世界编年史版）！"
+        );
+        addLog(
+          "Type commands in English or Chinese (n/北, look/看, attack/攻击, harvest/采集, ai <question>/问) or click any interactive chip.",
+          "world",
+          "text-slate-300",
+          "支持直接输入英文或中文指令（如 n/北、look/看、attack/攻击、harvest/采集、ai <问题>），或点击任意交互按钮。"
+        );
+        describeCurrentRoom();
+        // AI inference starts only after the player explicitly loads a local model.
+      }
+      renderAll();
+      startHeartbeat();
+    };

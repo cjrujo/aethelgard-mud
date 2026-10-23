@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-screen overflow-hidden">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aethelgard: Chronicles of the Shattered Rift — Living Chronicles · Local AI DM</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    html, body {
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: #090b10;
+      color: #e2e8f0;
+    }
+    .font-mono-mud {
+      font-family: 'JetBrains Mono', "PingFang SC", "Microsoft YaHei", monospace;
+    }
+    .font-display-mud {
+      font-family: 'Cinzel', "PingFang SC", serif;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2d3a4f;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.85)); }
+      50% { filter: drop-shadow(0 0 11px rgba(251, 191, 36, 1)); }
+    }
+    .player-beacon {
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+    .rarity-common { color: #cbd5e1; border-color: #475569; }
+    .rarity-uncommon { color: #34d399; border-color: #059669; }
+    .rarity-rare { color: #60a5fa; border-color: #2563eb; }
+    .rarity-epic { color: #c084fc; border-color: #7c3aed; }
+    .rarity-mythic { color: #fbbf24; border-color: #d97706; }
+    /* Single-language mode: disable dual-language pseudo-elements */
+    .bi-btn[data-zh]::after, .bi-inline[data-zh]::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    @keyframes hintPulseGold {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.85), 0 0 10px rgba(245, 158, 11, 0.45); }
+      50% { box-shadow: 0 0 0 2px rgba(253, 224, 71, 1), 0 0 16px rgba(251, 191, 36, 0.8); }
+    }
+    @keyframes hintPulseEmerald {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.85), 0 0 10px rgba(16, 185, 129, 0.45); }
+      50% { box-shadow: 0 0 0 2px rgba(110, 231, 183, 1), 0 0 16px rgba(52, 211, 153, 0.8); }
+    }
+    .hint-pulse-gold {
+      animation: hintPulseGold 1.6s infinite ease-in-out;
+      border-color: #fbbf24 !important;
+    }
+    .hint-pulse-emerald {
+      animation: hintPulseEmerald 1.6s infinite ease-in-out;
+      border-color: #34d399 !important;
+    }
+
+  </style>
+  <link rel="stylesheet" href="assets/game.css" />
+  <meta name="theme-color" content="#0f1420" />
+  <meta name="description" content="Aethelgard: a branching fantasy adventure with tactical combat and a genuine local AI Dungeon Master." />
+</head>
+<body class="h-screen max-h-screen overflow-hidden flex flex-col bg-[#090b10] text-slate-100 selection:bg-amber-500/30 selection:text-amber-200">
+
+  <!-- TOP NAVIGATION & WORLD HEARTBEAT BAR (Ultra-Compact 40px Height) -->
+  <header class="shrink-0 z-30 bg-[#0d111a]/95 backdrop-blur border-b border-slate-800 px-2.5 py-1">
+    <div class="max-w-[1760px] mx-auto flex flex-wrap items-center justify-between gap-1.5">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500/20 to-purple-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-display-mud font-bold text-sm shadow-inner">
+          Æ
+        </div>
+        <div class="flex items-center gap-1.5">
+          <h1 class="font-display-mud font-bold text-xs sm:text-sm tracking-wide text-amber-300">AETHELGARD · 艾瑟尔加德</h1>
+          <span id="header-biome-badge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Oakhaven Sanctuary · 橡木港圣所</span>
+          <span id="header-rift-wave-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/90 text-purple-300 border border-purple-500/60">Rift Wave 1</span>
+          <span id="header-ai-badge" class="hidden sm:inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-950/90 text-sky-300 border border-sky-700/50">🧠 AI · 尚未加载</span>
+        </div>
+      </div>
+
+      <!-- World Clock, Weather & Tick Controls -->
+      <div class="flex flex-wrap items-center gap-1 text-[10px]">
+        <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-0.5">
+          <span id="world-time-icon" class="text-amber-400">☀️</span>
+          <span id="world-time-label" class="font-medium text-slate-200">Day/白昼 • T1</span>
+          <span class="text-slate-600">|</span>
+          <span id="world-weather-label" class="text-sky-300">Clear Skies/晴空</span>
+        </div>
+
+        <button id="btn-toggle-build-drawer" type="button" onclick="toggleBuildSettingsDrawer()" class="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-amber-500/50 text-amber-300 text-[10px] font-semibold">
+          📊 Build &amp; Settings
+        </button>
+
+        <div id="secondary-header-controls" class="hidden flex items-center gap-1">
+          <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-lg p-0.5">
+            <button id="btn-tick-normal" onclick="setTickSpeed('normal')" class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40">2.5s</button>
+            <button id="btn-tick-fast" onclick="setTickSpeed('fast')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">1.2s</button>
+            <button id="btn-tick-pause" onclick="setTickSpeed('paused')" class="px-1.5 py-0.2 rounded text-[10px] font-medium text-slate-400 hover:text-slate-200">Turn</button>
+          </div>
+        </div>
+
+        <select id="lang-select" aria-label="Language" onchange="setLanguage(this.value)" class="px-1.5 py-0.5 rounded-lg bg-slate-900 border border-amber-500/50 text-amber-300 text-[10px] font-semibold focus:outline-none">
+          <option value="en">🇺🇸 English</option>
+          <option value="zh">🇨🇳 简体中文</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="ko">🇰🇷 한국어</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="ru">🇷🇺 Русский</option>
+          <option value="ar">🇸🇦 العربية</option>
+        </select>
+
+        <button id="btn-audio-toggle" onclick="toggleAudio()" class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 text-[10px] flex items-center gap-1">
+          <span id="audio-icon">🔊</span>
+          <span id="audio-label" class="hidden md:inline">SFX On</span>
+        </button>
+
+
+        <button id="btn-open-online-modal" type="button" onclick="openOnlineModal()" class="px-2 py-0.5 rounded-lg bg-emerald-950/80 border border-emerald-500/60 hover:bg-emerald-900/80 text-emerald-200 text-[10px] font-semibold">
+          🌐 Online (<span id="online-status-dot">Offline</span>)
+        </button>
+
+        <button id="btn-open-ai-modal" onclick="switchRightTab('ai')" data-zh="本地智脑" class="bi-inline px-2 py-0.5 rounded-lg bg-sky-950/70 border border-sky-600/50 hover:bg-sky-900/70 text-sky-200 text-[10px] font-semibold">
+          🧠 AI DM
+        </button>
+
+        <button id="btn-open-char-modal" onclick="openModal('char-modal')" data-zh="英雄/职业" class="bi-inline px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-[10px] font-medium">
+          🧙 Hero / Class
+        </button>
+
+        <button id="btn-open-save-modal" onclick="openSaveModal()" data-zh="存档/导出" class="bi-inline px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-300 text-[10px] font-medium">
+          💾 Save / JSON
+        </button>
+
+        <button id="btn-open-help-modal" onclick="openModal('help-modal')" data-zh="指南" class="bi-inline px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 text-amber-300 text-[10px] font-semibold">
+          ? Guide
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST NOTIFICATION BAR -->
+  <div id="toast-container" class="fixed bottom-3 right-3 z-50 flex flex-col gap-1.5 max-w-sm pointer-events-none"></div>
+
+  <!-- MAIN 3-COLUMN GAME WORKSPACE (Locked to remaining viewport height, zero page scroll, zero hidden cards) -->
+  <main id="main-viewport-grid" class="flex-1 min-h-0 max-w-[1760px] w-full mx-auto grid grid-cols-12 gap-2 p-1.5 overflow-hidden">
+
+    <!-- LEFT COLUMN: HERO VITALS, COMBAT STANCE/SKILLS & ATTRIBUTES/TALENTS (3 cols, all 3 sections guaranteed visible) -->
+    <section id="left-column-panel" class="col-span-12 lg:col-span-3 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
+      <!-- 1. Hero Identity & Vitals Card (Ultra-Compact) -->
+      <div id="card-hero-vitals" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg">
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <div class="flex items-center gap-1.5">
+            <h2 id="hero-name-display" class="font-display-mud font-bold text-xs sm:text-sm text-white">Kaelen</h2>
+            <span id="hero-level-badge" class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Lv. 1</span>
+            <span id="hero-class-title" class="text-[10px] text-slate-400 truncate">Vanguard·先锋卫士</span>
+          </div>
+          <div class="text-right text-[10px] font-mono-mud shrink-0">
+            <span class="text-amber-400 font-semibold">🪙<span id="hero-gold">60</span>g</span>
+            <span class="text-purple-300 ml-1">💎<span id="hero-shards">0</span> ⭐<span id="hero-rep">0</span></span>
+          </div>
+        </div>
+
+        <!-- 2x2 Compact Vital Bars Grid -->
+        <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px]">
+          <div>
+            <div class="flex justify-between leading-none mb-0.5">
+              <span data-i18n="hp" class="text-rose-400 font-semibold">HP 生命</span>
+              <span id="hero-hp-text" class="font-mono-mud text-slate-200">140/140</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="hero-hp-bar" class="h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between leading-none mb-0.5">
+              <span data-i18n="mp" class="text-sky-400 font-semibold">MP 法力</span>
+              <span id="hero-mp-text" class="font-mono-mud text-slate-200">45/45</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="hero-mp-bar" class="h-full bg-gradient-to-r from-blue-600 to-sky-400 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between leading-none mb-0.5">
+              <span data-i18n="sta" class="text-emerald-400 font-semibold">STA 体力</span>
+              <span id="hero-sta-text" class="font-mono-mud text-slate-200">100/100</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="hero-sta-bar" class="h-full bg-gradient-to-r from-emerald-600 to-teal-400 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between leading-none mb-0.5">
+              <span data-i18n="xp" class="text-amber-300 font-semibold">XP 经验</span>
+              <span id="hero-xp-text" class="font-mono-mud text-slate-300">0/100</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="hero-xp-bar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-300 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="hero-status-bar" class="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[10px] leading-none">
+          <span class="text-slate-400">Ready · 准备就绪</span>
+        </div>
+
+        <!-- Spirit Companion & Overdrive Strip (v8 Fun Pack) -->
+        <div id="companion-overdrive-strip" class="mt-1 pt-1 border-t border-slate-800/90 flex items-center justify-between gap-1 text-[10px]">
+          <button id="btn-cycle-companion" type="button" onclick="cycleCompanion()" class="px-1.5 py-0.5 rounded bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-600/50 text-indigo-200 font-semibold truncate">
+            🐺 Pet: Frostfang Wolf (Lv.1)
+          </button>
+          <button id="btn-ultimate-overdrive" type="button" onclick="castOverdriveUltimate()" class="px-1.5 py-0.5 rounded bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-200 font-mono-mud font-bold shrink-0">
+            💥 Ult: <span id="overdrive-pct">40</span>%
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 2. Combat Stance & Active Skills Card (Compact) -->
+      <div id="card-stance-skills" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg">
+        <div class="flex items-center justify-between mb-1">
+          <h3 data-i18n="stanceSkillsTitle" class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Stance & Skills · 姿态与技能</h3>
+          <span id="combat-state-pill" class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Peaceful · 和平</span>
+        </div>
+
+        <!-- Stance Selector -->
+        <div class="grid grid-cols-3 gap-1 mb-1.5">
+          <button id="stance-balanced" onclick="setStance('balanced')" data-zh="均衡" class="bi-inline px-1 py-0.5 rounded text-[10px] font-semibold border bg-amber-500/20 border-amber-500/50 text-amber-300">
+            ⚖️ Balanced
+          </button>
+          <button id="stance-aggressive" onclick="setStance('aggressive')" data-zh="狂攻" class="bi-inline px-1 py-0.5 rounded text-[10px] font-semibold border bg-slate-900 border-slate-800 text-slate-400 hover:text-rose-300">
+            🔥 Aggro
+          </button>
+          <button id="stance-defensive" onclick="setStance('defensive')" data-zh="守护" class="bi-inline px-1 py-0.5 rounded text-[10px] font-semibold border bg-slate-900 border-slate-800 text-slate-400 hover:text-sky-300">
+            🛡️ Guard
+          </button>
+        </div>
+
+        <!-- Active Class Skills (Compact 2-line rows) -->
+        <div id="skills-container" class="space-y-1">
+          <button id="btn-skill-0" onclick="useSkill(0)" class="w-full text-left px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800/90 border border-slate-700/80 flex items-center justify-between group">
+            <div class="leading-tight">
+              <div class="text-[10px] font-semibold text-amber-300">[1] Shield Bash · 盾牌猛击</div>
+              <div class="text-[9px] text-slate-400">140% DMG + Stun/眩晕 (15 STA)</div>
+            </div>
+            <span id="skill-cd-0" class="text-[9px] font-mono-mud px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/40">READY</span>
+          </button>
+          <button id="btn-skill-1" onclick="useSkill(1)" class="w-full text-left px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800/90 border border-slate-700/80 flex items-center justify-between group">
+            <div class="leading-tight">
+              <div class="text-[10px] font-semibold text-amber-300">[2] Whirlwind Cleave · 旋风斩</div>
+              <div class="text-[9px] text-slate-400">175% AoE + Bleed/流血 (25 STA)</div>
+            </div>
+            <span id="skill-cd-1" class="text-[9px] font-mono-mud px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/40">READY</span>
+          </button>
+          <button id="btn-skill-2" onclick="useSkill(2)" class="w-full text-left px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800/90 border border-slate-700/80 flex items-center justify-between group">
+            <div class="leading-tight">
+              <div class="text-[10px] font-semibold text-amber-300">[3] Iron Will · 钢铁意志</div>
+              <div class="text-[9px] text-slate-400">Heal 32% + Guard/护盾 (18 MP)</div>
+            </div>
+            <span id="skill-cd-2" class="text-[9px] font-mono-mud px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/40">READY</span>
+          </button>
+        </div>
+
+        <!-- Quick Combat Utility Row -->
+        <div class="grid grid-cols-3 gap-1 mt-1">
+          <button id="btn-quick-attack" onclick="executeCommand('attack')" data-zh="攻击" class="bi-inline px-1 py-0.5 rounded bg-rose-950/70 hover:bg-rose-900/80 border border-rose-700/50 text-rose-200 text-[10px] font-semibold">
+            ⚔️ Strike
+          </button>
+          <button id="btn-quick-potion" onclick="useQuickPotion()" data-zh="药水" class="bi-inline px-1 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/50 text-emerald-200 text-[10px] font-semibold">
+            🧪 Potion
+          </button>
+          <button id="btn-quick-flee" onclick="executeCommand('flee')" data-zh="撤退" class="bi-inline px-1 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-semibold">
+            🏃 Flee
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Attributes & Talents Card (Always visible on screen!) -->
+      <div id="card-stats-talents" class="hidden shrink-0 bg-[#0f1420] border border-amber-500/40 rounded-xl p-2 shadow-lg flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h3 data-i18n="statsTalentsTitle" class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Stats & Talents · 属性与天赋</h3>
+            <div class="flex gap-1 text-[9px]">
+              <span id="unspent-stat-badge" class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">Pts: 2</span>
+              <span id="unspent-talent-badge" class="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold">Tal: 1</span>
+            </div>
+          </div>
+
+          <!-- 4-Column Single Row for Base Attributes -->
+          <div class="grid grid-cols-4 gap-1 text-[10px] mb-1">
+            <div class="bg-slate-900/90 border border-slate-800 rounded px-1.5 py-0.5 flex items-center justify-between">
+              <span>STR <strong id="stat-str" class="font-mono-mud text-white">14</strong></span>
+              <button id="btn-alloc-str" onclick="allocateStat('str')" class="px-1 rounded bg-amber-500/25 hover:bg-amber-500/45 text-amber-300 font-bold text-[9px]">+1</button>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded px-1.5 py-0.5 flex items-center justify-between">
+              <span>INT <strong id="stat-int" class="font-mono-mud text-white">6</strong></span>
+              <button id="btn-alloc-int" onclick="allocateStat('int')" class="px-1 rounded bg-amber-500/25 hover:bg-amber-500/45 text-amber-300 font-bold text-[9px]">+1</button>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded px-1.5 py-0.5 flex items-center justify-between">
+              <span>AGI <strong id="stat-agi" class="font-mono-mud text-white">8</strong></span>
+              <button id="btn-alloc-agi" onclick="allocateStat('agi')" class="px-1 rounded bg-amber-500/25 hover:bg-amber-500/45 text-amber-300 font-bold text-[9px]">+1</button>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded px-1.5 py-0.5 flex items-center justify-between">
+              <span>VIT <strong id="stat-vit" class="font-mono-mud text-white">14</strong></span>
+              <button id="btn-alloc-vit" onclick="allocateStat('vit')" class="px-1 rounded bg-amber-500/25 hover:bg-amber-500/45 text-amber-300 font-bold text-[9px]">+1</button>
+            </div>
+          </div>
+
+          <!-- Secondary Derived Stats Strip -->
+          <div class="grid grid-cols-4 gap-1 text-center bg-slate-950/80 border border-slate-800/80 rounded px-1 py-0.5 mb-1 text-[9px]">
+            <div><span data-i18n="atk" class="text-slate-400">ATK物攻 </span><span id="derived-atk" class="font-mono-mud font-bold text-rose-300">42</span></div>
+            <div><span data-i18n="mag" class="text-slate-400">MAG法强 </span><span id="derived-mag" class="font-mono-mud font-bold text-sky-300">26</span></div>
+            <div><span data-i18n="def" class="text-slate-400">DEF防御 </span><span id="derived-def" class="font-mono-mud font-bold text-emerald-300">24</span></div>
+            <div><span data-i18n="crit" class="text-slate-400">CRIT暴击 </span><span id="derived-crit" class="font-mono-mud font-bold text-amber-300">12%</span></div>
+          </div>
+        </div>
+
+        <!-- 3 Talent Specializations (3-Column Compact Strip) -->
+        <div class="grid grid-cols-3 gap-1 text-[9px]">
+          <div class="bg-slate-900/80 px-1.5 py-1 rounded border border-slate-800 flex items-center justify-between">
+            <div>
+              <div data-i18n="warlordTitle" class="font-semibold text-rose-300 leading-none">Warlord·战神</div>
+              <div data-i18n="warlordDesc" class="text-[8px] text-slate-400">+8%DMG/吸血</div>
+            </div>
+            <button id="btn-talent-warlord" onclick="learnTalent('warlord')" class="px-1 py-0.2 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700/50 font-mono-mud">
+              Lv.<span id="talent-lvl-warlord">0</span> +
+            </button>
+          </div>
+          <div class="bg-slate-900/80 px-1.5 py-1 rounded border border-slate-800 flex items-center justify-between">
+            <div>
+              <div data-i18n="mysticTitle" class="font-semibold text-sky-300 leading-none">Mystic·秘法</div>
+              <div data-i18n="mysticDesc" class="text-[8px] text-slate-400">+10%MAG/回蓝</div>
+            </div>
+            <button id="btn-talent-mystic" onclick="learnTalent('mystic')" class="px-1 py-0.2 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700/50 font-mono-mud">
+              Lv.<span id="talent-lvl-mystic">0</span> +
+            </button>
+          </div>
+          <div class="bg-slate-900/80 px-1.5 py-1 rounded border border-slate-800 flex items-center justify-between">
+            <div>
+              <div data-i18n="pathfinderTitle" class="font-semibold text-amber-300 leading-none">Pathfinder·寻路</div>
+              <div data-i18n="pathfinderDesc" class="text-[8px] text-slate-400">+15%金/经验</div>
+            </div>
+            <button id="btn-talent-pathfinder" onclick="learnTalent('pathfinder')" class="px-1 py-0.2 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700/50 font-mono-mud">
+              Lv.<span id="talent-lvl-pathfinder">0</span> +
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER COLUMN: COMPACT BIOME ROOM HEADER + LARGE BILINGUAL TERMINAL LOG + COMMAND PROMPT (5 cols) -->
+    <section class="col-span-12 lg:col-span-5 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
+
+
+      <!-- SMART PROGRESSION ASSISTANT & SCENARIO LOADOUT HINT BAR -->
+      <div id="smart-assistant-banner" class="shrink-0 bg-gradient-to-r from-amber-950/60 via-slate-900/95 to-emerald-950/50 border border-amber-500/40 rounded-xl px-2.5 py-1.5 shadow-lg">
+        <div class="flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold uppercase tracking-wider shrink-0" id="smart-assistant-badge">🧭 Next Step</span>
+              <span id="smart-next-step-text" class="text-[11px] font-semibold text-amber-100 truncate">Explore north to Whispering Wilds to gather herbs and hunt creatures.</span>
+            </div>
+            <div id="smart-loadout-strip" class="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[9px] text-slate-300 mt-0.5">
+              <span id="hint-best-weapon">🗡️ Weapon: Rusty Iron Blade</span>
+              <span id="hint-best-tool">⛏️ Tool: Sickle &amp; Pickaxe</span>
+              <span id="hint-best-skill">⚡ Best Skill: [1] Shield Bash</span>
+            </div>
+          </div>
+          <button id="btn-proceed-next-step" type="button" onclick="proceedNextStep()" class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] shadow-md hint-pulse-gold transition-all">
+            ⚡ Proceed Next
+          </button>
+        </div>
+      </div>
+
+      <!-- Compact Room Context Card (Capped height so Terminal Log below always has plenty of space!) -->
+      <div id="room-context-card" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl overflow-hidden shadow-lg">
+        <!-- Compact 48px SVG Atmospheric Biome Header -->
+        <div class="relative h-12 w-full bg-slate-950 overflow-hidden border-b border-slate-800">
+          <svg id="biome-svg-banner" viewBox="0 0 800 120" preserveAspectRatio="xMidYMid slice" class="w-full h-full"></svg>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0f1420] via-black/25 to-black/50"></div>
+          <div class="absolute inset-0 px-2.5 py-1 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h2 id="room-title-display" class="font-display-mud font-bold text-xs sm:text-sm text-white drop-shadow truncate">Oakhaven Town Square</h2>
+                <span class="text-amber-300 text-xs">·</span>
+                <span id="room-title-zh-display" class="text-xs text-amber-200 font-semibold truncate">橡木港城镇广场</span>
+                <span id="room-id-pill" class="hidden xl:inline-block text-[9px] font-mono-mud px-1.5 py-0.2 rounded bg-black/60 text-amber-300 border border-amber-500/30">Oakhaven Sanctuary</span>
+                <span id="room-danger-pill" class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Safe · 安全</span>
+              </div>
+            </div>
+            <div class="flex gap-1 shrink-0">
+              <button id="btn-room-ai-lore" onclick="askNpcAi()" class="px-2 py-0.5 rounded bg-sky-950/90 hover:bg-sky-900 border border-sky-600/60 text-[10px] text-sky-200 font-semibold">
+                🧠 AI NPC/智脑对话
+              </button>
+              <button id="btn-room-look" onclick="executeCommand('look')" data-zh="观察" class="bi-inline px-2 py-0.5 rounded bg-black/70 hover:bg-black/90 border border-slate-700 text-[10px] text-slate-200">
+                👁️ Look
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compact Bilingual Room Description & Single-Row Action Chips -->
+        <div class="px-2.5 py-1.5 space-y-1">
+          <div class="leading-tight">
+            <p id="room-desc-display" class="text-[11px] text-slate-200 truncate"></p>
+            <p id="room-desc-zh-display" class="text-[11px] text-amber-100/85 truncate"></p>
+          </div>
+
+          <!-- Active Combat Target Banner (Slim 1-line bar when engaged) -->
+          <div id="combat-target-card" class="hidden bg-rose-950/50 border border-rose-700/60 rounded-lg px-2 py-1">
+            <div class="flex items-center justify-between text-[10px] mb-0.5">
+              <div class="flex items-center gap-1.5">
+                <span data-i18n="engagedLabel" class="text-rose-400 font-bold">⚔️ ENGAGED/交战:</span>
+                <span id="enemy-name-display" class="font-bold text-white">Briar Wolf</span>
+                <span id="enemy-level-display" class="text-[9px] px-1 rounded bg-rose-900/80 text-rose-200">Lv. 1</span>
+              </div>
+              <span id="enemy-hp-text" class="font-mono-mud text-rose-200">50/50 HP</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-rose-900">
+              <div id="enemy-hp-bar" class="h-full bg-gradient-to-r from-rose-600 to-amber-500 transition-all duration-200" style="width: 100%"></div>
+            </div>
+            <div id="enemy-intent-text" class="text-[9px] text-rose-300/90 mt-0.5 font-mono-mud truncate">ATK 11 • DEF 4</div>
+          </div>
+
+          <!-- Compact Exits & Interact Chips -->
+          <div class="space-y-1 pt-1 border-t border-slate-800/80 text-[10px]">
+            <div class="flex flex-wrap items-center gap-1">
+              <span data-i18n="exitsLabel" class="text-[9px] font-semibold uppercase text-slate-400">Exits/出口:</span>
+              <div id="room-exits-chips" class="flex flex-wrap gap-1"></div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1">
+              <span data-i18n="interactLabel" class="text-[9px] font-semibold uppercase text-slate-400">Interact/交互:</span>
+              <div id="room-entities-chips" class="flex flex-wrap gap-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrolling Bilingual MUD Narrative Terminal (Guaranteed large flex-1 visible area!) -->
+      <div class="bg-[#0b0e17] border border-slate-800/90 rounded-xl flex-1 min-h-[180px] flex flex-col shadow-lg overflow-hidden">
+        <!-- Terminal Filter Header -->
+        <div class="shrink-0 flex items-center justify-between px-2.5 py-1 border-b border-slate-800 bg-slate-900/60 text-[10px]">
+          <div class="flex items-center gap-1">
+            <button id="filter-all" onclick="setLogFilter('all')" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">All</button>
+            <button id="filter-combat" onclick="setLogFilter('combat')" class="px-2 py-0.5 rounded text-slate-400 hover:text-slate-200">Combat</button>
+            <button id="filter-world" onclick="setLogFilter('world')" class="px-2 py-0.5 rounded text-slate-400 hover:text-slate-200">Lore/World</button>
+            <button id="filter-loot" onclick="setLogFilter('loot')" class="px-2 py-0.5 rounded text-slate-400 hover:text-slate-200">Loot/Quests</button>
+            <button id="filter-ai" onclick="setLogFilter('ai')" class="px-2 py-0.5 rounded text-sky-400 hover:text-sky-200">🧠 AI/智脑</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="btn-autohunt-toggle" onclick="toggleAutoHunt()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium">
+              🤖 Auto-Hunt: OFF
+            </button>
+            <button id="btn-clear-log" onclick="clearTerminalLog()" class="text-slate-400 hover:text-slate-200">Clear</button>
+          </div>
+        </div>
+
+        <!-- Bilingual Terminal Output Stream (Line 1 English, Line 2 Chinese) -->
+        <div id="terminal-log" class="flex-1 min-h-[150px] overflow-y-auto px-2.5 py-2 space-y-1.5 font-mono-mud text-[11px] leading-snug"></div>
+
+        <!-- Classic MUD Command Input + Single-Line Macro Bar -->
+        <div class="shrink-0 p-1.5 border-t border-slate-800 bg-[#0f1420] space-y-1">
+          <form id="cmd-form" onsubmit="handleCommandSubmit(event)" class="flex items-center gap-1">
+            <span class="font-mono-mud font-bold text-amber-400 pl-1">&gt;</span>
+            <input
+              id="cmd-input"
+              type="text"
+              autocomplete="off"
+              placeholder="Command / 输入指令 (n/北, s/南, e/东, w/西, look/看, attack/攻击, harvest/采集, ai <question>/问)..."
+              class="flex-1 bg-slate-950 border border-slate-700/90 focus:border-amber-400 rounded-lg px-2 py-1 text-xs font-mono-mud text-white focus:outline-none"
+            />
+            <button id="btn-cmd-autocomplete" type="button" onclick="triggerAutocomplete()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono-mud border border-slate-700" title="Auto-complete command">
+              Tab ↹
+            </button>
+            <button id="btn-cmd-send" type="submit" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+              Send
+            </button>
+          </form>
+
+          <!-- 1-Tap Bilingual Macro Strip -->
+          <div class="flex flex-wrap items-center gap-1 text-[10px]">
+            <button id="macro-look" type="button" onclick="executeCommand('look')" data-zh="观察" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300">👁️ Look</button>
+            <button id="macro-harvest" type="button" onclick="executeCommand('harvest')" data-zh="采集" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-300">🌿 Harvest</button>
+            <button id="macro-rest" type="button" onclick="executeCommand('rest')" data-zh="休息" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-300">💤 Rest</button>
+            <button id="macro-bounty" type="button" onclick="executeCommand('bounty')" data-zh="悬赏" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300">📜 Bounty</button>
+            <button id="macro-rift" type="button" onclick="executeCommand('rift')" data-zh="无尽裂隙" class="bi-inline px-1.5 py-0.2 rounded bg-purple-950/60 hover:bg-purple-900/70 border border-purple-700/50 text-purple-200">🌀 Endless Rift</button>
+            <button id="macro-ai" type="button" onclick="triggerAiEncounter()" class="px-1.5 py-0.2 rounded bg-sky-950/70 hover:bg-sky-900/80 border border-sky-700/50 text-sky-200">🧠 AI Event·奇遇</button>
+            <button id="macro-help" type="button" onclick="executeCommand('help')" data-zh="指令" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400">❓ Commands</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: LARGE PLAYER-CENTERED WORLD ATLAS + TABBED INSPECTOR (4 cols) -->
+    <section class="col-span-12 lg:col-span-4 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
+
+      <!-- Large Interactive Player-Centered World Map Card -->
+      <div id="world-atlas-card" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg">
+        <!-- Map Header + Zoom Controls + Scout Button -->
+        <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
+          <div class="flex items-center gap-1.5">
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-amber-300">World Atlas · 世界星图 (<span id="explored-count">1</span>/32)</h3>
+            <span data-i18n="autoCentered" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎯 Auto-Centered · 自动居中</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button id="btn-map-zoom-in" onclick="adjustMapZoom(0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom In / 放大">🔍+</button>
+            <button id="btn-map-zoom-out" onclick="adjustMapZoom(-0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom Out / 缩小">🔍-</button>
+            <button id="btn-map-reset-zoom" onclick="resetMapZoom()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Center on Hero / 居中">🎯1:1</button>
+            <button id="btn-reveal-map" onclick="revealAtlasHint()" data-zh="侦察" class="bi-inline text-[10px] px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300">
+              🧭 Scout Region
+            </button>
+            <button id="btn-expand-frontier" type="button" onclick="expandProceduralFrontier(3, false)" class="text-[10px] px-1.5 py-0.2 rounded bg-purple-950/90 hover:bg-purple-900 border border-purple-500/60 text-purple-200 font-semibold">
+              🌌 +Frontier
+            </button>
+          </div>
+        </div>
+
+        <!-- Full-Width Large SVG Map Container (h-52 = 208px) with Floating Corner Compass -->
+        <div id="world-minimap-container" class="bg-[#070a11] border border-slate-800 rounded-lg overflow-hidden relative h-48 sm:h-52 w-full">
+          <svg id="world-minimap" viewBox="-15 185 250 150" class="w-full h-full select-none"></svg>
+
+          <!-- Floating Translucent Compass Pad in Top-Right Corner -->
+          <div class="absolute top-1.5 right-1.5 bg-slate-950/85 backdrop-blur-sm border border-slate-700/80 rounded-lg p-1 shadow-lg w-[88px]">
+            <div class="grid grid-cols-3 gap-0.5">
+              <button id="nav-up" onclick="executeCommand('u')" class="py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[9px] font-bold text-amber-300" title="Up (u)">▲U</button>
+              <button id="nav-n" onclick="executeCommand('n')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="North (n)">N</button>
+              <button id="nav-down" onclick="executeCommand('d')" class="py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[9px] font-bold text-sky-300" title="Down (d)">▼D</button>
+
+              <button id="nav-w" onclick="executeCommand('w')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="West (w)">W</button>
+              <button id="nav-look" onclick="executeCommand('look')" class="py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-[10px] font-bold text-amber-300" title="Look">👁️</button>
+              <button id="nav-e" onclick="executeCommand('e')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="East (e)">E</button>
+
+              <div></div>
+              <button id="nav-s" onclick="executeCommand('s')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="South (s)">S</button>
+              <div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Non-overlapping Legend & Active Exits Footer Bar (Outside SVG canvas so it never covers nodes!) -->
+        <div class="flex flex-wrap items-center justify-between gap-1 mt-1 text-[9px] px-0.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <span data-i18n="legHaven" class="text-emerald-400">● Haven/圣所</span>
+            <span data-i18n="legWilds" class="text-lime-400">● Wilds/荒野</span>
+            <span data-i18n="legCrypt" class="text-sky-400">● Crypt/地宫</span>
+            <span data-i18n="legForge" class="text-orange-400">● Forge/熔炉</span>
+            <span data-i18n="legRift" class="text-purple-400">● Rift/裂隙</span>
+          </div>
+          <div id="compass-exits-hint" class="font-mono-mud text-amber-300/90 font-semibold">Exits: N(北) E(东) W(西) S(南) U(上)</div>
+        </div>
+      </div>
+
+      <!-- Tabbed Management Drawer (Flex-1 min-h-0 internal scroll) -->
+      <div id="right-drawer-card" class="bg-[#0f1420] border border-slate-800/90 rounded-xl flex-1 min-h-[170px] flex flex-col shadow-lg overflow-hidden">
+        <!-- 5 Tab Headers -->
+        <div class="shrink-0 grid grid-cols-5 border-b border-slate-800 bg-slate-950/60 text-[11px] font-semibold">
+          <button id="tab-btn-inventory" onclick="switchRightTab('inventory')" data-zh="背包" class="bi-btn py-1 px-1 border-b-2 border-amber-400 text-amber-300 bg-amber-500/10">
+            🎒 Pack (<span id="inv-count-badge">0</span>)
+          </button>
+          <button id="tab-btn-crafting" onclick="switchRightTab('crafting')" data-zh="锻造" class="bi-btn py-1 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            ⚒️ Forge
+          </button>
+          <button id="tab-btn-quests" onclick="switchRightTab('quests')" data-zh="任务" class="bi-btn py-1 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            📜 Quests
+          </button>
+          <button id="tab-btn-achievements" onclick="switchRightTab('achievements')" data-zh="法典" class="bi-btn py-1 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            🏆 Codex
+          </button>
+          <button id="tab-btn-ai" onclick="switchRightTab('ai')" data-zh="智脑LLM" class="bi-btn py-1 px-1 border-b-2 border-transparent text-sky-400 hover:text-sky-200">
+            🧠 AI DM
+          </button>
+        </div>
+
+        <!-- TAB 1: INVENTORY & MERCHANT SHOP -->
+        <div id="panel-inventory" class="p-2 flex-1 min-h-0 overflow-y-auto space-y-2 text-xs">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="backpackTitle" class="font-bold uppercase tracking-wider text-slate-300 text-[10px]">Backpack · 背包与材料</span>
+              <button id="btn-sell-junk" onclick="sellAllCommonLoot()" data-zh="出售多余装备" class="bi-inline text-[10px] px-2 py-0.2 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700">
+                🪙 Sell Extra Gear
+              </button>
+            </div>
+            <div id="inventory-list" class="space-y-1"></div>
+          </div>
+
+          <!-- Context Merchant Shop -->
+          <div class="pt-1.5 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="quartermasterTitle" class="font-bold uppercase tracking-wider text-amber-300 text-[10px]">🛒 Quartermaster · 军需商店</span>
+              <span data-i18n="instantSupply" class="text-[9px] text-slate-400">Instant Supply · 即时补给</span>
+            </div>
+            <div id="shop-list" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 2: EQUIPMENT SLOTS, REFINING & CRAFTING FORGE -->
+        <div id="panel-crafting" class="hidden p-2 flex-1 min-h-0 overflow-y-auto space-y-2 text-xs">
+
+          <!-- Diablo-Style Set Bonuses & Affix Reforge Card (v9) -->
+          <div id="active-set-bonuses-card" class="bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-purple-950/50 border border-amber-500/40 rounded-lg p-2 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300 text-[10px] uppercase tracking-wider" id="diablo-set-header">🔥 Diablo Affix Forge &amp; Set Bonuses</span>
+              <button id="btn-roll-affix" type="button" onclick="rollDiabloAffixLoot(true)" class="px-2 py-0.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px]">
+                🎲 Roll Affix Set Gear (35g)
+              </button>
+            </div>
+            <div id="set-bonus-status-list" class="text-[10px] text-slate-300 space-y-0.5"></div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="equippedTitle" class="font-bold uppercase tracking-wider text-slate-300 text-[10px]">Equipped · 已装备栏位</span>
+              <button id="btn-refine-weapon" onclick="refineEquippedGear()" data-zh="星辰精炼" class="bi-inline text-[10px] px-2 py-0.2 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold">
+                ✨ Star-Refine (+<span id="refine-level-badge">0</span>)
+              </button>
+            </div>
+            <div id="equipment-slots-list" class="space-y-1"></div>
+          </div>
+
+          <div class="pt-1.5 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="recipesTitle" class="font-bold uppercase tracking-wider text-emerald-300 text-[10px]">⚒️ Recipes · 锻造与炼金配方</span>
+            </div>
+            <div id="crafting-recipes-list" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: STORY QUESTS & PROCEDURAL GUILD BOUNTIES -->
+        <div id="panel-quests" class="hidden p-2 flex-1 min-h-0 overflow-y-auto space-y-2 text-xs">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="campaignTitle" class="font-bold uppercase tracking-wider text-amber-300 text-[10px]">📖 Campaign · 主线史诗任务</span>
+              <span id="quest-completed-badge" class="text-[10px] text-slate-400">0 / 5 Complete</span>
+            </div>
+            <div id="story-quests-list" class="space-y-1"></div>
+          </div>
+
+          <div class="pt-1.5 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-1">
+              <span data-i18n="bountiesTitle" class="font-bold uppercase tracking-wider text-purple-300 text-[10px]">🎯 Bounties · 公会悬赏契约</span>
+              <button id="btn-refresh-bounties" onclick="refreshBounties()" data-zh="刷新" class="bi-inline text-[10px] px-2 py-0.2 rounded bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700">
+                🔄 New Contracts
+              </button>
+            </div>
+            <div id="bounties-list" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: ACHIEVEMENTS, ENDLESS RIFT & WORLD CODEX -->
+        <div id="panel-achievements" class="hidden p-2 flex-1 min-h-0 overflow-y-auto space-y-2 text-xs">
+          <div class="bg-gradient-to-r from-purple-950/70 to-indigo-950/70 border border-purple-600/50 rounded-lg p-2">
+            <div class="flex items-center justify-between mb-0.5">
+              <span data-i18n="endlessRiftTitle" class="font-bold text-purple-200 text-[11px]">🌀 Endless Astral Rift · 无尽星界裂隙</span>
+              <span class="font-mono-mud text-[10px] text-amber-300"><span data-i18n="bestPrefix">Best:</span> <span id="rift-best-wave">0</span></span>
+            </div>
+            <p data-i18n="endlessRiftDesc" class="text-[10px] text-purple-200/80 mb-1">Face escalating Void Waves for Mythic gear & Shards. · 挑战不断增强的虚空波次，赢取神话装备与裂隙碎片。</p>
+            <button id="btn-start-rift-wave" onclick="startRiftWaveChallenge()" data-zh="召唤下一波虚空裂隙领主" class="bi-btn w-full py-1 rounded bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px]">
+              ⚔️ Summon Next Rift Wave
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1 text-center bg-slate-900/80 border border-slate-800 rounded-lg p-1">
+            <div><div data-i18n="slainLabel" class="text-[9px] text-slate-400">Slain·击杀</div><div id="stat-kills" class="font-mono-mud font-bold text-rose-300">0</div></div>
+            <div><div data-i18n="craftedLabel" class="text-[9px] text-slate-400">Crafted·锻造</div><div id="stat-crafted" class="font-mono-mud font-bold text-emerald-300">0</div></div>
+            <div><div data-i18n="bossesLabel" class="text-[9px] text-slate-400">Bosses·首领</div><div id="stat-bosses" class="font-mono-mud font-bold text-amber-300">0</div></div>
+          </div>
+
+          <div>
+            <div data-i18n="achievementsTitle" class="font-bold uppercase tracking-wider text-slate-300 text-[10px] mb-1">🏅 Achievements · 成就与被动增益</div>
+            <div id="achievements-list" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 5: real local inference controls are mounted by ai-dm.js. -->
+        <div id="panel-ai" class="hidden p-2 flex-1 min-h-0 overflow-y-auto space-y-1.5 text-xs">
+          <p>Preparing local AI controls… · 正在准备本地智脑控制面板…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: CHARACTER CREATOR & CLASS SELECTION -->
+  <div id="char-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f1420] border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-display-mud font-bold text-lg text-amber-300">Hero Identity & Class · 英雄身份与职业</h2>
+          <p class="text-xs text-slate-400">Change class at a safe settlement. After level 1, retraining costs 30 gold per level; allocated attributes are refunded. · 安全据点可转职；1级后费用为等级×30金币，退还已分配属性点。</p>
+        </div>
+        <button id="btn-close-char-modal" onclick="closeModal('char-modal')" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label for="input-hero-name" class="block text-slate-300 font-semibold mb-1">Hero Name · 英雄名称</label>
+          <input id="input-hero-name" type="text" value="Kaelen" maxlength="24" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-medium" />
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-slate-300 font-semibold">Select Class Archetype · 选择职业原型</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button id="select-class-vanguard" type="button" onclick="selectClassOption('vanguard')" class="p-3 rounded-xl border border-amber-500 bg-amber-500/10 text-left space-y-1">
+              <div class="font-bold text-amber-300">🛡️ Vanguard · 先锋卫士</div>
+              <div class="text-[11px] text-slate-300">Heavy armor warrior. Shield Bash stun, AoE Cleave, Iron Will heal. · 重甲战士：盾击眩晕、旋风斩、钢铁意志回血。</div>
+            </button>
+            <button id="select-class-arcanist" type="button" onclick="selectClassOption('arcanist')" class="p-3 rounded-xl border border-slate-700 bg-slate-900/80 text-left space-y-1">
+              <div class="font-bold text-sky-300">✨ Arcanist · 裂隙奥术师</div>
+              <div class="text-[11px] text-slate-300">High-burst Rift mage. Arcane Bolt, Supernova burn, Mana Barrier. · 高爆发法师：奥术飞弹、超新星灼烧、法力护盾。</div>
+            </button>
+            <button id="select-class-shadowblade" type="button" onclick="selectClassOption('shadowblade')" class="p-3 rounded-xl border border-slate-700 bg-slate-900/80 text-left space-y-1">
+              <div class="font-bold text-purple-300">🗡️ Shadowblade · 暗影刺客</div>
+              <div class="text-[11px] text-slate-300">Lethal assassin. Viper Strike poison, guaranteed-crit Ambush, Smoke Veil. · 致命刺客：毒蛇打击、必暴伏击、烟幕闪避。</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <button id="btn-reset-new-game" type="button" onclick="resetNewGame()" data-zh="重置世界" class="bi-inline px-3 py-2 rounded-lg bg-rose-950/80 hover:bg-rose-900 text-rose-200 border border-rose-700/50 text-xs font-semibold">
+          🔄 Full World Reset
+        </button>
+        <div class="flex gap-2">
+          <button id="btn-cancel-char" type="button" onclick="closeModal('char-modal')" class="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs">Cancel</button>
+          <button id="btn-apply-char" type="button" onclick="applyCharacterConfig()" data-zh="确认并继续" class="bi-inline px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+            Apply & Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: SAVE / LOAD & JSON EXPORT / IMPORT -->
+  <div id="save-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f1420] border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-display-mud font-bold text-lg text-emerald-300">Save State & JSON Backup · 游戏存档与JSON备份</h2>
+          <p class="text-xs text-slate-400">Persist to browser storage or export/import portable JSON state. · 保存至浏览器本地存储，或导出/导入JSON存档文本。</p>
+        </div>
+        <button id="btn-close-save-modal" onclick="closeModal('save-modal')" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button id="btn-manual-save" onclick="saveGameState(true)" data-zh="保存至浏览器" class="bi-inline flex-1 py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+          💾 Save to Browser Storage
+        </button>
+        <button id="btn-manual-load" onclick="loadGameState(true)" data-zh="读取浏览器存档" class="bi-inline flex-1 py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs">
+          📂 Load from Browser Storage
+        </button>
+      </div>
+
+      <div class="space-y-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <label for="save-json-textarea" class="font-semibold text-slate-300">Portable Save JSON · 便携式JSON存档数据</label>
+          <button id="btn-copy-save-json" onclick="copySaveJson()" class="text-amber-300 hover:underline text-[11px]">📋 Copy JSON</button>
+        </div>
+        <textarea id="save-json-textarea" rows="5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono-mud text-[11px] text-emerald-300"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+        <button id="btn-import-save-json" onclick="importSaveJson()" data-zh="导入JSON存档" class="bi-inline px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+          📥 Import JSON State
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: COMMAND & GAMEPLAY GUIDE -->
+  <div id="help-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f1420] border border-slate-700 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-display-mud font-bold text-lg text-amber-300">Adventurer's Guide & Bilingual MUD Commands · 冒险指南与双语指令</h2>
+          <p class="text-xs text-slate-400">Play via English/Chinese text commands, keyboard shortcuts, or 1-click UI chips. · 支持英文/中文指令输入、快捷键或一键点击交互按钮。</p>
+        </div>
+        <button id="btn-close-help-modal" onclick="closeModal('help-modal')" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-amber-300 uppercase">Navigation · 移动与探索</div>
+          <p><code class="text-emerald-300">n/s/e/w/u/d (北/南/东/西/上/下)</code> — Move rooms · 房间移动</p>
+          <p><code class="text-emerald-300">look / 看</code> — Inspect room · 观察当前区域</p>
+          <p><code class="text-emerald-300">harvest / 采集</code> — Gather herbs & ore · 采集草药与矿石</p>
+          <p><code class="text-emerald-300">rest / 休息</code> — Restore full HP/MP/STA · 恢复全部状态</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-rose-300 uppercase">Combat · 战术战斗与技能</div>
+          <p><code class="text-emerald-300">attack / 攻击</code> — Engage hostile mob · 发起攻击</p>
+          <p><code class="text-emerald-300">skill 1 | 2 | 3</code> — Cast class skill · 释放职业技能</p>
+          <p><code class="text-emerald-300">flee / 逃跑</code> — Retreat from battle · 脱离战斗</p>
+          <p><code class="text-emerald-300">autohunt / 自动</code> — Auto-combat & loot · 自动狩猎</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-sky-300 uppercase">Forge & Economy · 锻造与贸易</div>
+          <p><code class="text-emerald-300">equip / use &lt;item&gt;</code> — Equip or drink · 穿戴装备/喝药</p>
+          <p><code class="text-emerald-300">craft &lt;recipe&gt; / 锻造</code> — Craft gear/potions · 锻造合成</p>
+          <p><code class="text-emerald-300">upgrade / 精炼</code> — Star-Refine gear · 星辰精炼强化</p>
+          <p><code class="text-emerald-300">buy / sell</code> — Trade with merchants · 商店买卖</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-purple-300 uppercase">AI DM & Quests · 智脑模型与任务</div>
+          <p><code class="text-emerald-300">ai &lt;question&gt; / 问 &lt;问题&gt;</code> — Ask CPU AI DM · 询问本地AI智脑</p>
+          <p><code class="text-emerald-300">talk &lt;npc&gt; / 对话</code> — Speak with NPCs · 与NPC交谈</p>
+          <p><code class="text-emerald-300">quest / bounty</code> — Campaign & bounties · 主线与悬赏</p>
+          <p><code class="text-emerald-300">rift / 裂隙</code> — Endless Rift Wave · 无尽裂隙挑战</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL 4: HYBRID OFFLINE / ONLINE MULTIPLAYER HUB (GitHub Pages + Cloudflare Worker WebSocket + P2P) -->
+  <div id="online-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0f1420] border border-emerald-600/60 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-3 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div>
+          <h2 class="font-display-mud font-bold text-lg text-emerald-300">🌐 Hybrid Offline / Online Multiplayer Hub</h2>
+          <p class="text-xs text-slate-400">Explore offline anytime, then bring your character &amp; Diablo gear online to meet friends, form teams, and raid!</p>
+        </div>
+        <button id="btn-close-online-modal" type="button" onclick="closeModal('online-modal')" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+
+      <!-- Identity: Alias, Guild/Team Tag & Mode Switch -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        <div>
+          <label for="input-online-alias" class="block text-slate-400 text-[10px] font-semibold mb-0.5">Online Alias (Name)</label>
+          <input id="input-online-alias" type="text" value="Kaelen" maxlength="20" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-semibold" />
+        </div>
+        <div>
+          <label for="input-online-guild" class="block text-slate-400 text-[10px] font-semibold mb-0.5">Team / Alliance Tag</label>
+          <input id="input-online-guild" type="text" value="STAR" maxlength="8" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-amber-300 font-mono-mud font-bold uppercase" />
+        </div>
+        <div class="flex flex-col justify-end">
+          <button id="btn-toggle-online-mode" type="button" onclick="toggleOnlineMultiplayer()" class="w-full py-1.5 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+            🔌 Connect Online Mode
+          </button>
+        </div>
+      </div>
+
+      <!-- Optional Cloudflare Worker WebSocket Endpoint (or Instant Serverless Mesh) -->
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 text-xs space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="font-semibold text-sky-300 text-[11px]">☁️ Cloudflare Worker / WebSocket Realm Endpoint (Optional)</span>
+          <span id="online-transport-badge" class="text-[10px] font-mono-mud px-2 py-0.5 rounded bg-slate-800 text-slate-300">Mode: Offline Solo</span>
+        </div>
+        <div class="flex gap-1.5">
+          <input id="input-cf-worker-url" type="text" placeholder="wss://aethelgard-mud.<your-subdomain>.workers.dev/room/global (Leave blank for Instant Mesh)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-[11px] font-mono-mud text-slate-200" />
+          <button id="btn-sync-character-passport" type="button" onclick="syncCharacterToOnline()" class="px-2.5 py-1 rounded-lg bg-sky-900/80 hover:bg-sky-800 text-sky-200 border border-sky-600/50 text-[11px] font-semibold">
+            📤 Sync Offline Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Online Players in Current Room & Co-op / PvP Team Actions -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
+          <div class="font-bold text-amber-300 text-[11px] uppercase">👥 Players &amp; Allies in Sector</div>
+          <div id="online-players-list" class="space-y-1 max-h-32 overflow-y-auto text-[11px]"></div>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
+          <div class="font-bold text-purple-300 text-[11px] uppercase">⚔️ Multiplayer Team Activities</div>
+          <button id="btn-online-coop-raid" type="button" onclick="startOnlineCoopRaid()" class="w-full py-1.5 px-2.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/60 text-purple-200 font-semibold text-left text-[11px]">
+            🐉 Co-op Team Boss Raid (Guarantees Diablo Set Drop!)
+          </button>
+          <button id="btn-online-team-pvp" type="button" onclick="startOnlineTeamSkirmish()" class="w-full py-1.5 px-2.5 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/60 text-rose-200 font-semibold text-left text-[11px]">
+            🏆 3v3 Team Arena Skirmish (+Glory &amp; Shards)
+          </button>
+        </div>
+      </div>
+
+      <!-- World Chat & Team Broadcast -->
+      <form id="online-chat-form" onsubmit="sendOnlineChatMessage(event)" class="flex gap-1.5 pt-1">
+        <input id="input-online-chat" type="text" placeholder="Broadcast message to allied players in this room..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
+        <button id="btn-send-online-chat" type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+          💬 Send Chat
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- AETHELGARD_SCRIPTS -->
+</body>
+</html>
