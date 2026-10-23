@@ -58,7 +58,7 @@ Native 事实测试先于随后进度条显示及存档容错修正，报告保�
 
 Ollama 桥接经过允许路径、请求大小、来源及流转发测试，上游使用 Mock。**没有本次真实 Ollama 推理结果。** 浏览器 Qwen3 的验收不能替代它。真实浏览器测试使用 Linux Chromium，Windows/macOS 的启动脚本与 Python 路径经过代码检查，没有在这两个操作系统上重做完整运行验收。
 
-远端 CI 的实际状态以相应 GitHub PR 的 Checks 为准。本地报告不预先宣称远端成功；提交分支和 PR 也不等于合并 main、发布 GitHub Pages 或部署多人服务器。
+首次远端 CI 暴露了 Node.js 22 测试参数名称和 Ubuntu 26.04 与锁定版 Playwright 的兼容问题。测试入口改用 Node.js 22.8+ 支持的 `--experimental-test-isolation=none`，工作流固定 Ubuntu 24.04；没有删除或放宽检查。远端 CI 的实际状态以相应 GitHub PR 的 Checks 为准。本地报告不预先宣称远端成功；提交分支和 PR 也不等于合并 main、发布 GitHub Pages 或部署多人服务器。
 
 ## 重现命令
 

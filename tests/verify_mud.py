@@ -21,7 +21,7 @@ def main():
     if not node_tests:
         parser.exit(1, "No JavaScript regression tests found.\n")
     commands = [[sys.executable, "src/build_mud_game.py", "--check"],
-                ["node", "--test", "--test-isolation=none", "--test-reporter=tap", *node_tests],
+                ["node", "--test", "--experimental-test-isolation=none", "--test-reporter=tap", *node_tests],
                 [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"]]
     report = {"timestamp": datetime.now(timezone.utc).isoformat(), "commands": [],
               "modelInferenceIncluded": False, "browserIncluded": False,

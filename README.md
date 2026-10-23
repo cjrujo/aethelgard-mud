@@ -132,7 +132,7 @@ npm run build
 python tests/verify_mud.py --report test-results/verification.json
 ```
 
-验证脚本默认检查生成文件是否一致、实际游戏规则/AI 调度/存档/联机协议，以及 localhost 启动器边界；开发与测试需要 Node.js 22.8+（CI 使用 22）与 Python，不需要下载模型。测试运行器使用 `--test-isolation=none`，避免本运行环境中子进程隔离导致用例计数缺失。AI 单元测试中的网络与模型响应是明确标记的 Mock。
+验证脚本默认检查生成文件是否一致、实际游戏规则/AI 调度/存档/联机协议，以及 localhost 启动器边界；开发与测试需要 Node.js 22.8+（CI 使用 22）与 Python，不需要下载模型。测试运行器使用 `--experimental-test-isolation=none`，避免本运行环境中子进程隔离导致用例计数缺失。AI 单元测试中的网络与模型响应是明确标记的 Mock。
 
 已有样式未变时也可直接运行 `python src/build_mud_game.py` 重建页面。浏览器与真实模型验证使用独立入口：
 

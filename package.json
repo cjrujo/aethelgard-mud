@@ -5,7 +5,7 @@
   "description": "An offline-capable browser RPG with genuine local model inference and an optional multiplayer realm.",
   "scripts": {
     "build": "npm run css && python src/build_mud_game.py",
-    "test": "node --test --test-isolation=none tests/*.test.mjs",
+    "test": "node --test --experimental-test-isolation=none tests/*.test.mjs",
     "test:model": "node tests/real-model.mjs",
     "test:browser": "node tests/browser.mjs",
     "css": "tailwindcss -i src/styles.css -o assets/game.css --minify",

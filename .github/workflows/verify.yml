@@ -10,7 +10,7 @@ env:
   ONNXRUNTIME_NODE_INSTALL_CUDA: skip
 jobs:
   game-and-tools:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
           name: game-verification
           path: test-results/
   real-local-model:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
