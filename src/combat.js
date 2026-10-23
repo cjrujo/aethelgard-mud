@@ -11,6 +11,7 @@ const CombatDirector = (() => {
     import: importSaveJson, funRender: renderFunPackUI
   };
   const slots = ["weapon", "armor", "helm", "ring", "relic"];
+  const retreatCost = 10, autoHuntLowHealth = .22;
   const intentNames = {
     strike: ["Quick strike", "快速攻击"], charge: ["Charging a heavy blow — interrupt now", "正在蓄力重击——现在可以打断"],
     heavy: ["Heavy blow — guard!", "重击即将落下——建议防御"], cast: ["Casting a spell — interrupt!", "正在吟唱——建议打断"],
@@ -267,7 +268,7 @@ const CombatDirector = (() => {
       say(`🧪 Used ${i.name}; the enemy also takes its turn.`, `🧪 使用${i.nameZh}；敌人也将行动。`);
     }
     if (kind === "flee") {
-      const cost = 10;
+      const cost = retreatCost;
       if (p.sta < cost) return reportBlocked("Retreat needs 10 stamina. Guard to recover stamina.", "撤退需要10点体力，可先防御恢复体力。");
       p.sta -= cost;
       const success = !e.boss || ["charge", "recover"].includes(e.intent) || random() < .70;
@@ -450,7 +451,13 @@ const CombatDirector = (() => {
     if (state.combat.inCombat) {
       if (state.autoHunt) {
         const e = normalizeEnemy(state.combat.enemy);
-        if (p.hp < p.maxHp * .22) action("flee");
+        if (p.hp < p.maxHp * autoHuntLowHealth) {
+          if (p.sta < retreatCost) {
+            state.autoHunt = false;
+            say("⏸ Auto-Hunt paused: low health and not enough stamina to retreat. The battle now waits for you. Use supplies, guard to recover stamina, or finish the enemy; each action takes a turn.",
+              "⏸ 自动狩猎已暂停：生命过低，且体力不足以撤退。当前战斗等待你手动操作：使用补给、防御恢复体力，或击败敌人；每个行动都会消耗回合。", "combat", "text-amber-300");
+          } else action("flee");
+        }
         else if (["cast", "charge"].includes(e.intent) && p.sta >= 18) action("interrupt");
         else if (e.intent === "heavy") action("guard");
         else action("attack");
@@ -459,7 +466,13 @@ const CombatDirector = (() => {
       p.cooldowns = p.cooldowns.map(c => Math.max(0, c - 1));
       p.mp = Math.min(p.maxMp, p.mp + (r && r.safe ? 8 : 2)); p.sta = Math.min(p.maxSta, p.sta + (r && r.safe ? 12 : 4));
       if (r && r.safe) p.hp = Math.min(p.maxHp, p.hp + Math.max(3, Math.round(p.maxHp * .04)));
-      if (state.autoHunt && r && !r.safe && r.mobs && r.mobs.length) engage(r.mobs[0]);
+      if (state.autoHunt && r && !r.safe && r.mobs && r.mobs.length) {
+        if (p.hp < p.maxHp * autoHuntLowHealth) {
+          state.autoHunt = false;
+          say("⏸ Auto-Hunt paused before the next battle: health is below 22%. Use supplies or rest at a safe settlement, then enable Auto-Hunt again when ready.",
+            "⏸ 自动狩猎已暂停，未开启下一场：生命低于22%。请先使用补给或前往安全据点休息，准备好后再开启。", "combat", "text-amber-300");
+        } else engage(r.mobs[0]);
+      }
     }
     renderAll();
   }

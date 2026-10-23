@@ -2052,10 +2052,10 @@
     function toggleAutoHunt() {
       state.autoHunt = !state.autoHunt;
       addLog(
-        `🤖 Auto-Hunt mode is now ${state.autoHunt ? "ENABLED" : "DISABLED"}.`,
+        state.autoHunt ? "🤖 Continuous Auto-Hunt enabled: each victory starts another encounter here. Toggle off to stop automatic actions." : "🤖 Auto-Hunt disabled. Finish or retreat from any current battle manually.",
         "combat",
         state.autoHunt ? "text-emerald-300" : "text-slate-400",
-        `🤖 自动狩猎模式已${state.autoHunt ? "开启" : "关闭"}。`
+        state.autoHunt ? "🤖 连续自动狩猎已开启：获胜后会继续挑战此地的敌人。再次点击可停止自动操作。" : "🤖 自动狩猎已关闭。若仍在战斗中，请手动完成或撤退。"
       );
       renderAll();
     }
