@@ -1,0 +1,90 @@
+{
+  "reviewedAt": "2026-10-24T10:28:30.640691+00:00",
+  "method": "Assistant semantic inspection of complete raw responses. Not a claim of human review. No answer replacement or output repair.",
+  "model": "onnx-community/Qwen3-0.6B-ONNX",
+  "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+  "dtype": "q8",
+  "backend": "native ONNX CPU, not browser WASM validation",
+  "mainEvidence": "ai-v11-native.json",
+  "initialFailures": "ai-v11-native-initial.json",
+  "rejectedPromptExperiment": "ai-v11-native-targeted-experiment.json",
+  "currentPromptEquivalence": {
+    "zh-mixed-guard": true,
+    "zh-cast-interrupt": true,
+    "zh-long-memory": true,
+    "zh-npc": true,
+    "zh-npc-relationship": true,
+    "zh-tavern": true
+  },
+  "promptOnlyEvidence": "real-model-qwen-0.6b-prompts.json",
+  "mainLoadMs": 3462.126354,
+  "mainGenerationTotalMs": 31321.698308,
+  "historicalAutomatedStatus": {
+    "passed": 3,
+    "failed": 0,
+    "needsHumanReview": 3
+  },
+  "experimentDecision": "Extra second-person and concrete-deed instructions worsened both targeted replies (one asked the question back, one echoed instructions). That prompt experiment was reverted. Its failures remain intact. The current six prompts are compared directly with the retained main generation prompts.",
+  "cases": [
+    {
+      "case": "zh-mixed-guard",
+      "verdict": "acceptable in this sample",
+      "reason": "Correct zero-stamina recommendation: guard, 65% damage reduction, 18 stamina and 8 mana. No extra counterattack or HP healing.",
+      "originalAnswer": "推荐行动：现在防御: 防御使本回合承伤减少65%，恢复18体力与8法力。",
+      "latencyMs": 6159.387748000001,
+      "inputTokens": 257,
+      "outputTokens": 29
+    },
+    {
+      "case": "zh-cast-interrupt",
+      "verdict": "acceptable in this sample",
+      "reason": "Names interrupt and its 18-stamina cost; correctly says a spell interruption does not guarantee exposure. Does not borrow skill names or guard mitigation.",
+      "originalAnswer": "推荐行动：打断施法。效果：敌人将按敌人行动模式推进，打断施法不会保证出现破绽。消耗：18体力。",
+      "latencyMs": 6281.696654000001,
+      "inputTokens": 249,
+      "outputTokens": 33
+    },
+    {
+      "case": "zh-long-memory",
+      "verdict": "facts retrieved; perspective limitation",
+      "reason": "Correctly retrieves both Mira and the promise to find the courier after they left short history. It restates them in the player’s first person instead of addressing the player; not counted as polished persona fidelity.",
+      "originalAnswer": "我姐姐叫米拉。我承诺寻找信使。",
+      "latencyMs": 2064.9947619999984,
+      "inputTokens": 137,
+      "outputTokens": 13
+    },
+    {
+      "case": "zh-npc",
+      "verdict": "acceptable in this sample",
+      "reason": "Welcomes the visitor without calling the visitor Mara; uses the supplied Silverbrook route rumor. Does not grant rewards. Three short sentences exceed the preferred one-to-two-sentence style, but no state error was observed.",
+      "originalAnswer": "欢迎来到镀金狮鹫酒馆！我听说银溪浅滩通往地下墓穴与烬峰，那里有神秘的传说。你对这里有什么好奇吗？",
+      "latencyMs": 7340.2369419999995,
+      "inputTokens": 248,
+      "outputTokens": 37
+    },
+    {
+      "case": "zh-npc-relationship",
+      "verdict": "fails grounding",
+      "reason": "Says it is wary, but invents trust/loyalty as the reason and does not cite the actual ranger/purse event. The strengthened current checker rejects this omission; the historical run only required trust-or-choice keywords.",
+      "originalAnswer": "Kaelen，我对你有所戒备，是因为你对我的信任和忠诚。我需要你的帮助才能继续守护这个酒馆。",
+      "latencyMs": 4777.657432,
+      "inputTokens": 206,
+      "outputTokens": 30
+    },
+    {
+      "case": "zh-tavern",
+      "verdict": "acceptable as limited supplemental atmosphere in this sample",
+      "reason": "Describes hearth light, an empty chair and soup smell. Does not move the courier/ranger into the scene or make the distant waterwheel audible; does not settle an unchosen outcome.",
+      "originalAnswer": "炉火在空椅子上投下暖黄的光，热汤在空位上蒸腾出淡淡的香气。",
+      "latencyMs": 4697.724770000001,
+      "inputTokens": 223,
+      "outputTokens": 26
+    }
+  ],
+  "limits": [
+    "Six specific Chinese samples are not a general accuracy estimate.",
+    "Native CPU results do not validate browser WASM performance, mobile devices, Ollama, or every language.",
+    "Relationship/persona reliability remains imperfect despite correct supplied facts.",
+    "Protocol and fixture tests do not establish model content quality."
+  ]
+}

@@ -1,21 +1,32 @@
-# Aethelgard · Living Chronicles（v10）
-
-> **验收记录（2026-10-23）**：本次源码已重新执行规则回归和真实本地模型验证。测试命令、实际输出、失败案例与尚未覆盖的范围统一记录在 [验证记录](docs/verification.md)；本地通过不代表远端 CI 或公共服务已上线。
+# Aethelgard · Living Chronicles（v11.0.0）
 
 艾瑟尔加德是一款浏览器文字角色扮演游戏：在五个区域中探索、与人物建立关系、应对有预兆的敌人，并通过持续生效的选择决定裂隙的结局。
 
-**v10 加入了真正的本地语言模型调用链，默认模型为 Qwen3 0.6B q8。** 浏览器模式通过独立 Web Worker 加载实际 ONNX 权重，在 CPU/WASM 上生成文字；也可以连接本机 Ollama。无需云端 API Key。没有加载模型时，可以明确选择规则助手；界面会区分模型回复、规则回复和失败后的显式回退。[AI 实现与使用说明](docs/ai-dm.md)
+**v11 把故事、战斗和成长串成可以持续推进的旅程**：默认路线包含各章关键事件，自动狩猎有明确终点，碎片可兑换套装并培养伙伴，高阶采集需要区域准备。存档增加单标签写入、恢复快照和保存后更新；在线战斗使用协议 **11**，前端与 Cloudflare Worker 需要一起升级。
 
-**模型内容仍有明确限制。** 当前 Qwen3 q8 已完成真实浏览器 CPU/WASM 加载与路线回复；Native CPU 事实测试仍发现虚构战斗效果，NPC 身份和叙事边界也未全部通过。成功生成文字不能代表整体准确率；叙事事实、行动效果和奖励始终由游戏规则负责。具体输出与限制见 [验证记录](docs/verification.md) 和 [AI 内容验收](docs/ai-dm.md#当前模型的实测范围与限制)。
+**智脑运行真实的本地模型，默认是 Qwen3 0.6B q8。** 浏览器通过独立 Web Worker 加载实际 ONNX 权重，在 CPU/WASM 上生成文字；也可连接本机 Ollama，无需云端 API Key。未加载模型时可以选择有明确来源标记的规则助手。v11 增加共享战斗事实、长期人物与承诺记录、取消后的“重新加载并继续”和本机回答反馈。[AI 实现与使用说明](docs/ai-dm.md)
+
+**小模型仍可能说错。** 真实 Qwen3 0.6B 测试仍出现 NPC 关系原因幻觉等问题；有推理输出、逻辑回归通过和叙事准确是不同的验收。界面保留规则事实和模型原文，实际行动、金币、装备、任务与胜负由游戏规则结算。具体输出、测试范围和已知限制见 [AI 内容验收](docs/ai-dm.md#当前模型的实测范围与限制) 与 [验证记录](docs/verification.md)。
+
+> **从 v9/v10 升级？** 先在原游戏地址导出 JSON 存档，再按 [v11 升级与发布指南](docs/v11-upgrade.md) 更新。更换本地端口会切换浏览器存档空间；更新静态网页不会自动更新 Cloudflare 服务端。本页的命令与工作流说明不代表你的线上服务已部署或远端 CI 已通过。
 
 ## 立即开始
 
-Windows、macOS 与 Linux 均需要 **Python 3.10 或更新版本**和现代浏览器。本仓库的打包工具提供两种本地交付形式：
+Windows、macOS 与 Linux 均需要 **Python 3.10 或更新版本**和现代浏览器。日常游玩不需要 npm。本仓库提供两种本地交付形式：
 
 | 包 | 包含什么 | 使用本地模型的准备 |
 | --- | --- | --- |
-| `aethelgard-v10-qwen-0.6b-offline.zip` · 完整离线包 | 已构建游戏、可维护源码、Qwen3 0.6B q8 权重、运行库与校验清单 | 解压后即可加载内置模型；游玩不用 npm，也不用在线下载 |
-| `aethelgard-v10-source.zip` · 轻量源码/游戏包 | 已构建游戏、源码、文档与工具；不含模型权重和运行库 | 规则玩法立即可用；真实模型需提前准备文件，或首次联网加载 |
+| `aethelgard-v11.0.0-qwen-0.6b-offline.zip` · 完整离线包 | 已构建游戏、可维护源码、**实际 Qwen3 0.6B q8 权重**、运行库与校验清单 | 解压后可加载内置模型，游玩无需在线下载 |
+| `aethelgard-v11.0.0-source.zip` · 轻量源码/游戏包 | 已构建游戏、源码、文档与工具；不含模型权重和运行库 | 规则玩法立即可用；真实模型需提前准备文件，或首次联网加载 |
+
+### 从 GitHub 下载
+
+打开仓库的 [Verify game and local AI 工作流](https://github.com/cjrujo/aethelgard-mud/actions/workflows/verify.yml)，选择与你要使用的提交对应的运行，在 **Artifacts** 中下载：
+
+- **`aethelgard-source-game`**：内含 `aethelgard-v11.0.0-source.zip`，由游戏与工具验证任务生成。
+- **`aethelgard-qwen-offline`**：内含 `aethelgard-v11.0.0-qwen-0.6b-offline.zip`，由实际浏览器模型任务在准备权重、完成验证后生成。
+
+相应任务成功上传后才会出现 artifact。GitHub 的下载外层也可能是 ZIP，先解压到上述交付包，再完整解压交付包。**Code → Download ZIP 取得的是仓库源码，不包含模型权重**。若对应运行还未生成交付包，可按下文命令自行准备和打包；不要把某次旧运行的成功当作当前提交的验证结果。
 
 取得 ZIP 后先完整解压，进入其中的 `aethelgard-mud` 文件夹。直接取得仓库源码也按轻量包的方式使用。
 
@@ -26,7 +37,9 @@ Windows、macOS 与 Linux 均需要 **Python 3.10 或更新版本**和现代浏�
 python3 tools/serve.py --open
 ```
 
-下文命令统一写作 `python`，请按系统改用 `python3` 或 Windows 的 `py -3`。默认地址是 **http://127.0.0.1:8765/**；保持启动器终端开启。端口被占用时可使用 `--port 8767`。
+下文命令统一写作 `python`，请按系统改用 `python3` 或 Windows 的 `py -3`。启动器首次尝试 **http://127.0.0.1:8765/**；端口被占用或系统不允许绑定时，会在 **18865–18874** 中寻找可用端口并记住选择。以后优先使用记住的端口。以终端实际打印的地址为准，并保持终端开启；`--port 8767` 可要求使用一个指定端口，指定端口失败时不会自动改用其他端口。
+
+**换端口前先导出 JSON，再在新地址导入。** 浏览器按协议、主机名和端口分别保存进度，`localhost` 与 `127.0.0.1` 也不同；新地址出现新英雄不表示旧进度被删除。详见 [本地更新与存档迁移](docs/v11-upgrade.md#3-更新本地游戏并保留进度)。
 
 **完整离线包的 AI 启动步骤**：打开“智脑”→“浏览器 CPU”→选择 **Qwen3 0.6B**→勾选“使用已下载的离线模型包”→“加载离线模型”。这一模式从解压目录读取文件，无需互联网。等待实际就绪后再提问。
 
@@ -35,17 +48,19 @@ python3 tools/serve.py --open
 ### 第一段旅程
 
 1. 在城镇广场打开“此地故事”，处理复苏之井的裂纹。
-2. 查看“你的旅程”卡片，按当前目标前进。输入 `journal` 或在输入框外按 `J` 查看日志。
-3. 调查地标、准备药品、装备战利品，然后进入荒野。
-4. 战斗先看敌人意图：重击时防御，蓄力或吟唱时考虑打断，破绽时进攻。喝药也占用一个回合。
-5. 返回安全据点休息；锻造、精炼和交易需要合适的地点与资源。
+2. 跟随“你的旅程”中的“目标下一步”，认识每章人物、调查线索，再挑战首领。可以“暂缓此线索”，以后从“日志与抉择”回访；暂缓不会替你选择或发奖。
+3. 调查地标、准备药品、装备战利品。高阶节点会显示所需主线进度或公会训练，地图仍可自由探索。
+4. 战斗先看敌人意图：重击时防御，蓄力或吟唱时考虑打断。打断蓄力会让存活敌人下一回合露出破绽；打断施法只取消当前法术。喝药也占用一个回合。
+5. 想自动战斗时打开“狩猎目标”。默认完成一场胜利即停；也可选择当前击杀契约，或主动设定连续狩猎的场数与生命下限。本轮成果和停止原因可在这里查看。
+6. 返回安全据点休息，在“公会与伙伴”查看声望等级、套装兑换、伙伴培养和采集训练。实际办理服务需要到公会大厅，并结束当前战斗。
 
 常用指令：
 
 ```text
 n / s / e / w / u / d
 look · harvest · rest · attack · skill 1 · guard · interrupt · flee
-recover · journal · encounter · choose 1 · ai 酒馆在哪里？ · save · load
+recover · journal · encounter · choose 1 · guild · hunt · skip
+ai 酒馆在哪里？ · save · load
 ```
 
 ## 本地 AI DM
@@ -102,25 +117,46 @@ ollama pull qwen2.5:0.5b
 
 AI 可以解释局势、扮演 NPC、补充奇遇气氛。**金币、装备、技能消耗、检定、任务与胜负由游戏规则结算**，模型生成的文字不会自行发奖。
 
+### 记忆、继续与纠错
+
+“记住的人物与承诺”保存玩家明确声明的少量事实，例如“我的姐姐叫米拉”“我承诺寻找信使”。这些记录独立于短期聊天窗口、按 NPC 会话隔离；人物关系和已结算故事另从实际游戏状态读取。承诺只代表玩家声明，不会自动完成任务。当前提取支持有限的明确句式，不是任意对话都能形成长期记忆。
+
+取消生成或尚未加载模型时，界面保留问题并提供“重新加载并继续”。继续前核对人物、地点和事件；场景已变时把问题放回输入框。重开游戏后需要重新加载模型，不会把旧的“已加载”状态当作实际驻留的模型。
+
+完整回复下可标记“事实有误”“角色不一致”“场景不符”，并在“回答反馈”导出带当时上下文的 JSON。这些记录只留在本机，不自动上传，也不会自动改写模型回复。详见 [游戏事实与人物记忆](docs/ai-dm.md#游戏事实与人物记忆)。
+
 ## 游戏内容
 
 | 系统 | 当前内容 |
 | --- | --- |
 | 世界与探索 | 32 个原创地点、5 个区域、地标线索与可扩展的程序生成边境 |
-| 旅程与抉择 | 23 个原创事件、69 个选项、5 个阵营信任、三枚封印、3 种结局 |
-| 战斗 | 手动回合、敌人预兆、具有不同阶段的首领、技能冷却、防御、打断、撤退与可选自动狩猎 |
-| 成长与装备 | 三职业、天赋、伙伴、随机词缀装备、套装效果、受资源与地点约束的锻造和精炼 |
+| 旅程与抉择 | 23 个原创事件、69 个选项、5 个阵营信任、三枚封印、3 种结局；关键故事进入默认路线，可暂缓、回访并查看结局条件 |
+| 战斗与狩猎 | 手动回合、敌人预兆、多阶段首领、技能冷却、防御、打断与撤退；单场、契约或显式连续狩猎，保留低血低体力安全暂停 |
+| 成长与装备 | 三职业、天赋、真实伙伴培养、随机词缀装备、三套装定向兑换、区域采集准备、锻造和精炼 |
+| 公会与经济 | 普通声望对应五级公会权益与最高 20% 商店折扣；碎片可用于套装和伙伴；支付前核对地点、战斗状态与完整价格 |
 | 失败与恢复 | 有限金币损失、可回收钱袋；不因战败直接删除角色等级或装备 |
-| 存档 | 本机自动保存、JSON 导出/导入、v9 迁移、新人物的上一位英雄备份、损坏存档保护 |
+| 存档与更新 | 本机自动保存、JSON 导出/导入、v9/v10 迁移、单标签写入与接管、恢复快照、保存成功后更新游戏 |
 
 新增故事、AI 控制和联机面板完整提供简体中文与英文；旧版其他语言入口仍保留，新增内容以英文回退。玩法细节见 [旅程设计](docs/gameplay-design.md) 和 [战斗与经济审计](docs/combat-audit.md)。
+
+## 保存、切换标签与更新
+
+同一来源下的英雄同时只有一个标签页可以写入。第二个标签页可查看提示并“接管并载入最新进度”；接管会载入已保存的进度，原页面暂停后台游玩。浏览器支持时使用 Web Locks，其他环境使用带冲突检测的保存租约。
+
+“存档 / JSON”提供当前英雄下载、上一位英雄与恢复快照的查看、下载和恢复。新旅程、导入和恢复会先写入并核对备份；备份失败时保留当前英雄，导入保存失败时恢复原英雄。存储空间不足或发生跨页冲突时，先导出本页 JSON，再处理提示。
+
+v11 页面发现新构建时显示“保存并更新”，保存成功后才切换 Service Worker 并刷新；在线战斗中先结束对局。更新提示与联机的“连接与版本诊断”读取生成的构建信息，便于查明前端、服务端是否来自同一版本。首次从 v10 更新及缓存排查见 [升级指南](docs/v11-upgrade.md)。
 
 ## 联机的实际范围
 
 - **地址留空**：BroadcastChannel 连接同一浏览器的同源标签页，只提供真实标签页在线名单与房间聊天。
-- **填写已部署的 v10 Worker WebSocket 地址**：真实在线列表、房间聊天、2–4 人协作副本、1v1 和 3v3 队伍竞技。副本和竞技场由服务器计算回合与结果，加入或排队不发奖励。
+- **填写已部署的 v11 Worker WebSocket 地址**：真实在线列表、房间聊天、2–4 人协作副本、1v1 和 3v3 队伍竞技。副本和竞技场由服务器计算回合与结果，加入或排队不发奖励。
 
-仓库提供 Cloudflare Workers / Durable Objects 服务器代码，**本次改动没有部署公共多人服务器**。跨设备联机需要自行部署并实测端点。离线存档可编辑，当前定位是朋友协作与友谊竞技；没有账户排位或完整反作弊承诺。[部署与玩法说明](docs/online.md)
+v11 在加入、排队请求发出前锁定单人活动并暂停自动行走/狩猎；断线会结束当前在线战斗。服务器已结算但尚未确认的奖励有持久收据，同一英雄重连同一服务器、同一 `realm` 后可恢复领取。进行中的战斗本身不会断线续打。
+
+**前端和 Cloudflare Worker 必须同步使用协议 11。** 更新时使用 `entry.js` 入口，并一并部署 `worker.js`、`receipts.js`、生成的 `build-info.js`。保留现有 `wrangler.toml` 中的 Worker 名称、Durable Object 绑定与迁移历史，将 `main` 更新为 `entry.js`。静态站点发布不替你部署 Worker。完整命令、健康检查和存档恢复身份说明见 [联机部署与玩法](docs/online.md)。
+
+仓库提供 Cloudflare Workers / Durable Objects 服务器代码，跨设备联机需要部署并实测自己的端点。离线存档可编辑，当前定位是朋友协作与友谊竞技，没有账户排位或完整反作弊承诺。本发布说明不宣称你的生产端点已更新。
 
 ## 开发、构建与测试
 
@@ -139,14 +175,17 @@ python tests/verify_mud.py --report test-results/verification.json
 ```bash
 npx playwright install chromium
 node tests/browser.mjs --report test-results/browser.json
+node tests/browser-update.mjs
 python tools/prepare_offline.py --model qwen-0.6b
 node tests/browser.mjs --model --report test-results/browser-model.json
 npm run test:model -- --model=qwen-0.6b --local
 ```
 
-`browser.mjs --model` 在新浏览器环境中阻断全部外网请求、保留 localhost 文件服务，从已准备的离线包实际加载 WASM 模型并生成路线回复；这不等于验收 Service Worker/浏览器缓存的断网重载。普通浏览器测试包含故事选择的保存和页面重载，不加载模型。Native ONNX CPU 命令使用实际游戏提示与事实；`--local` 从准备好的模型目录读取文件。两种真实推理的运行数据保存在 `test-results/`，必须分别解读；事实断言通过后仍需要人工阅读输出，避免漏掉额外的虚构效果。准备默认模型会下载数百 MB 文件。
+`browser.mjs --model` 在新浏览器环境中阻断全部外网请求、保留 localhost 文件服务，从已准备的离线包实际加载 WASM 模型并生成路线回复。普通浏览器测试包含故事选择保存、实际双标签页接管、手机宽度的公会/狩猎表单与诊断面板。独立的 `browser-update.mjs` 使用真实 Service Worker，验证安装、带查询参数的离线导航，以及已下载新版本在断网时保存并更新；它不验证模型缓存。Native ONNX CPU 命令使用实际游戏提示与事实；`--local` 从准备好的模型目录读取文件。两种真实推理的运行数据保存在 `test-results/`，必须分别解读；事实断言通过后仍需要人工阅读输出，避免漏掉额外的虚构效果。准备默认模型会下载数百 MB 文件。
 
-`npm run build` 同时构建 CSS、两个 HTML 与 Service Worker；`python src/build_mud_game.py --check` 检查生成页面是否与源码一致。仓库包含验证与 GitHub Pages 工作流；静态站点仅发布游戏壳和注册表，不把本机已下载的大模型作为 Git 文件上传。本地测试与打包不等于已推送、已通过远端 CI 或已发布。
+`npm run build` 构建 CSS、两个 HTML、Service Worker、`build-info.json` 和 Worker 的 `build-info.js`；`python src/build_mud_game.py --check` 检查生成文件与源码是否一致。前后端构建 ID 由同一次构建产生。
+
+GitHub Pages 自动发布等待 `main` 的 **Verify game and local AI** 成功，再对该提交构建和验证；手动触发也会先构建并验证。仓库未启用 Pages，或发布来源不是 GitHub Actions 时，部署任务跳过并在运行摘要说明原因，**不会自动更改仓库设置**。验证与下载包位于 Verify 工作流，与是否启用 Pages 分开。静态站点发布游戏壳和模型注册表，不把大模型权重作为 Git 文件上传，也不部署 Cloudflare Worker。本地验证、远端 CI、静态站点发布与公网联机验收应分别确认。
 
 ### 制作可解压运行的交付包
 
@@ -171,6 +210,7 @@ python tools/package_release.py --model qwen-0.6b
 
 ## 文档索引
 
+- [v11 升级、下载包、存档迁移与前后端发布](docs/v11-upgrade.md)
 - [AI DM、离线包、运行证据与模型验收](docs/ai-dm.md)
 - [探索、抉择、三种结局与实际通关](docs/gameplay-design.md)
 - [战斗、装备、经济审计](docs/combat-audit.md)
@@ -181,10 +221,16 @@ python tools/package_release.py --model qwen-0.6b
 
 ## English quickstart
 
-Install **Python 3.10+** on Windows, macOS or Linux. Extract the ZIP and enter its `aethelgard-mud` folder. Double-click `start_Windows.cmd` on Windows; on macOS/Linux run `sh start_unix.sh` or `python3 tools/serve.py --open`. Keep the terminal open and use http://127.0.0.1:8765/, not `file://`. Start with **Journey → Story here**.
+Install **Python 3.10+** on Windows, macOS or Linux. In the [Verify workflow](https://github.com/cjrujo/aethelgard-mud/actions/workflows/verify.yml), choose the intended revision and download `aethelgard-source-game` or `aethelgard-qwen-offline` after its corresponding job succeeds. These contain `aethelgard-v11.0.0-source.zip` and `aethelgard-v11.0.0-qwen-0.6b-offline.zip`, respectively; the repository's ordinary source ZIP does not contain model weights.
+
+Extract the package and enter its `aethelgard-mud` folder. Double-click `start_Windows.cmd` on Windows; on macOS/Linux run `sh start_unix.sh` or `python3 tools/serve.py --open`. Keep the terminal open and use the printed HTTP address. The launcher initially tries port 8765, falls back within 18865–18874 if necessary, and remembers its choice. **Export/import save JSON when changing ports or hosts**: browser saves belong to their original origin. Start with **Journey → Story here**.
 
 The **full offline ZIP** includes Qwen3 0.6B q8 and its runtime; playing requires neither npm nor internet downloads. Open **AI DM → Browser CPU**, select Qwen3 0.6B, enable **Use downloaded offline package**, and load it. The **source/game ZIP** contains no weights or runtime: play with the labeled rules assistant, load the model online, or first run `python tools/prepare_offline.py --model qwen-0.6b`. Verify prepared files offline with `python tools/prepare_offline.py --verify-only`. Ollama is an optional localhost backend through `/ollama`; its installation example remains `qwen2.5:0.5b`, matching the code default, not a quality recommendation. Real Ollama inference was not tested in this delivery.
 
-The current source has fresh rule regressions and real Qwen3 CPU/WASM generation evidence. Model facts and NPC narration still have known failures; successful inference is not a blanket quality approval. The rules engine owns world facts, actions and rewards. Qwen2.5 and SmolLM2 remain experimental alternatives. See [verification](docs/verification.md) for actual results and limitations.
+v11 recommends each chapter's stories, supports deferring and revisiting leads, adds guild set exchange and companion training, and makes auto-hunt stop after one win by default. Contract and explicitly continuous hunts have their own limits and a run summary. Only one tab writes a hero at a time; use takeover to load its latest save. Recovery snapshots are available in Save, and updates require a successful save before refreshing.
 
-Build a lightweight ZIP with `python tools/package_release.py`, or a verified full ZIP with `python tools/package_release.py --model qwen-0.6b` after preparing the model. Run `python tests/verify_mud.py` for deterministic checks. After installing development dependencies and Chromium, `node tests/browser.mjs --model` performs a fresh browser load and real generation from local files with external requests blocked; it does not test browser-cache offline reload. These are local commands, not a claim of successful remote CI or publication. Internet multiplayer requires your own deployed v10 Worker; an empty endpoint only enables same-browser tab chat.
+Model facts and NPC narration still have known failures, including an invented reason for an NPC relationship. Successful inference is not a blanket quality approval. Explicit names/promises have persistent, scoped memory; interrupted requests offer **Reload and continue**, and local feedback can be exported. The rules engine owns world facts, actions and rewards. Qwen2.5 and SmolLM2 remain experimental alternatives. See [AI quality limits](docs/ai-dm.md#当前模型的实测范围与限制) and [verification](docs/verification.md) for actual results.
+
+Build a lightweight ZIP with `python tools/package_release.py`, or a verified full ZIP with `python tools/package_release.py --model qwen-0.6b` after preparing the model. Run `python tests/verify_mud.py` for deterministic checks. After installing development dependencies and Chromium, `node tests/browser.mjs --model` performs a fresh browser load and real generation from local files with external requests blocked; it does not test browser-cache offline reload. These are local commands, not a claim of successful remote CI or publication.
+
+Internet multiplayer requires **both the v11 frontend and a protocol-11 Worker**. Set Wrangler's `main` to `entry.js`, deploy `entry.js`, `worker.js`, `receipts.js` and generated `build-info.js` together, and preserve your existing Durable Object binding and migrations in `wrangler.toml`. An empty endpoint only enables same-browser tab chat. Pages deployment follows successful verification and skips repositories without the corresponding Pages setup; it neither changes repository settings nor deploys the Worker. See the [upgrade guide](docs/v11-upgrade.md) and [multiplayer deployment](docs/online.md).

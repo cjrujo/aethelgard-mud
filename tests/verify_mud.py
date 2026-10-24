@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the current v10 regression suite and save an auditable fresh report."""
+"""Run the current regression suite and save an auditable fresh report."""
 from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
@@ -25,7 +25,7 @@ def main():
                 [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"]]
     report = {"timestamp": datetime.now(timezone.utc).isoformat(), "commands": [],
               "modelInferenceIncluded": False, "browserIncluded": False,
-              "note": "Fresh recovery verification; historical v10 counts are not reused.",
+              "note": "Fresh v11 verification; historical test counts are not reused.",
               "sourceSha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                                for p in sorted((ROOT / "src").glob("*")) if p.is_file()}}
     for command in commands:

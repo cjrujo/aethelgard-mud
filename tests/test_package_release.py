@@ -42,6 +42,7 @@ class PackageReleaseTests(unittest.TestCase):
         self.write("tests/regression.test.mjs", b"// fixture test\n")
         self.write(".github/workflows/verify.yml", b"name: fixture\n")
         self.write("cloudflare-worker/worker.js", b"// fixture server\n")
+        self.write_json("package.json", {"version": "11.0.0"})
         self.write(".gitignore", b"dist-release/\n")
         self.runtime_names = ("transformers.min.js", "ort-wasm-simd-threaded.jsep.mjs", "ort-wasm-simd-threaded.jsep.wasm")
         self.runtime_hashes = {}

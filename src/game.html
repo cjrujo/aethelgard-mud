@@ -89,6 +89,7 @@
         </div>
         <div class="flex items-center gap-1.5">
           <h1 class="font-display-mud font-bold text-xs sm:text-sm tracking-wide text-amber-300">AETHELGARD · 艾瑟尔加德</h1>
+          <span id="app-build-label" class="text-[10px] text-slate-400" aria-label="Game build">v11.0.0</span>
           <span id="header-biome-badge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Oakhaven Sanctuary · 橡木港圣所</span>
           <span id="header-rift-wave-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/90 text-purple-300 border border-purple-500/60">Rift Wave 1</span>
           <span id="header-ai-badge" class="hidden sm:inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-950/90 text-sky-300 border border-sky-700/50">🧠 AI · 尚未加载</span>
@@ -158,11 +159,23 @@
     </div>
   </header>
 
+  <aside id="app-save-banner" class="app-notice app-notice-warning" role="status" hidden>
+    <p id="app-save-banner-text"></p>
+    <div class="app-notice-actions">
+      <button id="app-take-over" type="button" class="ai-control" onclick="AethelgardApp.takeOver()">Take over and load latest · 接管并载入最新进度</button>
+      <button id="app-export-paused" type="button" class="ai-control" onclick="AethelgardApp.exportCurrent()">Export this page · 导出本页进度</button>
+    </div>
+  </aside>
+  <aside id="app-update-banner" class="app-notice" role="status" hidden>
+    <p id="app-update-text"></p>
+    <button id="app-update-now" type="button" class="ai-control ai-primary" onclick="AethelgardApp.saveAndUpdate()">Save and update · 保存并更新</button>
+  </aside>
+
   <!-- TOAST NOTIFICATION BAR -->
   <div id="toast-container" class="fixed bottom-3 right-3 z-50 flex flex-col gap-1.5 max-w-sm pointer-events-none"></div>
 
   <!-- MAIN 3-COLUMN GAME WORKSPACE (Locked to remaining viewport height, zero page scroll, zero hidden cards) -->
-  <main id="main-viewport-grid" class="flex-1 min-h-0 max-w-[1760px] w-full mx-auto grid grid-cols-12 gap-2 p-1.5 overflow-hidden">
+  <main id="main-viewport-grid" inert class="flex-1 min-h-0 max-w-[1760px] w-full mx-auto grid grid-cols-12 gap-2 p-1.5 overflow-hidden">
 
     <!-- LEFT COLUMN: HERO VITALS, COMBAT STANCE/SKILLS & ATTRIBUTES/TALENTS (3 cols, all 3 sections guaranteed visible) -->
     <section id="left-column-panel" class="col-span-12 lg:col-span-3 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
@@ -778,7 +791,20 @@
           <button id="btn-copy-save-json" onclick="copySaveJson()" class="text-amber-300 hover:underline text-[11px]">📋 Copy JSON</button>
         </div>
         <textarea id="save-json-textarea" rows="5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono-mud text-[11px] text-emerald-300"></textarea>
+        <p id="app-save-status" role="status" class="text-xs text-slate-300"></p>
+        <button type="button" class="ai-control" onclick="AethelgardApp.exportCurrent()">Download JSON · 下载存档文件</button>
       </div>
+
+      <section class="space-y-2 border-t border-slate-700 pt-3" aria-labelledby="app-backup-heading">
+        <h3 id="app-backup-heading" class="text-sm text-emerald-200">Recovery snapshots · 恢复快照</h3>
+        <button id="app-restore-previous" type="button" class="ai-control" onclick="AethelgardApp.restorePrevious()">Restore previous hero · 恢复上一位英雄</button>
+        <label class="block text-xs text-slate-300" for="app-backup-select">Choose a backup · 选择备份</label>
+        <select id="app-backup-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs"></select>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="ai-control" onclick="AethelgardApp.restoreBackup()">Restore selected · 恢复所选快照</button>
+          <button type="button" class="ai-control" onclick="AethelgardApp.exportBackup()">Download selected · 下载所选快照</button>
+        </div>
+      </section>
 
       <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
         <button id="btn-import-save-json" onclick="importSaveJson()" data-zh="导入JSON存档" class="bi-inline px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">

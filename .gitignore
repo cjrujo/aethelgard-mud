@@ -17,3 +17,7 @@ saves/
 savegames/
 .DS_Store
 .openai/
+.launcher-port.json
+.launcher-port-*.tmp
+.wrangler/
+.dev.vars*

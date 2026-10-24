@@ -226,7 +226,7 @@ const GameDirector = (() => {
     const d = state.director;
     d.version = 1;
     if (!Number.isFinite(d.seed)) d.seed = Math.floor(Math.random()*0xFFFFFFFF) >>> 0;
-    for (const k of ['completed','discoveries','flags','trust','milestones','actions','surveyCooldowns']) {
+    for (const k of ['completed','discoveries','flags','trust','milestones','actions','surveyCooldowns','skipped','guildTools']) {
       if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {};
     }
     for (const k of Object.keys(factions)) d.trust[k] = Math.max(-9,Math.min(9,Number(d.trust[k])||0));
@@ -235,6 +235,9 @@ const GameDirector = (() => {
     if (!Array.isArray(d.regions)) d.regions = [];
     if (!Array.isArray(d.bossesLogged)) d.bossesLogged = [];
     if (d.pending && (!byId[d.pending.id] || d.completed[d.pending.id])) d.pending = null;
+    if (!byId[d.revisit] || d.completed[d.revisit]) d.revisit = null;
+    for (const id of Object.keys(d.skipped)) if (!byId[id] || id === 'final_choice') delete d.skipped[id];
+    for (const id of Object.keys(d.guildTools)) if (!['aether','forge','astral'].includes(id) || d.guildTools[id] !== true) delete d.guildTools[id];
     if (!d.ending || !['restoration','guardian','sovereign'].includes(d.ending)) d.ending = null;
     return d;
   }
@@ -250,6 +253,7 @@ const GameDirector = (() => {
   }
   function persist() { if(typeof saveGameState==='function') saveGameState(false); }
   function canMutate() {
+    if(typeof window.AethelgardApp?.canWrite==='function' && !window.AethelgardApp.canWrite()){notify('Another tab owns this save. Resume editing there or take control from the save notice.','另一标签页正在保存这份旅程，请在该页继续，或通过存档提示接管。');return false;}
     const busy=typeof OnlineRealm!=='undefined' && typeof OnlineRealm.isBusy==='function' && OnlineRealm.isBusy();
     if(busy)notify('Finish or leave the online battle before changing your solo journey.','请先完成或离开在线战斗，再推进单人旅程。');
     return !busy;
@@ -262,7 +266,7 @@ const GameDirector = (() => {
   function allianceScore() { return Object.values(ensureState().trust).reduce((n,x)=>n+Math.max(0,x),0); }
   function requirementReason(req={}) {
     const d=ensureState(), p=state.player;
-    if(req.boss && !(state.world.defeatedBosses||[]).includes(req.boss)) return bi('Defeat this region’s boss first.','先击败本区域首领。');
+    if(req.boss && !(state.world.defeatedBosses||[]).includes(req.boss) && !STORY_QUESTS.some(q=>q.reqBoss===req.boss&&(state.quests.completed||[]).includes(q.id))) return bi('Defeat this region’s boss first.','先击败本区域首领。');
     if(req.flags && req.flags.some(f=>!d.flags[f])) return bi('Preserve all three seals and align the observatory’s shared anchors.','需要保留三枚封印，并校准观星台共同锚点。');
     if(req.anyFlags && !req.anyFlags.some(f=>d.flags[f])) return bi('Study a binding formula or align the crown socket first.','需要先研究束缚公式，或校准王冠插槽。');
     if(req.trust) for(const [key,min] of Object.entries(req.trust)) if((d.trust[key]||0)<min) return bi(`${factions[key].en} trust ${min} required.`,`需要${factions[key].zh}信任 ${min} 点。`);
@@ -341,7 +345,8 @@ const GameDirector = (() => {
     d.pending={id:e.id,room:current,token:`${d.seed}:${e.id}:${state.tickCount||0}`,startedTick:state.tickCount||0,narration:null};
     narrationNotice=null;
     d.lastOutcome=null;
-    state.autoHunt=false;
+    if(typeof CombatDirector!=='undefined')CombatDirector.stopHunt('story');
+    else state.autoHunt=false;
     persist();open('event');render();
     if(typeof window.dispatchEvent==='function' && typeof CustomEvent==='function') window.dispatchEvent(new CustomEvent('aethelgard:encounter',{detail:{id:e.id,token:d.pending.token}}));
     return {ok:true,pending:d.pending};
@@ -364,6 +369,7 @@ const GameDirector = (() => {
       consume(c.cost);
       // Consume the event before any reward can trigger rendering or an extra click.
       d.completed[e.id]={choice:c.id,success,roll:c.check?roll:null,tick:state.tickCount||0};
+      delete d.skipped[e.id];if(d.revisit===e.id)d.revisit=null;
       d.pending=null;
       applyEffects(result.effects);
       d.lastOutcome={id:e.id,title:e.title,body:result.text,effects:result.effects,choice:c.label,success,roll:c.check?roll:null,chance:c.check?chance(c):null};
@@ -419,19 +425,59 @@ const GameDirector = (() => {
     const d=ensureState();
     d.actions[type]=(d.actions[type]||0)+1;
     if(type==='combat_defeat')record(`defeat:${state.tickCount}:${d.actions[type]}`,bi('A costly return','付出代价的归来'),bi('You survived. Replenish supplies, read enemy intent, and return when prepared.','你活了下来。补充物资，读清敌人的意图，准备好再回来。'),'lesson');
-    if(type==='move' && d.pending && d.pending.room!==state.world.currentRoom) close();
+    if(type==='move') {
+      if(d.pending && d.pending.room!==state.world.currentRoom) close();
+      if(typeof CombatDirector!=='undefined' && state.autoHunt)CombatDirector.stopHunt('moved');
+    }
     sync();
     if(['combat_victory','combat_defeat','craft','equip','refine','move'].includes(type))persist();
     return d;
   }
 
+  // Recommended story beats are guidance, not additional quest locks. Existing
+  // saves continue their current chapter; every unresolved beat can be revisited.
+  const chapterStories = {
+    q1_wilds: ['tavern_courier','wounded_scout'],
+    q2_bandit_king: ['brom_apprentice','mill_wheel','menhir_root','elara_plan'],
+    q3_sunken_lich: ['bandit_ledger','river_cart','bone_ferry','vesper_names','forbidden_page','memory_bell'],
+    q4_titan_forge: ['freed_souls','borin_valves','furnace_fire','bridge_rescue','geode_echo'],
+    q5_astral_architect: ['rift_anchor','chrono_self','observatory_lens','conduit_choice']
+  };
+  function storyObjective(id, chapter, progress, extra={}) {
+    const e=byId[id];
+    return {chapter,target:e.room,event:id,label:bi(`Follow the lead: ${e.title.en}. Your choice prepares the next chapter.`, `跟随线索：${e.title.zh}。你的选择将为接下来的旅程做准备。`),progress,total:6,skippable:id!=='final_choice',...extra};
+  }
   function objective() {
     const d=ensureState(),done=state.quests.completed||[],first=STORY_QUESTS.find(q=>!done.includes(q.id));
-    if(d.ending) return {chapter:bi('Epilogue · Your Aethelgard','终章余韵 · 你的艾瑟尔加德'),target:'r_town_square',label:bi('Return home, finish unresolved stories, or challenge the Endless Rift.','回家看看、完成尚未处理的故事，或挑战无尽裂隙。'),progress:6,total:6};
-    if(!d.completed.first_oath && !done.length)return {chapter:bi('Prologue · A promise at the well','序章 · 井边的承诺'),target:'r_town_square',event:'first_oath',label:bi('Speak with Thorne about the broken seal.','与索恩谈谈断裂的铜印。'),progress:0,total:6};
-    if(!first)return {chapter:bi('Epilogue · A sky of your choosing','终章 · 选择属于你的天空'),target:'r_astral_core',event:'final_choice',label:bi('Return to the Rift’s heart and decide its future.','回到裂隙之心，决定它的未来。'),progress:5,total:6};
+    if(d.revisit && !requirementReason(byId[d.revisit].require)) return storyObjective(d.revisit,bi('Return to an unfinished story','回访尚未处理的故事'),Math.min(5,done.length),{revisit:true});
+    if(d.ending) return {chapter:bi('Epilogue · Your Aethelgard','终章余韵 · 你的艾瑟尔加德'),target:'r_town_square',label:bi('Return home, revisit unresolved stories, train companions or challenge the Endless Rift.','回家看看、回访尚未处理的故事、培养伙伴，或挑战无尽裂隙。'),progress:6,total:6};
+    if(!d.completed.first_oath && !d.skipped.first_oath && !done.length)return storyObjective('first_oath',bi('Prologue · A promise at the well','序章 · 井边的承诺'),0,{label:bi('Speak with Thorne about the broken seal.','与索恩谈谈断裂的铜印。')});
+    if(!first)return storyObjective('final_choice',bi('Epilogue · A sky of your choosing','终章 · 选择属于你的天空'),5,{label:bi('Choose the Rift’s future. Review unfinished leads in the journal before committing; sealing the Rift is always available.','决定裂隙的未来。做最后决定前，可在日志回访未完线索；封闭裂隙始终可选。')});
+    const next=(chapterStories[first.id]||[]).find(id=>!d.completed[id]&&!d.skipped[id]&&!requirementReason(byId[id].require));
+    if(next)return storyObjective(next,bi(first.title,first.titleZh),done.length,{quest:first.id});
     const map={q1_wilds:'r_wilds_trail',q2_bandit_king:'r_bandit_stronghold',q3_sunken_lich:'r_lich_sanctum',q4_titan_forge:'r_caldera_throne',q5_astral_architect:'r_astral_core'};
     return {chapter:bi(first.title,first.titleZh),target:map[first.id],label:bi(first.desc,first.descZh),quest:first.id,progress:done.length,total:6};
+  }
+  function skipObjective() {
+    if(!canMutate()||state.combat.inCombat)return false;
+    const d=ensureState(),o=objective();
+    if(!o.skippable||!o.event)return false;
+    d.skipped[o.event]=true;if(d.revisit===o.event)d.revisit=null;
+    if(d.pending?.id===o.event)d.pending=null;
+    const e=byId[o.event];
+    record(`skip:${o.event}`,bi(`Lead postponed: ${e.title.en}`,`已暂缓线索：${e.title.zh}`),bi('No choice or reward was claimed. This story remains available from the journal, including before the ending.','没有替你做选择，也没有结算奖励。可随时从日志回访，包括最终结局之前。'),'lead',e.room);
+    notify(`Skipped the recommendation for ${e.title.en}. Return from the journal whenever you wish.`,`已跳过「${e.title.zh}」的推荐步骤，故事仍可在日志回访。`);
+    close();persist();renderAll();return true;
+  }
+  function revisit(id) {
+    if(!canMutate()||state.combat.inCombat)return false;
+    const d=ensureState(),e=byId[id];if(!e||d.completed[id])return false;
+    const blocked=requirementReason(e.require);if(blocked){notify(blocked.en,blocked.zh);return false;}
+    d.revisit=id;delete d.skipped[id];close();persist();renderAll();return true;
+  }
+  function unfinishedLeads() {
+    const d=ensureState();
+    return encounters.filter(e=>e.id!=='final_choice'&&!d.completed[e.id]).map(e=>({id:e.id,title:text(e.title),roomId:e.room,skipped:!!d.skipped[e.id],available:!requirementReason(e.require),reason:text(requirementReason(e.require))}));
   }
   function followObjective() {
     if(!canMutate())return false;
@@ -459,12 +505,14 @@ const GameDirector = (() => {
       message=text(bi('Your online battle is active. Use its battle panel to continue.','在线战斗正在进行，请通过在线战斗面板继续。'));
       label=text(bi('Open online battle','打开在线战斗'));act=()=>OnlineRealm.open();
     }else if(state.combat.inCombat&&state.combat.enemy&&typeof CombatDirector!=='undefined'){
-      const intent=state.combat.enemy.intent,interrupt=['charge','cast'].includes(intent)&&state.player.sta>=18;
-      const guard=intent==='heavy'||(['charge','cast'].includes(intent)&&!interrupt);
-      const action=interrupt?'interrupt':guard?'guard':'attack';
-      const hints={interrupt:bi('The foe is charging or casting. Interrupt now for 18 stamina.','敌人正在蓄力或施法，现在可用18体力打断。'),guard:bi('Brace for the next hit. Guard reduces damage and restores stamina and mana.','准备承受下一击。防御可减伤，并恢复体力与法力。'),attack:bi('Read the enemy intent and choose your attack. Your skills remain available below.','观察敌人意图并选择攻击，下方仍可选用技能。')};
-      message=text(hints[action]);label=text(action==='interrupt'?bi('Interrupt · 18 STA','打断 · 18体力'):action==='guard'?bi('Guard this turn','本回合防御'):bi('Strike this turn','本回合攻击'));
-      act=()=>CombatDirector.action(action);
+      const context=CombatDirector.getContext(),recommendation=context.decisions?.recommendedAction;
+      if(recommendation){
+        const kind=recommendation.kind,skill=kind==='skill'?context.skills[recommendation.index]:null,item=kind==='potion'?ITEM_CATALOG[recommendation.itemId]:null;
+        const names={attack:bi('Strike this turn','本回合攻击'),guard:bi('Guard this turn','本回合防御'),interrupt:bi('Interrupt · 18 STA','打断 · 18体力'),ultimate:bi('Use Overdrive','释放超载必杀'),flee:bi('Retreat · 10 STA','撤退 · 10体力')};
+        message=text(bi(recommendation.reasonEn,recommendation.reasonZh));
+        label=skill?text(bi(skill.name,skill.nameZh)):item?text(bi(`Use ${item.name}`,`使用${item.nameZh}`)):text(names[kind]||names.attack);
+        act=()=>CombatDirector.action(kind,kind==='skill'?recommendation.index:recommendation.itemId);
+      }
     }else if(state.world.currentRoom===o.target){
       const quest=STORY_QUESTS.find(q=>q.id===o.quest);
       if(o.event)label=text(bi('Make your choice','做出选择'));
@@ -502,7 +550,7 @@ const GameDirector = (() => {
       chapter:text(o.chapter),objective:text(o.label),objectiveRoom:o.target,
       seals:{root:!!d.flags.sigil_root,memory:!!d.flags.sigil_memory,fire:!!d.flags.sigil_fire},
       trust:{...d.trust},allianceScore:allianceScore(),flags:{...d.flags},ending:d.ending,
-      completedEncounters:Object.keys(d.completed),discoveryCount:Object.keys(d.discoveries).length,
+      completedEncounters:Object.keys(d.completed),skippedRecommendations:Object.keys(d.skipped),unfinishedLeads:unfinishedLeads(),recommendedEvent:o.event||null,discoveryCount:Object.keys(d.discoveries).length,
       journal:d.journal.slice(-6).map(j=>({title:text(j.title),text:text(j.body),roomId:j.roomId})),
       encounter:e?{id:e.id,token:d.pending.token,title:text(e.title),opening:text(e.opening),roomId:e.room,
         choices:e.choices.map((c,index)=>({index,label:text(c.label),cost:costSummary(c.cost),check:c.check?{stat:c.check.stat,chance:chance(c)}:null,
@@ -544,6 +592,45 @@ const GameDirector = (() => {
     if(returnFocus&&typeof returnFocus.focus==='function')returnFocus.focus();
   }
   function changeTab(tab){modalTab=tab;lastRenderKey='';render();}
+  function leadsHtml() {
+    const leads=unfinishedLeads();if(!leads.length)return '';
+    return `<h3 class="gd-title">${esc(text(bi('Unfinished leads · choose one to revisit','未完线索 · 选择一条回访')))}</h3><p class="gd-small">${esc(text(bi('Skipping a recommendation never consumes its choice or reward. Completed choices remain part of your story.','暂缓推荐不会消耗选择或奖励；已经做出的选择仍是故事的一部分。')))}</p>${leads.map(e=>`<button class="gd-choice" onclick="GameDirector.revisit('${e.id}')" ${e.available?'':'disabled'}><strong>${esc(e.title)}${e.skipped?' · '+esc(text(bi('postponed','已暂缓'))):''}</strong><small>${esc(getLang()==='zh'?WORLD_ROOMS[e.roomId].titleZh:WORLD_ROOMS[e.roomId].title)}${e.reason?' · '+esc(e.reason):''}</small></button>`).join('')}`;
+  }
+  function endingReadinessHtml() {
+    const d=ensureState(),rows=byId.final_choice.choices.map(c=>({label:text(c.label),reason:text(requirementReason(c.require))}));
+    const missing=[['sigil_root','menhir_root'],['sigil_memory','memory_bell'],['sigil_fire','furnace_fire'],['lens_aligned','observatory_lens']].filter(([flag])=>!d.flags[flag]);
+    return `<div class="gd-notice"><strong>${esc(text(bi('Before your final choice','最终决定前')))}</strong>${rows.map(r=>`<p>${esc(r.label)}：${esc(r.reason||text(bi('Ready','已满足条件')))}</p>`).join('')}<p>${esc(text(bi('The guardian ending is always available. You may leave before deciding; completed choices cannot be rewritten.','守护结局始终可选。做决定前可以离开；已经做出的选择不会被重写。')))}</p>${missing.map(([,id])=>d.completed[id]?`<p class="gd-small">${esc(text(byId[id].title))} · ${esc(text(bi('Resolved differently in this journey','本次旅程已做出其他选择')))}</p>`:`<button class="gd-btn secondary" onclick="GameDirector.revisit('${id}')">${esc(text(bi('Revisit: ','回访：'))+text(byId[id].title))}</button>`).join('')}<button class="gd-btn secondary" onclick="GameDirector.changeTab('journal')">${esc(text(bi('Review every unfinished lead','查看全部未完线索')))}</button></div>`;
+  }
+  function travelToGuild() {
+    if(!canMutate()||state.combat.inCombat)return false;
+    const path=findShortestPath(state.world.currentRoom,'r_guild_hall');
+    if(!path)return false;if(path.length)moveDirection(path[0]);open('guild');return true;
+  }
+  function redeemSelectedSet() {
+    return CombatDirector.redeemSet(document.getElementById('guild-set-slot')?.value,document.getElementById('guild-set-id')?.value);
+  }
+  function guildHtml() {
+    if(typeof CombatDirector==='undefined')return '';
+    const g=CombatDirector.getGuildContext(),t=g.training,x=g.exchange,path=findShortestPath(state.world.currentRoom,'r_guild_hall');
+    const disabled=!g.canUse?'disabled':'';
+    return `<div class="gd-kicker">${esc(text(bi('ADVENTURERS’ GUILD','冒险者公会')))}</div><h3 class="gd-title">${esc(g.rank.name)} · ${g.reputation} ${esc(text(bi('reputation','声望')))}</h3><p>${esc(text(bi(`Merchant discount: ${g.discountPercent}%. ${g.nextRank?`Next rank at ${g.nextRank.at} reputation.`:'Highest rank reached.'}`,`商店折扣：${g.discountPercent}%。${g.nextRank?`下阶需要 ${g.nextRank.at} 声望。`:'已达最高阶。'}`)))}</p><p>${state.player.gold} ${esc(text(bi('gold','金币')))} · ${state.player.shards} ${esc(text(bi('Rift shards','裂隙碎片')))}</p>${!g.canUse?`<p class="gd-notice">${esc(text(bi('Services require the Guild Hall, outside solo and online battles.','服务需在公会大厅、单人及在线战斗之外办理。')))}</p>${!state.combat.inCombat&&path?.length?`<button class="gd-btn" onclick="GameDirector.travelToGuild()">${esc(text(bi(`One step toward the Guild · ${path.length} steps left`,`向公会走一步 · 还需 ${path.length} 步`)))}</button>`:''}`:''}<h3 class="gd-title">${esc(text(bi('Choose your set and slot','选择套装与部位')))}</h3><p class="gd-small">${esc(text(bi(`One level-${x.tier} set item: ${x.shards} shards + ${x.gold} gold. The set and slot are guaranteed; affixes roll normally. Requires 25 reputation.`,`兑换一件 ${x.tier} 阶套装：${x.shards} 碎片 + ${x.gold} 金币。保证所选套装与部位，词缀正常随机。需 25 声望。`)))}</p><div class="gd-actions"><label>${esc(text(bi('Set','套装')))} <select id="guild-set-id" class="gd-btn secondary" aria-label="${esc(text(bi('Choose a set','选择套装')))}">${g.sets.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label><label>${esc(text(bi('Slot','部位')))} <select id="guild-set-slot" class="gd-btn secondary" aria-label="${esc(text(bi('Choose a slot','选择部位')))}">${g.slots.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label><button class="gd-btn" onclick="GameDirector.redeemSelectedSet()" ${!g.canUse||!x.available?'disabled':''}>${esc(text(bi('Exchange shards','支付并兑换')))}</button></div><h3 class="gd-title">${esc(text(bi('Companion training','伙伴培养')))} · Lv.${t.level}</h3><p>${esc(text(bi(`All unlocked companions share training. Pet strikes gain +0.5 percentage points per level; current bonus +${t.bonusPercent} points.`,`已解锁伙伴共享培养等级。每级协战伤害系数增加 0.5 个百分点，当前额外 +${t.bonusPercent} 个百分点。`)))}</p><p class="gd-small">${esc(text(bi(`Current training cap: ${t.cap} (hero level + 2, maximum 13).`,`当前培养上限 ${t.cap} 级（角色等级 + 2，最高 13 级）。`)))}</p><button class="gd-btn" onclick="CombatDirector.trainCompanion(${t.level})" ${!g.canUse||!t.available?'disabled':''}>${esc(text(t.level>=t.cap?bi('Training cap reached','已达当前培养上限'):bi(`Train to Lv.${t.level+1} · ${t.shards} shards + ${t.gold} gold`,`培养至 Lv.${t.level+1} · ${t.shards} 碎片 + ${t.gold} 金币`)))}</button><h3 class="gd-title">${esc(text(bi('Gathering preparations','区域采集准备')))}</h3><p class="gd-small">${esc(text(bi('Regional victories unlock these preparations for free. Experienced explorers may buy the training earlier. Movement remains unrestricted.','击败对应区域首领可免费获得准备资格；有经验的探索者也可提前购买培训。移动始终自由。')))}</p>${g.tools.map(tool=>`<div class="gd-journal-entry"><strong>${esc(tool.name)}</strong><p class="gd-small">${esc(tool.description)}</p><button class="gd-btn secondary" onclick="CombatDirector.purchaseTool('${tool.id}')" ${!g.canUse||!tool.available?'disabled':''}>${esc(tool.unlocked?text(bi('Prepared','已具备资格')):text(bi(`${tool.gold} gold · Lv.${tool.level} + ${tool.rep} reputation`,`${tool.gold} 金币 · 需 Lv.${tool.level} 与 ${tool.rep} 声望`)))}</button></div>`).join('')}`;
+  }
+  function applyHuntSettings() {
+    const mode=document.getElementById('hunt-mode')?.value;
+    const maxBattles=Number(document.getElementById('hunt-limit')?.value);
+    const healthFloor=Number(document.getElementById('hunt-health')?.value)/100;
+    return CombatDirector.configureHunt({mode,maxBattles,healthFloor});
+  }
+  function startConfiguredHunt() {
+    if(!applyHuntSettings())return false;
+    return CombatDirector.startHunt();
+  }
+  function huntHtml() {
+    if(typeof CombatDirector==='undefined')return '';
+    const h=CombatDirector.getHuntContext(),s=h.session;
+    return `<div class="gd-kicker">${esc(text(bi('AUTO-HUNT','自动狩猎')))}</div><h3 class="gd-title">${esc(text(bi('Give this expedition an ending','给本次狩猎一个终点')))}</h3><p>${esc(text(bi('A new game defaults to one battle. Contract mode stops when the current kill contract is ready; it only hunts eligible local foes. Continuous hunting is an explicit choice.','新旅程默认只打一场。契约模式完成当前击杀委托即停，只选择当前地点符合条件的敌人。连续模式需主动选择。')))}</p><div class="gd-actions"><label>${esc(text(bi('Goal','目标')))} <select id="hunt-mode" class="gd-btn secondary" onchange="document.getElementById('hunt-limit').value=this.value==='single'?1:this.value==='contract'?0:5" ${h.active?'disabled':''}>${[['single','One battle','一场即停'],['contract','Current kill contract','当前击杀契约'],['continuous','Continuous','连续狩猎']].map(([id,en,zh])=>`<option value="${id}" ${h.mode===id?'selected':''}>${esc(text(bi(en,zh)))}</option>`).join('')}</select></label><label>${esc(text(bi('Battle cap','场次上限')))} <input id="hunt-limit" type="number" min="0" max="100" value="${h.maxBattles}" class="gd-btn secondary" ${h.active?'disabled':''}></label><label>${esc(text(bi('Pause below HP %','生命低于此百分比时停下')))} <input id="hunt-health" type="number" min="22" max="90" value="${Math.round(h.healthFloor*100)}" class="gd-btn secondary" ${h.active?'disabled':''}></label></div><p class="gd-small">${esc(text(bi('Single mode always stops after one win. For contracts the cap is an additional limit; 0 means the contract target. For continuous mode 0 explicitly means unlimited. Range: 0–100 battles, 22–90% HP. Changing rooms stops the run.','单场模式固定一胜即停。契约模式的场次为额外上限，0 代表以契约目标为准；连续模式填 0 才表示不限场次。场次范围 0–100，生命下限 22–90%。离开当前房间会停止本轮。')))}</p><div class="gd-actions"><button class="gd-btn secondary" onclick="GameDirector.applyHuntSettings()" ${h.active?'disabled':''}>${esc(text(bi('Save hunting goals','保存狩猎目标')))}</button><button class="gd-btn" onclick="${h.active?'toggleAutoHunt()':'GameDirector.startConfiguredHunt()'}">${esc(text(h.active?bi('Pause this run','暂停本轮'):bi('Save and start','保存并开始')))}</button></div><p class="gd-notice">${esc(h.statusText)}</p>${h.contract?`<p>${esc(text(bi('Current contract: ','当前契约：'))+h.contract.description)} · ${h.contract.progress}/${h.contract.target}</p>`:''}${s?`<div class="gd-outcome"><strong>${esc(text(bi('This run’s combat rewards','本轮战斗收益')))}</strong><p>${s.wins} ${esc(text(bi('wins','胜')))} · +${s.xp} XP · +${s.gold} ${esc(text(bi('gold','金币')))} · ${s.loot} ${esc(text(bi('loot items','件掉落')))}</p><p class="gd-small">${esc(h.stopText)}</p></div>`:''}`;
+  }
+
   function journalHtml() {
     const d=ensureState(),o=objective();
     let html=`<div class="gd-kicker">${esc(text(bi('CURRENT CHAPTER','当前篇章')))}</div><h3 class="gd-title">${esc(text(o.chapter))}</h3><p>${esc(text(o.label))}</p><div class="gd-actions"><button class="gd-btn" onclick="GameDirector.close();GameDirector.followObjective()">${esc(text(bi('Take the next step','沿目标前进一步')))}</button><button class="gd-btn secondary" onclick="GameDirector.close();switchRightTab('quests')">${esc(text(bi('Quest & contract details','查看主线与契约')))}</button></div>`;
@@ -552,6 +639,7 @@ const GameDirector = (() => {
     const remainingHere=available();
     if(remainingHere.length) html+=`<button class="gd-choice" onclick="GameDirector.startEncounter('${remainingHere[0].id}')"><strong>◇ ${esc(text(remainingHere[0].title))}</strong><small>${esc(text(bi('An unresolved encounter is here.','这里还有一个等待处理的事件。')))}</small></button>`;
     html+=d.journal.slice().reverse().map(j=>`<article class="gd-journal-entry"><h3>${esc(text(j.title))}</h3><div class="gd-small">${esc(getLang()==='zh'?(WORLD_ROOMS[j.roomId]||{}).titleZh:(WORLD_ROOMS[j.roomId]||{}).title)}</div><p>${esc(text(j.body))}</p></article>`).join('');
+    html+=leadsHtml();
     return html;
   }
   function eventHtml() {
@@ -562,11 +650,13 @@ const GameDirector = (() => {
     }
     const atRoom=state.world.currentRoom===e.room&&!state.combat.inCombat;
     let html=`<div class="gd-kicker">${esc(getLang()==='zh'?WORLD_ROOMS[e.room].titleZh:WORLD_ROOMS[e.room].title)}</div><h3 class="gd-title">${esc(text(e.title))}</h3><p class="gd-opening">${esc(text(e.opening))}</p>`;
+    if(e.id==='final_choice')html+=endingReadinessHtml();
     if(!atRoom)html+=`<p class="gd-notice">${esc(text(bi('Return here outside combat to make your choice.','请返回此处，并在非战斗状态下做出选择。')))}</p>`;
     html+=e.choices.map((c,i)=>{const blocked=requirementReason(c.require)||costReason(c.cost);return `<button class="gd-choice" onclick="GameDirector.resolveChoice(${i})" ${blocked||!atRoom?'disabled':''}><strong>${i+1}. ${esc(text(c.label))}</strong><small>${esc(costSummary(c.cost))}${c.check?` · ${esc(text(statName(c.check.stat)))} ${chance(c)}% ${esc(text(bi('success chance','成功率')))}`:''}</small><small>${esc(effectsSummary(c.result.effects))}</small>${c.failure?`<small class="gd-risk">${esc(text(bi('On failure: ','失败后：'))+effectsSummary(c.failure.effects))}</small>`:''}${blocked?`<small class="gd-risk">${esc(text(blocked))}</small>`:''}</button>`;}).join('');
     html+=`<p class="gd-small">${esc(text(bi('Choices resolve once and are saved. Checks are fixed for this journey; reloading does not reroll them. You can leave and return before choosing.','每次选择只结算一次并写入存档。检定结果随旅程固定，读档不会重新掷骰。做决定前可以离开并返回。')))}</p>`;
     if(d.pending.narration&&d.pending.narration.lang===getLang())html+=`<div class="gd-narration"><div class="gd-kicker">${esc(text(bi('AI atmosphere · authored story above is authoritative','AI补充描写 · 剧情事实以上方原文为准')))} · ${esc(d.pending.narration.source)}</div>${esc(d.pending.narration.text)}</div>`;
     if(narrationNotice)html+=`<p class="gd-notice" role="status">${esc(text(narrationNotice))}</p>`;
+    if(objective().event===e.id && objective().skippable)html+=`<button class="gd-btn secondary" onclick="GameDirector.skipObjective()">${esc(text(bi('Skip this recommendation · revisit later','跳过本条推荐 · 可稍后回访')))}</button>`;
     html+=`<div class="gd-actions"><button class="gd-btn secondary" onclick="GameDirector.requestNarration()" ${narrationBusyToken===d.pending.token?'disabled':''}>${esc(text(narrationBusyToken===d.pending.token?bi('The DM is writing…','DM 正在描写……'):bi('Ask the DM to describe the scene','请 DM 描写此场景')))}</button><button class="gd-btn secondary" onclick="GameDirector.close()">${esc(text(bi('Decide later','稍后决定')))}</button></div>`;
     return html;
   }
@@ -598,7 +688,7 @@ const GameDirector = (() => {
     rendering=true;
     try {
       mount();const d=ensureState(),o=objective(),here=available(),card=document.getElementById('gd-journey');
-      if(card)card.innerHTML=`<div class="gd-row"><span class="gd-kicker">${esc(text(bi('YOUR JOURNEY','你的旅程')))}</span><span class="gd-small">${o.progress}/${o.total}</span></div><h3 class="gd-title">${esc(text(o.chapter))}</h3><div class="gd-progress"><i style="width:${Math.round(o.progress/o.total*100)}%"></i></div><p>${esc(text(o.label))}</p><div class="gd-seals">${[['root',bi('Root','根')],['memory',bi('Memory','记忆')],['fire',bi('Fire','火')]].map(([k,v])=>`<span class="gd-tag ${d.flags['sigil_'+k]?'active':''}">${d.flags['sigil_'+k]?'◆':'◇'} ${esc(text(v))}</span>`).join('')}<span class="gd-tag">${esc(text(bi('Trust','信任')))} ${allianceScore()}</span></div><div class="gd-actions"><button class="gd-btn" onclick="GameDirector.followObjective()">${esc(text(bi('Next step','目标下一步')))}</button><button class="gd-btn secondary" onclick="GameDirector.open('journal')">${esc(text(bi('Journal & choices','日志与抉择')))}</button>${here.length?`<button class="gd-btn secondary" onclick="GameDirector.startEncounter()">◇ ${esc(text(bi('Story here','此地故事')))}</button>`:''}</div>`;
+      if(card)card.innerHTML=`<div class="gd-row"><span class="gd-kicker">${esc(text(bi('YOUR JOURNEY','你的旅程')))}</span><span class="gd-small">${o.progress}/${o.total}</span></div><h3 class="gd-title">${esc(text(o.chapter))}</h3><div class="gd-progress"><i style="width:${Math.round(o.progress/o.total*100)}%"></i></div><p>${esc(text(o.label))}</p><div class="gd-seals">${[['root',bi('Root','根')],['memory',bi('Memory','记忆')],['fire',bi('Fire','火')]].map(([k,v])=>`<span class="gd-tag ${d.flags['sigil_'+k]?'active':''}">${d.flags['sigil_'+k]?'◆':'◇'} ${esc(text(v))}</span>`).join('')}<span class="gd-tag">${esc(text(bi('Trust','信任')))} ${allianceScore()}</span></div><div class="gd-actions"><button class="gd-btn" onclick="GameDirector.followObjective()">${esc(text(bi('Next step','目标下一步')))}</button><button class="gd-btn secondary" onclick="GameDirector.open('journal')">${esc(text(bi('Journal & choices','日志与抉择')))}</button><button class="gd-btn secondary" onclick="GameDirector.open('guild')">${esc(text(bi('Guild & companions','公会与伙伴')))}</button><button class="gd-btn secondary" onclick="GameDirector.open('hunt')">${esc(text(bi('Hunt goals','狩猎目标')))}</button>${o.skippable?`<button class="gd-btn secondary" onclick="GameDirector.skipObjective()">${esc(text(bi('Skip this lead','暂缓此线索')))}</button>`:''}${here.length?`<button class="gd-btn secondary" onclick="GameDirector.startEncounter()">◇ ${esc(text(bi('Story here','此地故事')))}</button>`:''}</div>`;
       const chips=document.getElementById('room-entities-chips');
       if(chips){
         const old=chips.querySelector('[onclick="openMysteryChestOrShrine()"]');
@@ -610,14 +700,24 @@ const GameDirector = (() => {
       if(contractButton){contractButton.title=text(bi('Guild Hall only. Complete and claim the current board before taking the next one.','仅公会大厅可领取。请先完成并领取本批全部契约。'));}
       renderGuidance(o);
       const modal=document.getElementById('gd-modal');if(!modal)return;modal.hidden=!modalOpen;if(!modalOpen)return;
-      const key=JSON.stringify([getLang(),modalTab,d.pending,d.lastOutcome,d.completed,d.flags,d.trust,d.journal.length,narrationBusyToken,narrationNotice,state.world.currentRoom,state.combat.inCombat,state.player.gold,state.player.sta,state.player.mp,state.player.inventory,state.player.stats]);
+      // Resource regeneration must not replace a form while a player is
+      // choosing a set or editing an expedition. Each tab tracks only its view.
+      const details=modalTab==='guild'?[CombatDirector.getGuildContext(),state.player.gold,state.player.shards]
+        :modalTab==='hunt'?CombatDirector.getHuntContext()
+        :[d.pending,d.lastOutcome,d.completed,d.skipped,d.revisit,d.flags,d.trust,d.journal.length,narrationBusyToken,narrationNotice,state.player.gold,state.player.sta,state.player.mp,state.player.inventory,state.player.stats];
+      const key=JSON.stringify([getLang(),modalTab,state.world.currentRoom,state.combat.inCombat,details]);
       if(key===lastRenderKey)return;lastRenderKey=key;
-      document.getElementById('gd-modal-head').innerHTML=`<div class="gd-row"><div><div class="gd-kicker">AETHELGARD · ${esc(text(bi('CHRONICLES','编年史')))}</div><h2 id="gd-modal-title">${esc(text(bi('The choices you carry','你带在身上的选择')))}</h2></div><button class="gd-btn secondary" onclick="GameDirector.close()" aria-label="${esc(text(bi('Close','关闭')))}">✕</button></div><div class="gd-tabs"><button class="gd-btn ${modalTab==='event'?'':'secondary'}" onclick="GameDirector.changeTab('event')">${esc(text(bi('Encounter','当前事件')))}</button><button class="gd-btn ${modalTab==='journal'?'':'secondary'}" onclick="GameDirector.changeTab('journal')">${esc(text(bi('Journey journal','旅程日志')))}</button></div>`;
-      document.getElementById('gd-modal-body').innerHTML=modalTab==='journal'?journalHtml():eventHtml();
+      document.getElementById('gd-modal-head').innerHTML=`<div class="gd-row"><div><div class="gd-kicker">AETHELGARD · ${esc(text(bi('CHRONICLES','编年史')))}</div><h2 id="gd-modal-title">${esc(text(bi('The choices you carry','你带在身上的选择')))}</h2></div><button class="gd-btn secondary" onclick="GameDirector.close()" aria-label="${esc(text(bi('Close','关闭')))}">✕</button></div><div class="gd-tabs"><button class="gd-btn ${modalTab==='event'?'':'secondary'}" onclick="GameDirector.changeTab('event')">${esc(text(bi('Encounter','当前事件')))}</button><button class="gd-btn ${modalTab==='journal'?'':'secondary'}" onclick="GameDirector.changeTab('journal')">${esc(text(bi('Journey journal','旅程日志')))}</button><button class="gd-btn ${modalTab==='guild'?'':'secondary'}" onclick="GameDirector.changeTab('guild')">${esc(text(bi('Guild services','公会服务')))}</button><button class="gd-btn ${modalTab==='hunt'?'':'secondary'}" onclick="GameDirector.changeTab('hunt')">${esc(text(bi('Hunt goals','狩猎目标')))}</button></div>`;
+      const selectedGuild=modalTab==='guild'?{slot:document.getElementById('guild-set-slot')?.value,setId:document.getElementById('guild-set-id')?.value}:null;
+      document.getElementById('gd-modal-body').innerHTML=modalTab==='journal'?journalHtml():modalTab==='guild'?guildHtml():modalTab==='hunt'?huntHtml():eventHtml();
+      if(selectedGuild){
+        if(['weapon','armor','helm','ring','relic'].includes(selectedGuild.slot))document.getElementById('guild-set-slot').value=selectedGuild.slot;
+        if(Object.hasOwn(DIABLO_SETS,selectedGuild.setId))document.getElementById('guild-set-id').value=selectedGuild.setId;
+      }
     } finally{rendering=false;}
   }
 
-  return {ensureState,getContext,onAction,startEncounter,resolveChoice,setNarration,discover,available,open,close,changeTab,render,sync,objective,followObjective,requestNarration,refreshContracts,canMutate,
+  return {ensureState,getContext,onAction,skipObjective,revisit,unfinishedLeads,applyHuntSettings,startConfiguredHunt,redeemSelectedSet,travelToGuild,startEncounter,resolveChoice,setNarration,discover,available,open,close,changeTab,render,sync,objective,followObjective,requestNarration,refreshContracts,canMutate,
     catalog:()=>({encounters:encounters.map(e=>({id:e.id,room:e.room,title:e.title,choices:e.choices.length})),discoveryCount:discoveryRows.length}),
     isModalOpen:()=>modalOpen};
 })();
@@ -637,6 +737,9 @@ window.refreshBounties=()=>GameDirector.refreshContracts();
   const previousCommand=executeCommand;
   executeCommand=function(raw){const parts=String(raw||'').trim().split(/\s+/),cmd=(parts[0]||'').toLowerCase();
     if(['journal','journey','日志','旅程'].includes(cmd))return GameDirector.open('journal');
+    if(['guild','公会'].includes(cmd))return GameDirector.open('guild');
+    if(['skip','暂缓'].includes(cmd))return GameDirector.skipObjective();
+    if(['hunt','狩猎'].includes(cmd))return GameDirector.open('hunt');
     if(['encounter','event','奇遇','事件'].includes(cmd))return GameDirector.startEncounter();
     if(['inspect','调查'].includes(cmd))return GameDirector.discover();
     if(['choose','选择'].includes(cmd))return GameDirector.resolveChoice(Number(parts[1])-1);

@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { createHarness, projectRoot } from './harness.mjs';
-import { openingChapters, fullCampaign } from './harness-campaign.mjs';
+import { openingChapters, fullCampaign, guidedCampaign } from './harness-campaign.mjs';
 
-const report = { generatedAt: null, scope: 'Reconstructed tests executed against recovered v10 source; historical test counts are not reused.', policy: 'Actual moves, authored choices, earned primary attributes and class talent, owned gear upgrades, nearest safe rest, visible intents, skills, overdrive and guard. No injected campaign progress, rewards, levels, victory flags, or health.', openings: [], main: null, passedCases: [] };
+const report = { generatedAt: null, scope: 'V11 production rules: legal authored campaign and default guided journey; no injected progression.', policy: 'Actual moves, authored choices, earned primary attributes and class talent, owned gear upgrades, nearest safe rest, visible intents, skills, overdrive and guard. No injected campaign progress, rewards, levels, victory flags, or health.', openings: [], guided: [], main: null, passedCases: [] };
 let expectedCases = 0;
 function verified(name, fn) {
   expectedCases++;
@@ -59,11 +59,19 @@ verified('Legal five-chapter Vanguard campaign, meaningful guard branches, all 2
   } finally { h.dispose(); }
 });
 
+
+for (const classId of ['vanguard', 'arcanist', 'shadowblade']) {
+  verified(`${classId} follows the default guided journey through 23 stories and a reachable restoration ending`, () => {
+    const h=createHarness({classId,seed:1234});
+    try { report.guided.push(guidedCampaign(h)); } finally { h.dispose(); }
+  });
+}
+
 after(() => {
   report.generatedAt = new Date().toISOString();
   report.passed = report.passedCases.length === expectedCases;
   report.expectedCases = expectedCases;
   report.sourceSha256 = Object.fromEntries(['core', 'gameplay', 'combat', 'bootstrap'].map(name => [name, createHash('sha256').update(fs.readFileSync(path.join(projectRoot, 'src', `${name}.js`))).digest('hex')]));
   const dir = path.join(projectRoot, 'test-results'); fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'campaign-recovery.json'), JSON.stringify(report, null, 2) + '\n');
+  fs.writeFileSync(path.join(dir, 'campaign-v11.json'), JSON.stringify(report, null, 2) + '\n');
 });

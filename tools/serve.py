@@ -2,11 +2,13 @@
 """Serve Aethelgard on this computer, with a fixed local Ollama bridge."""
 from __future__ import annotations
 import argparse
+import errno
 import http.client
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path, PurePosixPath
 import re
+import tempfile
 import threading
 from urllib.parse import unquote, urlsplit
 import webbrowser
@@ -149,14 +151,60 @@ def make_server(port=8765, directory=None):
     return ThreadingHTTPServer(("127.0.0.1", port), handler)
 
 
+def start_server(port=None, directory=None):
+    """Keep a stable origin; try a bounded fallback only for the default launcher."""
+    root = Path(directory or ROOT)
+    if port is not None:
+        if not 0 <= port <= 65535:
+            raise ValueError("Port must be between 0 and 65535.")
+        return make_server(port, root), None
+    config = root / ".launcher-port.json"
+    preferred = 8765
+    try:
+        if config.stat().st_size <= 4096:
+            saved = json.loads(config.read_text(encoding="utf-8")).get("port")
+            if isinstance(saved, int) and not isinstance(saved, bool) and 1024 <= saved <= 65535:
+                preferred = saved
+    except (OSError, ValueError, AttributeError):
+        pass
+    candidates = list(dict.fromkeys([preferred, *range(18865, 18875)]))
+    last_error = None
+    for candidate in candidates:
+        try:
+            server = make_server(candidate, root)
+        except OSError as error:
+            if error.errno not in (errno.EADDRINUSE, errno.EACCES) and getattr(error, "winerror", None) not in (10013, 10048):
+                raise
+            last_error = error
+            continue
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=root, prefix=".launcher-port-", suffix=".tmp", delete=False) as output:
+                temporary = Path(output.name)
+                json.dump({"port": server.server_port}, output)
+            temporary.replace(config)
+        except OSError:
+            if temporary:
+                temporary.unlink(missing_ok=True)
+        return server, preferred if candidate != preferred else None
+    raise OSError(f"No available launcher port. Try --port 18880. Last error: {last_error}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, help="Use this exact port; default remembers a free local port (starts at 8765)")
     parser.add_argument("--open", action="store_true", dest="open_browser")
     args = parser.parse_args()
-    server = make_server(args.port)
+    try:
+        server, previous_port = start_server(args.port)
+    except (OSError, ValueError) as error:
+        parser.exit(1, f"Could not start Aethelgard: {error}\nTry another port, for example: python tools/serve.py --port 18880 --open\n")
     url = f"http://127.0.0.1:{server.server_port}/"
-    print(f"Aethelgard v10: {url}\nKeep this window open. Press Ctrl+C to stop.", flush=True)
+    if previous_port is not None:
+        print(f"Port {previous_port} is unavailable. This launcher will remember {server.server_port}.\n"
+              "Browser saves belong to their original port. Export/import JSON when changing ports.\n"
+              "原端口无法使用，已记住新端口。浏览器存档按端口区分，更换地址时请导出/导入 JSON。", flush=True)
+    print(f"Aethelgard v11: {url}\nKeep this window open. Press Ctrl+C to stop.", flush=True)
     if args.open_browser:
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()
     try:

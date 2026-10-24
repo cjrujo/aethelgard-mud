@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path, PurePosixPath
+import re
 import stat
 import tempfile
 import zipfile
@@ -19,10 +20,11 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 ARCHIVE_ROOT = "aethelgard-mud"
 REQUIRED_FILES = (
-    "index.html", "open_world_mud.html", "sw.js", "assets/game.css", "assets/ai-worker.js",
+    "index.html", "open_world_mud.html", "sw.js", "build-info.json", "assets/game.css", "assets/ai-worker.js",
     "models/registry.json", "tools/serve.py", "tools/prepare_offline.py", "tools/package_release.py",
     "start_Windows.cmd", "start_unix.sh", "README.md", "src/build_mud_game.py",
-    "package.json", "package-lock.json", "tailwind.config.cjs",
+    "package.json", "package-lock.json", "tailwind.config.cjs", "cloudflare-worker/entry.js", "cloudflare-worker/worker.js", "cloudflare-worker/receipts.js",
+    "cloudflare-worker/build-info.js", "cloudflare-worker/wrangler.toml",
 )
 SOURCE_DIRECTORIES = ("assets", "docs", "src", "tests", ".github", "cloudflare-worker")
 OPTIONAL_FILES = (".gitignore", ".gitattributes", "LICENSE", "LICENSE.txt", "LICENSE.md", "NOTICE", "NOTICE.txt")
@@ -148,7 +150,10 @@ def create_release(root=None, model_key=None, output=None):
     if model_key:
         offline_files, manifest = selected_offline_files(root, registry, model_key)
         files.update(offline_files)
-    name = f"aethelgard-v10-{model_key}-offline.zip" if model_key else "aethelgard-v10-source.zip"
+    version = read_json(root / "package.json")["version"]
+    if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,2}(?:-[a-zA-Z0-9.-]+)?", version):
+        raise ValueError("Invalid package version for release filename")
+    name = f"aethelgard-v{version}-{model_key}-offline.zip" if model_key else f"aethelgard-v{version}-source.zip"
     destination = Path(output).resolve() if output else root / "dist-release" / name
     if destination.suffix.lower() != ".zip":
         raise ValueError("Release output must be a .zip file")
@@ -182,7 +187,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=[model["key"] for model in registry["models"]],
                         help="Include only this exact registry model and its verified offline runtime")
-    parser.add_argument("--output", type=Path, help="Output ZIP path; default is dist-release/aethelgard-v10-*.zip")
+    parser.add_argument("--output", type=Path, help="Output ZIP path; default is dist-release/aethelgard-v<VERSION>-*.zip")
     args = parser.parse_args(argv)
     try:
         result = create_release(model_key=args.model, output=args.output)

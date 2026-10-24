@@ -1,6 +1,6 @@
 {
   "name": "aethelgard-living-chronicles",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "private": true,
   "description": "An offline-capable browser RPG with genuine local model inference and an optional multiplayer realm.",
   "scripts": {

@@ -211,3 +211,40 @@ export function fullCampaign(h) {
   delete h.context.endingCheckpoint;
   return result;
 }
+
+// V11 route test: use the actual recommended journey step and the live tactical
+// button. We choose authored options, gather permitted nodes along the route,
+// spend earned points and legally walk to settlements for recovery.
+export function guidedCampaign(h) {
+  const preferred={first_oath:0,tavern_courier:0,wounded_scout:0,brom_apprentice:1,mill_wheel:2,menhir_root:0,elara_plan:0,bandit_ledger:0,river_cart:0,bone_ferry:1,vesper_names:0,forbidden_page:1,memory_bell:0,freed_souls:0,borin_valves:1,furnace_fire:0,bridge_rescue:0,geode_echo:0,rift_anchor:0,chrono_self:0,observatory_lens:0,conduit_choice:0,final_choice:0};
+  const events=[],battles=[];let steps=0,activeBattle=null;
+  spendEarnedPoints(h);restNearest(h);
+  while(!h.state.director?.ending && steps++<450) {
+    if(h.state.combat.inCombat) {
+      if(!activeBattle)activeBattle={id:h.state.combat.enemy.id,turns:0,kills:h.state.telemetry.kills};
+      h.run('renderAll()');
+      assert.ok(h.json('CombatDirector.getContext().decisions.recommendedAction'),'combat should have a legal recommendation');
+      h.document.getElementById('btn-proceed-next-step').click();activeBattle.turns++;
+      assert.ok(activeBattle.turns<65,'a guided battle must make progress');
+      if(!h.state.combat.inCombat) {
+        assert.ok(h.state.telemetry.kills>activeBattle.kills,`guided battle ended without victory: ${activeBattle.id}`);
+        battles.push({id:activeBattle.id,turns:activeBattle.turns});activeBattle=null;
+        equipOwnedUpgrades(h);spendEarnedPoints(h);restNearest(h);
+      }
+      continue;
+    }
+    if(h.state.director.pending) {
+      const id=h.state.director.pending.id,index=preferred[id];assert.ok(Number.isInteger(index),`Unexpected story ${id}`);
+      const result=h.run(`GameDirector.resolveChoice(${index})`);
+      assert.equal(result.ok,true,`${id} choice blocked: ${result.reason}`);events.push(id);
+      h.run('GameDirector.close()');equipOwnedUpgrades(h);spendEarnedPoints(h);restNearest(h);continue;
+    }
+    const harvestable=h.run(`(WORLD_ROOMS[state.world.currentRoom].nodes||[]).some(n=>!state.world.harvestedCooldowns[state.world.currentRoom+':'+n.id]&&CombatDirector.harvestAccess(n.item).allowed)`);
+    if(harvestable)h.run('harvestRoomNodes()');
+    h.run('GameDirector.followObjective()');
+  }
+  assert.ok(steps<450,'guidance must not loop or strand a player');
+  assert.equal(h.state.quests.completed.length,5);assert.equal(h.state.director.ending,'restoration');
+  assert.equal(events.length,23);assert.equal(new Set(events).size,23);
+  return {classId:h.state.player.classId,level:h.state.player.level,steps,events,battles,ending:h.state.director.ending};
+}

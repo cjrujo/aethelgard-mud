@@ -1,0 +1,822 @@
+{
+  "timestamp": "2026-10-24T10:25:58.115Z",
+  "runtime": "@huggingface/transformers@3.8.1",
+  "model": "onnx-community/Qwen3-0.6B-ONNX",
+  "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+  "dtype": "q8",
+  "registryDtype": "q8",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "hostLabel": "v11-ai-persona-targeted-native-cpu",
+    "workingDirectory": "/workspace/scratch/81c1b808ed78/aethelgard-improvements"
+  },
+  "backend": "native ONNX CPU, not browser WASM validation",
+  "promptSource": {
+    "src/core.js": "8100ef7afaf68d9a9032fd321827ca45df95feaebfab7bea2638b81efa4e1313",
+    "src/gameplay.js": "743bfcf78d397c2b543f1fff1b5a04fa02eeceb9bdf4461412c8df6edce0dca9",
+    "src/combat.js": "36d7c659cbd5a58c95eed5a8ab8debc14f2bfbb3cb691aa91bea7064146895d3",
+    "src/ai-dm.js": "1fb9c618e864c0971d714a821b95e4002420b996c7449a9f73091943518e37a5",
+    "src/online.js": "32831ed415e76c6745d65869cc9e27d81e89050c37d2a031442de53a9d417f98",
+    "src/bootstrap.js": "79dc4d48b8211980705f08b696f317722a7b672b3db819c42eaee86517d40a1c",
+    "assets/ai-worker.js": "190a184b0e95c731d6ab98162f4d99223495aefde0124b4ad2c80540884617f6",
+    "tests/harness.mjs": "648e57643ae6609df61f6168abc53386b6836941d110e0da1c31369f74d32048",
+    "tests/real-model.mjs": "25305e8ddd3dd70016ef0c2275cf64c63b16c43de2dac8b6e56683bd9fc339ea"
+  },
+  "chatTemplateOptions": {
+    "enable_thinking": false
+  },
+  "evaluation": "Required facts and selected contradictions are checked. Raw outputs still need semantic review; narrative samples never pass on nonempty output alone.",
+  "selectedLanguages": [
+    "zh"
+  ],
+  "selectedCases": [
+    "long-memory",
+    "npc-relationship"
+  ],
+  "completeSuite": false,
+  "generation": {
+    "max_new_tokens": 128,
+    "do_sample": false,
+    "repetition_penalty": 1,
+    "return_full_text": false,
+    "add_special_tokens": false
+  },
+  "status": "failed",
+  "loadMs": 3032.146588,
+  "results": [
+    {
+      "case": "zh-long-memory",
+      "expected": {
+        "rememberedName": "米拉",
+        "promise": "寻找信使",
+        "origin": "Explicit player statement stored outside eight intervening user turns; no invented assistant history."
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_town_square",
+          "name": "橡木港城镇广场",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港北哨门",
+            "e": "铁心铁匠铺",
+            "w": "月瓣炼金工坊",
+            "s": "镀金狮鹫酒馆",
+            "u": "冒险者公会大厅"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "我的姐姐叫什么名字？我承诺过什么？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你负责回忆玩家明确提供的资料。逐项回答问题；若问姓名与承诺，两项都要回答。用“你的”称呼玩家的亲友，用“你承诺”复述玩家的承诺。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "玩家明确提供的记忆（不是世界状态的证明）\n玩家的承诺（不代表已履行）：我承诺寻找信使\n玩家明确说过：姐姐叫米拉。\n\n我的姐姐叫什么名字？我承诺过什么？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你负责回忆玩家明确提供的资料。逐项回答问题；若问姓名与承诺，两项都要回答。用“你的”称呼玩家的亲友，用“你承诺”复述玩家的承诺。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n玩家明确提供的记忆（不是世界状态的证明）\n玩家的承诺（不代表已履行）：我承诺寻找信使\n玩家明确说过：姐姐叫米拉。\n\n我的姐姐叫什么名字？我承诺过什么？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 157,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "56568",
+            "100668",
+            "104843",
+            "99673",
+            "100692",
+            "103008",
+            "101111",
+            "1773",
+            "100062",
+            "47882",
+            "102104",
+            "86119",
+            "24968",
+            "100155",
+            "56007",
+            "66187",
+            "57218",
+            "104327",
+            "3837",
+            "112794",
+            "104278",
+            "102104",
+            "1773",
+            "11622",
+            "2073",
+            "103929",
+            "854",
+            "112451",
+            "99673",
+            "9370",
+            "118146",
+            "3837",
+            "11622",
+            "2073",
+            "56568",
+            "104327",
+            "854",
+            "58364",
+            "41932",
+            "99673",
+            "9370",
+            "104327",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99673",
+            "100692",
+            "103008",
+            "101376",
+            "9909",
+            "99520",
+            "99489",
+            "44091",
+            "9370",
+            "104022",
+            "23083",
+            "99673",
+            "9370",
+            "104327",
+            "9909",
+            "108259",
+            "36667",
+            "104436",
+            "7552",
+            "5122",
+            "35946",
+            "104327",
+            "104243",
+            "21317",
+            "32555",
+            "198",
+            "99673",
+            "100692",
+            "106183",
+            "5122",
+            "105341",
+            "99882",
+            "72261",
+            "72225",
+            "3407",
+            "97611",
+            "105341",
+            "99882",
+            "99245",
+            "101419",
+            "11319",
+            "35946",
+            "104327",
+            "38182",
+            "99245",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "你的姐姐叫米拉。你承诺过什么？",
+          "rawOutput": [
+            {
+              "generated_text": "你的姐姐叫米拉。你承诺过什么？"
+            }
+          ],
+          "outputTokens": 12,
+          "latencyMs": 2949.2083930000003,
+          "firstTokenMs": 1084.0851749999997,
+          "tokensPerSecond": 4.068888461216311
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "remembers the supplied name",
+          "passed": true
+        },
+        {
+          "name": "answers the remembered-person question",
+          "passed": true
+        },
+        {
+          "name": "does not deny supplied memory",
+          "passed": true
+        },
+        {
+          "name": "remembers the explicit promise",
+          "passed": false
+        },
+        {
+          "name": "does not mark the promise completed",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-npc-relationship",
+      "expected": {
+        "trust": -5,
+        "flag": "scout_abandoned",
+        "manualReview": [
+          "Speaks as Mara to the traveler, not to Mara.",
+          "Reflects actual distrust and taking the wounded ranger’s purse.",
+          "Does not invent a fine, denied access, combat, or a new reward."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "id": "innkeeper_mara",
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "faction": "town",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": -5,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {
+            "scout_abandoned": true
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，你为什么对我有所戒备？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。请明确引用已发生事实中的具体行为来解释态度，说清是谁做了什么，并用这一行为回答“为什么”。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 -5；态度：不信任。\n已发生的事实：旅人拿走受伤游侠的钱袋后离开。\n\n玩家提问: 玛拉，你为什么对我有所戒备？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。请明确引用已发生事实中的具体行为来解释态度，说清是谁做了什么，并用这一行为回答“为什么”。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 -5；态度：不信任。\n已发生的事实：旅人拿走受伤游侠的钱袋后离开。\n\n玩家提问: 玛拉，你为什么对我有所戒备？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 216,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "3837",
+            "105051",
+            "28946",
+            "20412",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "100148",
+            "111256",
+            "101419",
+            "112451",
+            "103992",
+            "1773",
+            "14880",
+            "100692",
+            "103346",
+            "36667",
+            "99726",
+            "101349",
+            "101047",
+            "100398",
+            "101070",
+            "36407",
+            "104136",
+            "102316",
+            "3837",
+            "36587",
+            "79766",
+            "105518",
+            "104209",
+            "99245",
+            "90395",
+            "11622",
+            "100147",
+            "101070",
+            "102104",
+            "2073",
+            "100678",
+            "55807",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "104283",
+            "28946",
+            "5122",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "1773",
+            "116376",
+            "28946",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "23031",
+            "99283",
+            "101294",
+            "104283",
+            "3837",
+            "100148",
+            "111300",
+            "101419",
+            "108804",
+            "103992",
+            "66187",
+            "8997",
+            "101294",
+            "5122",
+            "39",
+            "27541",
+            "18861",
+            "9592",
+            "10236",
+            "224",
+            "231",
+            "79599",
+            "106446",
+            "28946",
+            "8997",
+            "107022",
+            "115098",
+            "5122",
+            "103218",
+            "75405",
+            "99734",
+            "1773",
+            "102497",
+            "481",
+            "20",
+            "24968",
+            "102316",
+            "5122",
+            "16530",
+            "102497",
+            "8997",
+            "36667",
+            "106806",
+            "101349",
+            "5122",
+            "99407",
+            "17340",
+            "99674",
+            "99314",
+            "105497",
+            "82894",
+            "102530",
+            "106714",
+            "100509",
+            "33447",
+            "104093",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "3837",
+            "56568",
+            "100678",
+            "102788",
+            "101192",
+            "101372",
+            "56278",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "玛拉以不信任的态度回应了Kaelen的提问，但具体行为和事实依据需要根据已发生的事实来解释。",
+          "rawOutput": [
+            {
+              "generated_text": "玛拉以不信任的态度回应了Kaelen的提问，但具体行为和事实依据需要根据已发生的事实来解释。"
+            }
+          ],
+          "outputTokens": 29,
+          "latencyMs": 6376.347852000001,
+          "firstTokenMs": 1855.4089079999994,
+          "tokensPerSecond": 4.54805802210177
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "does not call the traveler Mara",
+          "passed": true
+        },
+        {
+          "name": "does not invent an item reward",
+          "passed": true
+        },
+        {
+          "name": "reflects the established trust or choice",
+          "passed": true
+        },
+        {
+          "name": "grounds the attitude in the recorded ranger/purse deed",
+          "passed": false
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passedCases": 0,
+  "failedCases": 2,
+  "manualReviewCases": 0
+}
