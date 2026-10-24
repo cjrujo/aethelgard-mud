@@ -611,7 +611,7 @@
 
     function createInitialState() {
       return {
-        version: "v10",
+        version: "v11",
         lang: "en",
         tickCount: 1,
         tickSpeed: "normal",
@@ -772,6 +772,7 @@
         crit = Math.min(85, crit + 10);
       } else if (p.stance === "defensive") {
         atk = Math.round(atk * 0.85);
+        mag = Math.round(mag * 0.85);
         def = Math.round(def * 1.35);
       }
 
@@ -2050,14 +2051,11 @@
     }
 
     function toggleAutoHunt() {
-      state.autoHunt = !state.autoHunt;
-      addLog(
-        state.autoHunt ? "🤖 Continuous Auto-Hunt enabled: each victory starts another encounter here. Toggle off to stop automatic actions." : "🤖 Auto-Hunt disabled. Finish or retreat from any current battle manually.",
-        "combat",
-        state.autoHunt ? "text-emerald-300" : "text-slate-400",
-        state.autoHunt ? "🤖 连续自动狩猎已开启：获胜后会继续挑战此地的敌人。再次点击可停止自动操作。" : "🤖 自动狩猎已关闭。若仍在战斗中，请手动完成或撤退。"
-      );
+      // The combat module owns goals, resource checks and termination summaries.
+      if (typeof CombatDirector === "undefined") return false;
+      const result = state.autoHunt ? CombatDirector.stopHunt("manual") : CombatDirector.startHunt();
       renderAll();
+      return result;
     }
 
     function setLogFilter(filter) {
@@ -3723,7 +3721,7 @@
                 <div class="text-[10px] text-slate-400">${escapeHtml(trEntityDesc(it))}</div>
               </div>
               <button onclick="buyShopItem('${name.replace(/'/g, "\\'")}')" class="px-2 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/50 text-[10px] font-mono-mud font-semibold">
-                ${escapeHtml(uiText("buyAction"))} ${it.value}g
+                ${escapeHtml(uiText("buyAction"))} ${typeof CombatDirector !== "undefined" ? CombatDirector.shopPrice(name) : it.value}g
               </button>
             </div>
           `;
@@ -4477,7 +4475,8 @@
       if (petBtn) {
         const petName = getLang() === "zh" ? pet.nameZh : pet.name;
         const petPrefix = getLang() === "zh" ? "伙伴" : "Pet";
-        petBtn.textContent = `${pet.icon} ${petPrefix}: ${petName} (Lv.${state.fun.companionLevel + state.player.level - 1})`;
+        petBtn.textContent = `${pet.icon} ${petPrefix}: ${petName} (Lv.${state.fun.companionLevel})`;
+        petBtn.title = getLang() === "zh" ? "切换已解锁伙伴；在公会使用裂隙碎片培养伙伴。" : "Switch unlocked companions; train them with Rift shards at the Guild.";
       }
 
       const ultBtn = document.getElementById("btn-ultimate-overdrive");

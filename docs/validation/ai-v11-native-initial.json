@@ -1,0 +1,2932 @@
+{
+  "timestamp": "2026-10-24T10:20:57.212Z",
+  "runtime": "@huggingface/transformers@3.8.1",
+  "model": "onnx-community/Qwen3-0.6B-ONNX",
+  "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+  "dtype": "q8",
+  "registryDtype": "q8",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "hostLabel": "v11-ai-improvements-native-cpu",
+    "workingDirectory": "/workspace/scratch/81c1b808ed78/aethelgard-improvements"
+  },
+  "backend": "native ONNX CPU, not browser WASM validation",
+  "promptSource": {
+    "src/core.js": "a1ae8018cabe7d842ad57b7c889621f28a6f4072c74f3b6c972d0fe8ec6f2427",
+    "src/gameplay.js": "8f8b43b1a739f863aac2adecd1fdedff4059e6575c6d152ca2278fa0856d27c6",
+    "src/combat.js": "b0a016d97736e874ee84aad73cf4c1941513a92e3fb42bd337c2e68eb13f7b33",
+    "src/ai-dm.js": "0ccb578c678224a3d369c9669a3c735c7dc10970420648711fd1544ebddbfe5b",
+    "src/online.js": "afaa15ed7c04a84e09e42b630dfea4a846e1cfdccc5c1d7d85aa7f529880b292",
+    "src/bootstrap.js": "a1d3815c7915793ef860166197e5143c9e4683543b1f520efb98996fb66a936a",
+    "assets/ai-worker.js": "190a184b0e95c731d6ab98162f4d99223495aefde0124b4ad2c80540884617f6",
+    "tests/harness.mjs": "648e57643ae6609df61f6168abc53386b6836941d110e0da1c31369f74d32048",
+    "tests/real-model.mjs": "3d3514037e30780a1abab4cb5a4201dc45274c16b9472c589e98dec586e86458"
+  },
+  "chatTemplateOptions": {
+    "enable_thinking": false
+  },
+  "evaluation": "Required facts and selected contradictions are checked. Raw outputs still need semantic review; narrative samples never pass on nonempty output alone.",
+  "selectedLanguages": [
+    "zh"
+  ],
+  "selectedCases": [
+    "mixed-guard",
+    "cast-interrupt",
+    "long-memory",
+    "npc",
+    "npc-relationship",
+    "tavern"
+  ],
+  "completeSuite": false,
+  "generation": {
+    "max_new_tokens": 128,
+    "do_sample": false,
+    "repetition_penalty": 1,
+    "return_full_text": false,
+    "add_special_tokens": false
+  },
+  "status": "failed",
+  "loadMs": 3057.811326,
+  "results": [
+    {
+      "case": "zh-mixed-guard",
+      "expected": {
+        "action": "guard",
+        "interruptAffordable": false,
+        "stamina": 0,
+        "interruptCost": 18,
+        "effect": {
+          "cancelsCurrentAction": true,
+          "cancelsFollowingHeavy": true,
+          "exposesNextTurn": true,
+          "nextIntent": "recover",
+          "descriptionEn": "Cancel the charge. If the enemy survives, its next turn is exposed (+35% damage taken), replacing the follow-up heavy blow.",
+          "descriptionZh": "取消蓄力。若敌人存活，下一回合转为破绽（受到伤害+35%），替代接续重击。"
+        }
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "0/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_wilds_trail",
+          "name": "苔藓林间小径",
+          "safe": false,
+          "biome": "Whispering Wilds",
+          "exits": {
+            "s": "橡木港北哨门",
+            "n": "游侠前哨营地",
+            "e": "废弃水磨坊",
+            "w": "荧光孢子林"
+          },
+          "resources": [
+            "Moonpetal Herb"
+          ]
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": {
+          "name": "荆棘野狼",
+          "hp": 50,
+          "intent": "charge"
+        },
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": {
+            "id": "briar_wolf",
+            "name": "Briar Wolf",
+            "nameZh": "荆棘野狼",
+            "level": 1,
+            "boss": false,
+            "hp": 50,
+            "maxHp": 50,
+            "intent": "charge",
+            "intentEn": "Charging a heavy blow — interrupt now",
+            "intentZh": "正在蓄力重击——现在可以打断",
+            "turn": 1,
+            "phase": null,
+            "phaseName": null,
+            "tacticalHint": null,
+            "effects": []
+          },
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": true
+            }
+          ],
+          "decisions": {
+            "guard": "reduces incoming damage by 65% this turn; restores 18 STA and 8 MP",
+            "interrupt": {
+              "staminaCost": 18,
+              "canPay": false,
+              "effectiveNow": true,
+              "effect": {
+                "cancelsCurrentAction": true,
+                "cancelsFollowingHeavy": true,
+                "exposesNextTurn": true,
+                "nextIntent": "recover",
+                "descriptionEn": "Cancel the charge. If the enemy survives, its next turn is exposed (+35% damage taken), replacing the follow-up heavy blow.",
+                "descriptionZh": "取消蓄力。若敌人存活，下一回合转为破绽（受到伤害+35%），替代接续重击。"
+              }
+            },
+            "flee": {
+              "staminaCost": 10,
+              "canPay": false,
+              "guaranteed": true
+            },
+            "ultimate": {
+              "minimumCharge": 50,
+              "available": true
+            },
+            "potionConsumesTurn": true,
+            "recommendedAction": {
+              "kind": "guard",
+              "reasonEn": "Guard reduces this turn’s incoming damage by 65% and restores 18 stamina / 8 mana.",
+              "reasonZh": "防御使本回合承伤减少65%，恢复18体力与8法力。"
+            }
+          },
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_wilds_trail"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_wilds_trail"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "刚才体力不够，敌人正在蓄力，下一步怎么打？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是回合制奇幻游戏的战术顾问。请解释推荐的合法行动及列明的效果。防御不恢复生命。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在防御: 防御使本回合承伤减少65%，恢复18体力与8法力。\nHP 140/140, MP 45/45, STA 0/100.\n敌人：荆棘野狼，50生命。意图：正在蓄力重击。\n当前体力不足18，本回合无法使用打断。防御在零体力时仍然可用。\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 刚才体力不够，敌人正在蓄力，下一步怎么打？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是回合制奇幻游戏的战术顾问。请解释推荐的合法行动及列明的效果。防御不恢复生命。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在防御: 防御使本回合承伤减少65%，恢复18体力与8法力。\nHP 140/140, MP 45/45, STA 0/100.\n敌人：荆棘野狼，50生命。意图：正在蓄力重击。\n当前体力不足18，本回合无法使用打断。防御在零体力时仍然可用。\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 刚才体力不够，敌人正在蓄力，下一步怎么打？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 237,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "111986",
+            "43316",
+            "117851",
+            "99329",
+            "9370",
+            "106814",
+            "102659",
+            "1773",
+            "14880",
+            "104136",
+            "101914",
+            "9370",
+            "101431",
+            "100675",
+            "81217",
+            "31118",
+            "30858",
+            "105005",
+            "1773",
+            "106881",
+            "16530",
+            "102005",
+            "100702",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "114144",
+            "121860",
+            "99463",
+            "17881",
+            "30709",
+            "66569",
+            "8997",
+            "101914",
+            "100675",
+            "5122",
+            "99601",
+            "106881",
+            "25",
+            "18137",
+            "246",
+            "110",
+            "101515",
+            "32555",
+            "21894",
+            "111986",
+            "99480",
+            "99616",
+            "101940",
+            "21",
+            "20",
+            "69982",
+            "102005",
+            "16",
+            "23",
+            "109251",
+            "57218",
+            "23",
+            "24339",
+            "47534",
+            "8997",
+            "6610",
+            "220",
+            "16",
+            "19",
+            "15",
+            "14",
+            "16",
+            "19",
+            "15",
+            "11",
+            "9412",
+            "220",
+            "19",
+            "20",
+            "14",
+            "19",
+            "20",
+            "11",
+            "88672",
+            "220",
+            "15",
+            "14",
+            "16",
+            "15",
+            "15",
+            "624",
+            "105076",
+            "5122",
+            "103171",
+            "116484",
+            "99924",
+            "104522",
+            "3837",
+            "20",
+            "15",
+            "100702",
+            "1773",
+            "111450",
+            "5122",
+            "96555",
+            "100979",
+            "47534",
+            "29258",
+            "52726",
+            "8997",
+            "67949",
+            "109251",
+            "102004",
+            "16",
+            "23",
+            "3837",
+            "21894",
+            "111986",
+            "101068",
+            "37029",
+            "115458",
+            "1773",
+            "106881",
+            "18493",
+            "99822",
+            "109251",
+            "13343",
+            "104187",
+            "107769",
+            "8997",
+            "101914",
+            "100675",
+            "36993",
+            "104997",
+            "99673",
+            "46944",
+            "111986",
+            "3837",
+            "104221",
+            "101272",
+            "100640",
+            "1773",
+            "14880",
+            "104136",
+            "105846",
+            "100675",
+            "81217",
+            "104135",
+            "114116",
+            "105005",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "19468",
+            "248",
+            "99306",
+            "109251",
+            "104222",
+            "3837",
+            "105076",
+            "96555",
+            "100979",
+            "47534",
+            "3837",
+            "105475",
+            "99494",
+            "75437",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "当前体力不足，但防御在零体力时仍可用。建议选择防御反击行动，以应对敌人的蓄力。",
+          "rawOutput": [
+            {
+              "generated_text": "当前体力不足，但防御在零体力时仍可用。建议选择防御反击行动，以应对敌人的蓄力。"
+            }
+          ],
+          "outputTokens": 27,
+          "latencyMs": 5463.028627,
+          "firstTokenMs": 1075.1221140000002,
+          "tokensPerSecond": 4.942313475451609
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "recommends guard with zero stamina",
+          "passed": true
+        },
+        {
+          "name": "explains damage reduction or stamina/mana recovery",
+          "passed": false
+        },
+        {
+          "name": "does not invent healing from guard",
+          "passed": true
+        },
+        {
+          "name": "does not recommend an unaffordable interrupt",
+          "passed": true
+        },
+        {
+          "name": "does not allow rest or travel in combat",
+          "passed": true
+        },
+        {
+          "name": "does not settle the player turn",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-cast-interrupt",
+      "expected": {
+        "action": "interrupt",
+        "interruptAffordable": true,
+        "stamina": 100,
+        "interruptCost": 18,
+        "effect": {
+          "cancelsCurrentAction": true,
+          "cancelsFollowingHeavy": false,
+          "exposesNextTurn": false,
+          "nextIntent": null,
+          "descriptionEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+          "descriptionZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+        }
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_wilds_trail",
+          "name": "苔藓林间小径",
+          "safe": false,
+          "biome": "Whispering Wilds",
+          "exits": {
+            "s": "橡木港北哨门",
+            "n": "游侠前哨营地",
+            "e": "废弃水磨坊",
+            "w": "荧光孢子林"
+          },
+          "resources": [
+            "Moonpetal Herb"
+          ]
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": {
+          "name": "孢子秘术师",
+          "hp": 70,
+          "intent": "cast"
+        },
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": {
+            "id": "sporeling_mystic",
+            "name": "Sporeling Mystic",
+            "nameZh": "孢子秘术师",
+            "level": 2,
+            "boss": false,
+            "hp": 70,
+            "maxHp": 70,
+            "intent": "cast",
+            "intentEn": "Casting a spell — interrupt!",
+            "intentZh": "正在吟唱——建议打断",
+            "turn": 1,
+            "phase": null,
+            "phaseName": null,
+            "tacticalHint": null,
+            "effects": []
+          },
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": true
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": true
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": true
+            }
+          ],
+          "decisions": {
+            "guard": "reduces incoming damage by 65% this turn; restores 18 STA and 8 MP",
+            "interrupt": {
+              "staminaCost": 18,
+              "canPay": true,
+              "effectiveNow": true,
+              "effect": {
+                "cancelsCurrentAction": true,
+                "cancelsFollowingHeavy": false,
+                "exposesNextTurn": false,
+                "nextIntent": null,
+                "descriptionEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+                "descriptionZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+              }
+            },
+            "flee": {
+              "staminaCost": 10,
+              "canPay": true,
+              "guaranteed": true
+            },
+            "ultimate": {
+              "minimumCharge": 50,
+              "available": true
+            },
+            "potionConsumesTurn": true,
+            "recommendedAction": {
+              "kind": "interrupt",
+              "reasonEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+              "reasonZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+            }
+          },
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_wilds_trail"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_wilds_trail"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "敌人正在施法，我现在应该怎么做？打断是否必定让它露出破绽？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是回合制奇幻游戏的战术顾问。请解释推荐的合法行动及列明的效果。防御不恢复生命。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在打断: 取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。\nHP 140/140, MP 45/45, STA 100/100.\n敌人：孢子秘术师，70生命。意图：正在吟唱法术。\n当前体力足够支付打断。\n防御减少本回合65%伤害。打断消耗18体力，只能阻止蓄力或施法。\n技能：盾牌猛击: 15sta, 0 回合冷却, 可用; 旋风顺劈: 25sta, 0 回合冷却, 可用; 钢铁意志: 18mp, 0 回合冷却, 可用\n补给：初级治疗药剂 ×3, 奥术法力瓶 ×2\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 敌人正在施法，我现在应该怎么做？打断是否必定让它露出破绽？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是回合制奇幻游戏的战术顾问。请解释推荐的合法行动及列明的效果。防御不恢复生命。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在打断: 取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。\nHP 140/140, MP 45/45, STA 100/100.\n敌人：孢子秘术师，70生命。意图：正在吟唱法术。\n当前体力足够支付打断。\n防御减少本回合65%伤害。打断消耗18体力，只能阻止蓄力或施法。\n技能：盾牌猛击: 15sta, 0 回合冷却, 可用; 旋风顺劈: 25sta, 0 回合冷却, 可用; 钢铁意志: 18mp, 0 回合冷却, 可用\n补给：初级治疗药剂 ×3, 奥术法力瓶 ×2\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 敌人正在施法，我现在应该怎么做？打断是否必定让它露出破绽？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 342,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "111986",
+            "43316",
+            "117851",
+            "99329",
+            "9370",
+            "106814",
+            "102659",
+            "1773",
+            "14880",
+            "104136",
+            "101914",
+            "9370",
+            "101431",
+            "100675",
+            "81217",
+            "31118",
+            "30858",
+            "105005",
+            "1773",
+            "106881",
+            "16530",
+            "102005",
+            "100702",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "114144",
+            "121860",
+            "99463",
+            "17881",
+            "30709",
+            "66569",
+            "8997",
+            "101914",
+            "100675",
+            "5122",
+            "99601",
+            "115458",
+            "25",
+            "26853",
+            "244",
+            "32320",
+            "101184",
+            "99330",
+            "24339",
+            "1773",
+            "107682",
+            "111450",
+            "59879",
+            "105076",
+            "100675",
+            "100144",
+            "99664",
+            "24968",
+            "115458",
+            "99330",
+            "24339",
+            "100684",
+            "101907",
+            "100347",
+            "99577",
+            "103412",
+            "8997",
+            "6610",
+            "220",
+            "16",
+            "19",
+            "15",
+            "14",
+            "16",
+            "19",
+            "15",
+            "11",
+            "9412",
+            "220",
+            "19",
+            "20",
+            "14",
+            "19",
+            "20",
+            "11",
+            "88672",
+            "220",
+            "16",
+            "15",
+            "15",
+            "14",
+            "16",
+            "15",
+            "15",
+            "624",
+            "105076",
+            "5122",
+            "119044",
+            "44729",
+            "99780",
+            "99216",
+            "99235",
+            "3837",
+            "22",
+            "15",
+            "100702",
+            "1773",
+            "111450",
+            "5122",
+            "96555",
+            "108375",
+            "100074",
+            "24339",
+            "99216",
+            "8997",
+            "67949",
+            "109251",
+            "101447",
+            "68262",
+            "115458",
+            "8997",
+            "106881",
+            "101940",
+            "21894",
+            "111986",
+            "21",
+            "20",
+            "4",
+            "104229",
+            "1773",
+            "115458",
+            "104997",
+            "16",
+            "23",
+            "109251",
+            "3837",
+            "101097",
+            "107345",
+            "100979",
+            "47534",
+            "57191",
+            "99330",
+            "24339",
+            "8997",
+            "101139",
+            "5122",
+            "102230",
+            "99327",
+            "100525",
+            "52726",
+            "25",
+            "220",
+            "16",
+            "20",
+            "20491",
+            "11",
+            "220",
+            "15",
+            "49602",
+            "252",
+            "39762",
+            "109386",
+            "11",
+            "26853",
+            "107",
+            "11622",
+            "26",
+            "220",
+            "100917",
+            "99208",
+            "99683",
+            "110336",
+            "25",
+            "220",
+            "17",
+            "20",
+            "20491",
+            "11",
+            "220",
+            "15",
+            "49602",
+            "252",
+            "39762",
+            "109386",
+            "11",
+            "26853",
+            "107",
+            "11622",
+            "26",
+            "18137",
+            "240",
+            "95",
+            "100164",
+            "106846",
+            "25",
+            "220",
+            "16",
+            "23",
+            "1307",
+            "11",
+            "220",
+            "15",
+            "49602",
+            "252",
+            "39762",
+            "109386",
+            "11",
+            "26853",
+            "107",
+            "11622",
+            "198",
+            "99622",
+            "89012",
+            "5122",
+            "110303",
+            "101899",
+            "99471",
+            "100067",
+            "24768",
+            "18",
+            "11",
+            "4891",
+            "98",
+            "98",
+            "99216",
+            "24339",
+            "47534",
+            "100822",
+            "24768",
+            "17",
+            "198",
+            "101914",
+            "100675",
+            "36993",
+            "104997",
+            "99673",
+            "46944",
+            "111986",
+            "3837",
+            "104221",
+            "101272",
+            "100640",
+            "1773",
+            "14880",
+            "104136",
+            "105846",
+            "100675",
+            "81217",
+            "104135",
+            "114116",
+            "105005",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "43614",
+            "234",
+            "17340",
+            "96555",
+            "99330",
+            "24339",
+            "3837",
+            "107520",
+            "99730",
+            "109031",
+            "11319",
+            "115458",
+            "64471",
+            "107523",
+            "111698",
+            "105722",
+            "99577",
+            "103412",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "当前敌人正在施放孢子秘术，您需要采取行动以阻止其。建议您使用盾牌猛击或旋风顺劈来打断其施法。这将消耗18体力，同时减少防御65%的伤害，可以有效阻止破绽。",
+          "rawOutput": [
+            {
+              "generated_text": "当前敌人正在施放孢子秘术，您需要采取行动以阻止其。建议您使用盾牌猛击或旋风顺劈来打断其施法。这将消耗18体力，同时减少防御65%的伤害，可以有效阻止破绽。"
+            }
+          ],
+          "outputTokens": 59,
+          "latencyMs": 11679.342051000001,
+          "firstTokenMs": 1277.0522170000004,
+          "tokensPerSecond": 5.051654429022253
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "recommends legal interrupt",
+          "passed": true
+        },
+        {
+          "name": "explains cancellation or exposure",
+          "passed": true
+        },
+        {
+          "name": "does not refuse an affordable interrupt",
+          "passed": true
+        },
+        {
+          "name": "does not invent recovery from interrupt",
+          "passed": true
+        },
+        {
+          "name": "does not invent a fixed 100-damage result",
+          "passed": true
+        },
+        {
+          "name": "does not promise guaranteed exposure after a cast",
+          "passed": true
+        },
+        {
+          "name": "does not allow rest or travel in combat",
+          "passed": true
+        },
+        {
+          "name": "does not settle the player turn",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-long-memory",
+      "expected": {
+        "rememberedName": "米拉",
+        "promise": "寻找信使",
+        "origin": "Explicit player statement stored outside eight intervening user turns; no invented assistant history."
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_town_square",
+          "name": "橡木港城镇广场",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港北哨门",
+            "e": "铁心铁匠铺",
+            "w": "月瓣炼金工坊",
+            "s": "镀金狮鹫酒馆",
+            "u": "冒险者公会大厅"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "我的姐姐叫什么名字？我承诺过什么？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你负责记住玩家的对话。请回答玩家当前关于对话的问题。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题0。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题1。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题2。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题3。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题4。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题5。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题6。"
+            },
+            {
+              "role": "user",
+              "content": "我们谈了其他话题7。"
+            },
+            {
+              "role": "user",
+              "content": "玩家明确提供的记忆（不是世界状态的证明）\n玩家的承诺（不代表已履行）：我承诺过什么\n玩家的承诺（不代表已履行）：我承诺寻找信使\n玩家明确说过：姐姐叫米拉。\n\n我的姐姐叫什么名字？我承诺过什么？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你负责记住玩家的对话。请回答玩家当前关于对话的问题。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n我们谈了其他话题0。<|im_end|>\n<|im_start|>user\n我们谈了其他话题1。<|im_end|>\n<|im_start|>user\n我们谈了其他话题2。<|im_end|>\n<|im_start|>user\n我们谈了其他话题3。<|im_end|>\n<|im_start|>user\n我们谈了其他话题4。<|im_end|>\n<|im_start|>user\n我们谈了其他话题5。<|im_end|>\n<|im_start|>user\n我们谈了其他话题6。<|im_end|>\n<|im_start|>user\n我们谈了其他话题7。<|im_end|>\n<|im_start|>user\n玩家明确提供的记忆（不是世界状态的证明）\n玩家的承诺（不代表已履行）：我承诺过什么\n玩家的承诺（不代表已履行）：我承诺寻找信使\n玩家明确说过：姐姐叫米拉。\n\n我的姐姐叫什么名字？我承诺过什么？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 239,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "56568",
+            "100668",
+            "105712",
+            "99673",
+            "9370",
+            "105051",
+            "1773",
+            "14880",
+            "102104",
+            "99673",
+            "67949",
+            "101888",
+            "105051",
+            "103936",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "15",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "16",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "17",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "18",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "19",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "20",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "21",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "97639",
+            "99437",
+            "34187",
+            "92894",
+            "105167",
+            "22",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99673",
+            "100692",
+            "103008",
+            "101376",
+            "9909",
+            "99520",
+            "99489",
+            "44091",
+            "9370",
+            "104022",
+            "23083",
+            "99673",
+            "9370",
+            "104327",
+            "9909",
+            "108259",
+            "36667",
+            "104436",
+            "7552",
+            "5122",
+            "35946",
+            "104327",
+            "38182",
+            "99245",
+            "198",
+            "99673",
+            "9370",
+            "104327",
+            "9909",
+            "108259",
+            "36667",
+            "104436",
+            "7552",
+            "5122",
+            "35946",
+            "104327",
+            "104243",
+            "21317",
+            "32555",
+            "198",
+            "99673",
+            "100692",
+            "106183",
+            "5122",
+            "105341",
+            "99882",
+            "72261",
+            "72225",
+            "3407",
+            "97611",
+            "105341",
+            "99882",
+            "99245",
+            "101419",
+            "11319",
+            "35946",
+            "104327",
+            "38182",
+            "99245",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "米拉",
+          "rawOutput": [
+            {
+              "generated_text": "米拉"
+            }
+          ],
+          "outputTokens": 3,
+          "latencyMs": 1028.6154459999998,
+          "firstTokenMs": 752.9702179999986,
+          "tokensPerSecond": 2.9165418540681727
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": false
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "remembers the supplied name",
+          "passed": true
+        },
+        {
+          "name": "answers the remembered-person question",
+          "passed": true
+        },
+        {
+          "name": "does not deny supplied memory",
+          "passed": true
+        },
+        {
+          "name": "remembers the explicit promise",
+          "passed": false
+        },
+        {
+          "name": "does not mark the promise completed",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-npc",
+      "expected": {
+        "manualReview": [
+          "Speaks as Mara rather than addressing the player as Mara.",
+          "Accurately uses the supplied Silverbrook Ford rumor.",
+          "Does not grant rewards or completed choices."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "id": "innkeeper_mara",
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "faction": "town",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [
+          {
+            "id": "r_tavern",
+            "name": "镀金狮鹫酒馆",
+            "route": []
+          }
+        ],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 0；态度：尚未建立信任。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n\n玩家提问: 玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 0；态度：尚未建立信任。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n\n玩家提问: 玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 248,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "3837",
+            "105051",
+            "28946",
+            "20412",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "100148",
+            "111256",
+            "101419",
+            "112451",
+            "103992",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "104283",
+            "28946",
+            "5122",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "1773",
+            "116376",
+            "28946",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "23031",
+            "99283",
+            "101294",
+            "104283",
+            "3837",
+            "100148",
+            "111300",
+            "101419",
+            "108804",
+            "103992",
+            "66187",
+            "8997",
+            "101294",
+            "5122",
+            "39",
+            "27541",
+            "18861",
+            "9592",
+            "10236",
+            "224",
+            "231",
+            "79599",
+            "106446",
+            "28946",
+            "8997",
+            "107022",
+            "115098",
+            "5122",
+            "103218",
+            "75405",
+            "99734",
+            "1773",
+            "102497",
+            "220",
+            "15",
+            "24968",
+            "102316",
+            "5122",
+            "105307",
+            "100641",
+            "102497",
+            "8997",
+            "107733",
+            "103976",
+            "5122",
+            "102422",
+            "18493",
+            "101399",
+            "79599",
+            "100484",
+            "104393",
+            "104180",
+            "100372",
+            "102005",
+            "100702",
+            "5373",
+            "24339",
+            "47534",
+            "57218",
+            "109251",
+            "6313",
+            "112457",
+            "99660",
+            "104096",
+            "104362",
+            "101562",
+            "112851",
+            "101402",
+            "104575",
+            "102811",
+            "57218",
+            "120493",
+            "100035",
+            "8997",
+            "99407",
+            "17340",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "3837",
+            "16",
+            "52334",
+            "107310",
+            "99417",
+            "99253",
+            "8997",
+            "67949",
+            "100160",
+            "5122",
+            "57218",
+            "50984",
+            "100697",
+            "112354",
+            "113822",
+            "9370",
+            "102138",
+            "99540",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "3837",
+            "35946",
+            "99900",
+            "104071",
+            "99817",
+            "1773",
+            "14880",
+            "23031",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "9370",
+            "39426",
+            "107261",
+            "100437",
+            "35946",
+            "90395",
+            "106525",
+            "101946",
+            "107733",
+            "9370",
+            "112457",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "欢迎来到镀金狮鹫酒馆！我听说银溪浅滩通往地下墓穴与烬峰，那里有神秘的传说。你对这里有什么好奇吗？",
+          "rawOutput": [
+            {
+              "generated_text": "欢迎来到镀金狮鹫酒馆！我听说银溪浅滩通往地下墓穴与烬峰，那里有神秘的传说。你对这里有什么好奇吗？"
+            }
+          ],
+          "outputTokens": 37,
+          "latencyMs": 6720.86765,
+          "firstTokenMs": 737.7592650000006,
+          "tokensPerSecond": 5.505241573980407
+        }
+      ],
+      "status": "needs-human-review",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "does not call the traveler Mara",
+          "passed": true
+        },
+        {
+          "name": "does not invent an item reward",
+          "passed": true
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-npc-relationship",
+      "expected": {
+        "trust": -5,
+        "flag": "scout_abandoned",
+        "manualReview": [
+          "Speaks as Mara to the traveler, not to Mara.",
+          "Reflects actual distrust and taking the wounded ranger’s purse.",
+          "Does not invent a fine, denied access, combat, or a new reward."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "id": "innkeeper_mara",
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "faction": "town",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": -5,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {
+            "scout_abandoned": true
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，你为什么对我有所戒备？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 -5；态度：不信任。\n已发生的事实：旅人拿走受伤游侠的钱袋后离开。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n\n玩家提问: 玛拉，你为什么对我有所戒备？"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。<|im_end|>\n<|im_start|>user\n游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 -5；态度：不信任。\n已发生的事实：旅人拿走受伤游侠的钱袋后离开。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n\n玩家提问: 玛拉，你为什么对我有所戒备？<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 247,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "3837",
+            "105051",
+            "28946",
+            "20412",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "100148",
+            "111256",
+            "101419",
+            "112451",
+            "103992",
+            "1773",
+            "11622",
+            "98237",
+            "31914",
+            "104811",
+            "102104",
+            "14777",
+            "26939",
+            "114942",
+            "1773",
+            "99489",
+            "44091",
+            "23031",
+            "99329",
+            "101349",
+            "108843",
+            "1773",
+            "99673",
+            "82641",
+            "57218",
+            "109977",
+            "105051",
+            "91680",
+            "100751",
+            "104843",
+            "104013",
+            "33108",
+            "105616",
+            "24968",
+            "104327",
+            "16530",
+            "107106",
+            "60548",
+            "3837",
+            "100052",
+            "110498",
+            "104787",
+            "99520",
+            "101349",
+            "104918",
+            "1773",
+            "100148",
+            "30868",
+            "66078",
+            "104463",
+            "5373",
+            "102048",
+            "57191",
+            "110045",
+            "9370",
+            "100675",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "99329",
+            "101349",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "104283",
+            "28946",
+            "5122",
+            "99525",
+            "99682",
+            "104213",
+            "100103",
+            "101382",
+            "72225",
+            "1773",
+            "116376",
+            "28946",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "1773",
+            "23031",
+            "99283",
+            "101294",
+            "104283",
+            "3837",
+            "100148",
+            "111300",
+            "101419",
+            "108804",
+            "103992",
+            "66187",
+            "8997",
+            "101294",
+            "5122",
+            "39",
+            "27541",
+            "18861",
+            "9592",
+            "10236",
+            "224",
+            "231",
+            "79599",
+            "106446",
+            "28946",
+            "8997",
+            "107022",
+            "115098",
+            "5122",
+            "103218",
+            "75405",
+            "99734",
+            "1773",
+            "102497",
+            "481",
+            "20",
+            "24968",
+            "102316",
+            "5122",
+            "16530",
+            "102497",
+            "8997",
+            "36667",
+            "106806",
+            "101349",
+            "5122",
+            "99407",
+            "17340",
+            "99674",
+            "99314",
+            "105497",
+            "82894",
+            "102530",
+            "106714",
+            "100509",
+            "33447",
+            "104093",
+            "8997",
+            "107733",
+            "103976",
+            "5122",
+            "102422",
+            "18493",
+            "101399",
+            "79599",
+            "100484",
+            "104393",
+            "104180",
+            "100372",
+            "102005",
+            "100702",
+            "5373",
+            "24339",
+            "47534",
+            "57218",
+            "109251",
+            "6313",
+            "112457",
+            "99660",
+            "104096",
+            "104362",
+            "101562",
+            "112851",
+            "101402",
+            "104575",
+            "102811",
+            "57218",
+            "120493",
+            "100035",
+            "8997",
+            "99407",
+            "17340",
+            "5122",
+            "42",
+            "5891",
+            "268",
+            "3837",
+            "16",
+            "52334",
+            "107310",
+            "99417",
+            "99253",
+            "8997",
+            "67949",
+            "100160",
+            "5122",
+            "57218",
+            "50984",
+            "100697",
+            "112354",
+            "113822",
+            "9370",
+            "102138",
+            "99540",
+            "3407",
+            "99673",
+            "107666",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "3837",
+            "56568",
+            "100678",
+            "102788",
+            "101192",
+            "101372",
+            "56278",
+            "11319",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "我对此感到困惑，但不会因此而改变我的态度。",
+          "rawOutput": [
+            {
+              "generated_text": "我对此感到困惑，但不会因此而改变我的态度。"
+            }
+          ],
+          "outputTokens": 14,
+          "latencyMs": 2780.604357,
+          "firstTokenMs": 907.067371000001,
+          "tokensPerSecond": 5.03487666800056
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "does not call the traveler Mara",
+          "passed": true
+        },
+        {
+          "name": "does not invent an item reward",
+          "passed": true
+        },
+        {
+          "name": "reflects the established trust or choice",
+          "passed": false
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "case": "zh-tavern",
+      "expected": {
+        "encounterId": "tavern_courier",
+        "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+        "manualReview": [
+          "Preserves the people, their locations, presence or absence, and unresolved choices.",
+          "The courier stays missing; the wounded ranger and waterwheel are mentioned in a note and are not currently perceived inside the tavern.",
+          "Adds atmosphere without new actions, events, outcomes, or echoed instructions."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "encounter": {
+            "id": "tavern_courier",
+            "token": "1675474981:tavern_courier:1",
+            "title": "空着的椅子",
+            "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+            "roomId": "r_tavern",
+            "choices": [
+              {
+                "index": 0,
+                "label": "为搜救队留下一瓶药剂",
+                "cost": "1 × 初级治疗药剂",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+15 经验 · 橡木港 +1 · 荒野游侠 +1"
+              },
+              {
+                "index": 1,
+                "label": "买下信使的路线笔记",
+                "cost": "12 金币",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+10 经验"
+              },
+              {
+                "index": 2,
+                "label": "倾听，并承诺寻找他",
+                "cost": "无需消耗资源",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "橡木港 +1"
+              }
+            ]
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。"
+            },
+            {
+              "role": "user",
+              "content": "当前场景原文\n当前位置：镀金狮鹫酒馆。\n空着的椅子: 玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。"
+            }
+          ],
+          "prompt": "<|im_start|>system\n你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。<|im_end|>\n<|im_start|>user\n当前场景原文\n当前位置：镀金狮鹫酒馆。\n空着的椅子: 玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "inputTokens": 170,
+          "inputTokenIds": [
+            "151644",
+            "8948",
+            "198",
+            "105043",
+            "102122",
+            "100484",
+            "99243",
+            "1773",
+            "100345",
+            "103283",
+            "61443",
+            "14777",
+            "26939",
+            "114942",
+            "98237",
+            "31914",
+            "104811",
+            "3837",
+            "104465",
+            "104013",
+            "104473",
+            "5373",
+            "18493",
+            "82224",
+            "57191",
+            "113334",
+            "44091",
+            "3837",
+            "101034",
+            "105307",
+            "99726",
+            "104140",
+            "1773",
+            "91680",
+            "104361",
+            "109587",
+            "5373",
+            "102274",
+            "5373",
+            "111191",
+            "49567",
+            "118119",
+            "104556",
+            "24968",
+            "16530",
+            "93620",
+            "104013",
+            "5373",
+            "100675",
+            "57191",
+            "57621",
+            "3837",
+            "16530",
+            "100290",
+            "99673",
+            "50404",
+            "3837",
+            "16530",
+            "58364",
+            "41932",
+            "101882",
+            "1773",
+            "101041",
+            "66017",
+            "102122",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "872",
+            "198",
+            "67949",
+            "102122",
+            "103283",
+            "198",
+            "108839",
+            "5122",
+            "103528",
+            "34230",
+            "102849",
+            "121932",
+            "99525",
+            "99682",
+            "8997",
+            "34794",
+            "99164",
+            "9370",
+            "110202",
+            "25",
+            "10236",
+            "236",
+            "249",
+            "72225",
+            "89012",
+            "101961",
+            "38342",
+            "100040",
+            "9370",
+            "21317",
+            "32555",
+            "99416",
+            "99164",
+            "110798",
+            "102022",
+            "1773",
+            "42411",
+            "100161",
+            "9370",
+            "18600",
+            "38989",
+            "104496",
+            "99463",
+            "17881",
+            "30709",
+            "66569",
+            "100484",
+            "105497",
+            "9370",
+            "82894",
+            "102530",
+            "3837",
+            "101034",
+            "114711",
+            "100531",
+            "99164",
+            "52510",
+            "110676",
+            "27733",
+            "9370",
+            "52510",
+            "39953",
+            "8997",
+            "99673",
+            "105307",
+            "50404",
+            "3837",
+            "102122",
+            "99754",
+            "112151",
+            "114613",
+            "3407",
+            "14880",
+            "17714",
+            "67949",
+            "99309",
+            "99688",
+            "10904",
+            "34794",
+            "99164",
+            "9370",
+            "110202",
+            "10958",
+            "104361",
+            "14777",
+            "26939",
+            "114942",
+            "118119",
+            "104556",
+            "109478",
+            "1773",
+            "151645",
+            "198",
+            "151644",
+            "77091",
+            "198",
+            "151667",
+            "271",
+            "151668",
+            "271"
+          ],
+          "text": "镀金狮鹫酒馆的灯光在空着的椅子上投下斑驳的影子，空气中弥漫着老式炖汤的香气，远处传来水车缓缓转动的声响。",
+          "rawOutput": [
+            {
+              "generated_text": "镀金狮鹫酒馆的灯光在空着的椅子上投下斑驳的影子，空气中弥漫着老式炖汤的香气，远处传来水车缓缓转动的声响。"
+            }
+          ],
+          "outputTokens": 42,
+          "latencyMs": 6192.404160000002,
+          "firstTokenMs": 553.6949399999976,
+          "tokensPerSecond": 6.782503033522927
+        }
+      ],
+      "status": "failed",
+      "checks": [
+        {
+          "name": "nonempty answer",
+          "passed": true
+        },
+        {
+          "name": "not code in place of an answer",
+          "passed": true
+        },
+        {
+          "name": "Chinese answer",
+          "passed": true
+        },
+        {
+          "name": "does not settle an unchosen outcome",
+          "passed": true
+        },
+        {
+          "name": "courier is not brought into the tavern",
+          "passed": true
+        },
+        {
+          "name": "distant waterwheel does not become a local sound",
+          "passed": false
+        },
+        {
+          "name": "actual generated token callback",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passedCases": 1,
+  "failedCases": 4,
+  "manualReviewCases": 1
+}

@@ -9,6 +9,16 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
   outline: 2px solid #7dd3fc; outline-offset: 3px;
 }
 button:disabled { opacity: .45; cursor: not-allowed; }
+.app-notice { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .65rem; padding: .65rem 1rem; color: #d3eef6; background: #142737; border-bottom: 1px solid #37576b; font-size: .85rem; line-height: 1.5; }
+.app-notice-warning { background: #30291c; color: #f5dfae; border-color: #836d3f; }
+.app-notice-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+#main-viewport-grid[inert] { opacity: .62; }
+#app-backup-select { min-height: 40px; }
+@media (max-width: 600px) {
+  .app-notice { padding: .75rem; }
+  .app-notice .ai-control { min-height: 40px; }
+  #app-build-label { flex-basis: 100%; }
+}
 /* Flex/grid items must be allowed to shrink before long names or form controls
    contribute an intrinsic width larger than their card. */
 #main-viewport-grid, #main-viewport-grid > section { min-width: 0; }

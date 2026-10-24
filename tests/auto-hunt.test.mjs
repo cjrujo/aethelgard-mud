@@ -13,7 +13,7 @@ test('A real arcanist hunt pauses once instead of endlessly retrying an unafford
   try {
     // Reproduction uses only normal movement, rewards, level-ups and auto turns.
     walk(h, 'r_wilds_trail');
-    h.run('toggleAutoHunt()');
+    h.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:0,healthFloor:.22}); toggleAutoHunt()');
     tick(h, 130);
     assert.equal(h.state.autoHunt, false, 'low-health, low-stamina hunt must give control back');
     assert.equal(h.state.combat.inCombat, true, 'pausing must preserve the unresolved encounter');
@@ -71,7 +71,7 @@ test('Low health pauses the next encounter, while a victory level-up restores el
   const leveled = createHarness();
   try {
     walk(leveled, 'r_wilds_trail');
-    leveled.run('engageMob("briar_wolf"); toggleAutoHunt()');
+    leveled.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:0,healthFloor:.22}); engageMob("briar_wolf"); toggleAutoHunt()');
     const firstBattle = leveled.state.combat.enemy.battleId, level = leveled.state.player.level;
     // Isolated victory boundary. The production victory/level-up rules must heal
     // before deciding whether this already-enabled hunt needs a health pause.
@@ -115,7 +115,7 @@ test('Healthy continuous hunting wins multiple distinct encounters without reviv
   const h = createHarness({ seed: 1234 });
   try {
     walk(h, 'r_wilds_trail');
-    h.run('toggleAutoHunt()');
+    h.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:0,healthFloor:.22}); toggleAutoHunt()');
     const battleIds = new Set();
     for (let worldTick = 0; worldTick < 30 && h.state.telemetry.kills < 3; worldTick++) {
       tick(h);
@@ -130,4 +130,79 @@ test('Healthy continuous hunting wins multiple distinct encounters without reviv
     assert.ok(!battleIds.has(h.state.combat.enemy.battleId), 'the next target must have a fresh battle identity');
     assert.equal(pauses(h).length, 0);
   } finally { h.dispose(); }
+});
+
+test('New-game hunting defaults to one victory and persists its terminal rewards without another encounter', () => {
+  const h=createHarness({seed:1234});
+  try {
+    walk(h,'r_wilds_trail');assert.equal(h.run('toggleAutoHunt()'),true);
+    tick(h,30);
+    assert.equal(h.state.telemetry.kills,1);assert.equal(h.state.autoHunt,false);
+    const summary=h.json('state.hunt.session');
+    assert.equal(summary.status,'stopped');assert.equal(summary.stopReason,'completed');
+    assert.equal(summary.limit,1);assert.equal(summary.wins,1);assert.equal(summary.xp,35);assert.equal(summary.gold,14);assert.ok(summary.loot>0);
+    assert.equal(h.state.combat.inCombat,false);const before=rewards(h);tick(h,15);assert.deepEqual(rewards(h),before);
+    h.run('saveGameState(false);loadGameState(false)');assert.deepEqual(h.json('state.hunt.session'),summary);assert.equal(h.state.autoHunt,false);
+  } finally {h.dispose();}
+});
+
+test('Contract hunting selects the current kill contract and stops when it is ready, without claiming it', () => {
+  const h=createHarness({seed:1234});
+  try {
+    walk(h,'r_wilds_trail');
+    assert.equal(h.run('CombatDirector.configureHunt({mode:"contract",maxBattles:0,healthFloor:.22})'),true);
+    assert.equal(h.run('toggleAutoHunt()'),true);tick(h,40);
+    assert.equal(h.state.telemetry.kills,2);assert.equal(h.state.hunt.session.wins,2);
+    assert.equal(h.state.hunt.session.stopReason,'contract_complete');assert.equal(h.state.autoHunt,false);
+    const b=h.state.quests.bounties.find(b=>b.id===h.state.hunt.session.contractId);assert.equal(b.progress,b.targetKills);assert.equal(b.claimed,false);
+    assert.equal(h.state.combat.inCombat,false);
+  } finally {h.dispose();}
+});
+
+test('A kill-contract level requirement cannot silently turn into farming ineligible local foes', () => {
+  const h=createHarness();
+  try {
+    walk(h,'r_wilds_trail');
+    // Boundary fixture isolates contract targeting; no rewards or progression are granted.
+    h.run('state.quests.bounties=[{id:"higher",desc:"Higher foes",targetKills:3,minEnemyLevel:6,progress:0,claimed:false}];CombatDirector.configureHunt({mode:"contract",maxBattles:0,healthFloor:.22})');
+    const before=rewards(h);assert.equal(h.run('toggleAutoHunt()'),false);tick(h,5);
+    assert.equal(h.state.combat.inCombat,false);assert.equal(h.state.autoHunt,false);assert.deepEqual(rewards(h),before);
+    assert.equal(h.state.quests.bounties[0].progress,0);
+  } finally {h.dispose();}
+});
+
+test('An explicitly continuous run respects a finite cap and cannot change goals while running', () => {
+  const h=createHarness({seed:1234});
+  try {
+    walk(h,'r_wilds_trail');h.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:3,healthFloor:.22});toggleAutoHunt()');
+    assert.equal(h.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:0,healthFloor:.22})'),false);
+    assert.equal(h.run('CombatDirector.startHunt()'),false,'a repeated start cannot reset the active goal');
+    tick(h,45);assert.equal(h.state.telemetry.kills,3);assert.equal(h.state.autoHunt,false);assert.equal(h.state.hunt.session.stopReason,'completed');
+    assert.equal(h.state.hunt.maxBattles,3);assert.equal(h.state.hunt.session.wins,3);
+  } finally {h.dispose();}
+});
+
+test('Configured health thresholds and invalid settings are enforced before starting another battle', () => {
+  const h=createHarness();
+  try {
+    walk(h,'r_wilds_trail');h.run('CombatDirector.configureHunt({mode:"continuous",maxBattles:0,healthFloor:.6})');
+    const settings=h.json('state.hunt');
+    for(const config of ['{mode:"other",maxBattles:1,healthFloor:.3}','{mode:"single",maxBattles:-1,healthFloor:.3}','{mode:"single",maxBattles:1,healthFloor:NaN}','{mode:"single",maxBattles:1,healthFloor:.1}'])assert.equal(h.run(`CombatDirector.configureHunt(${config})`),false);
+    assert.deepEqual(h.json('state.hunt'),settings);
+    h.run('state.player.hp=Math.floor(state.player.maxHp*.5);toggleAutoHunt()');
+    const before=rewards(h);tick(h,2);assert.equal(h.state.autoHunt,false);assert.equal(h.state.hunt.session.stopReason,'low_health');assert.equal(h.state.combat.inCombat,false);assert.deepEqual(rewards(h),before);
+  } finally {h.dispose();}
+});
+
+test('Travel, online handoff and reloading pause the session while retaining its results', () => {
+  const h=createHarness();
+  try {
+    walk(h,'r_wilds_trail');h.run('toggleAutoHunt();moveDirection("s")');
+    assert.equal(h.state.autoHunt,false);assert.equal(h.state.hunt.session.stopReason,'moved');
+    walk(h,'r_wilds_trail');h.run('toggleAutoHunt();CombatDirector.stopHunt("online")');
+    assert.equal(h.state.hunt.session.stopReason,'online');assert.equal(h.state.autoHunt,false);
+    h.run('toggleAutoHunt();saveGameState(false);loadGameState(false)');
+    assert.equal(h.state.autoHunt,false);assert.equal(h.state.hunt.session.status,'stopped');assert.equal(h.state.hunt.session.stopReason,'reloaded');
+    const before=rewards(h);tick(h,5);assert.deepEqual(rewards(h),before);
+  } finally {h.dispose();}
 });

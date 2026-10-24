@@ -1,0 +1,66 @@
+{
+  "timestamp": "2026-10-24T10:34:22.837Z",
+  "modelRequested": false,
+  "checks": [
+    {
+      "name": "six modules boot and default model is Qwen3",
+      "passed": true
+    },
+    {
+      "name": "responsive width 1440",
+      "passed": true,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "name": "responsive width 980",
+      "passed": true,
+      "detail": {
+        "viewport": 980,
+        "document": 980
+      }
+    },
+    {
+      "name": "responsive width 390",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "name": "real first story choice survives save and reload",
+      "passed": true
+    },
+    {
+      "name": "mobile hunt goals save and survive a world heartbeat",
+      "passed": true
+    },
+    {
+      "name": "mobile guild services retain the selected equipment slot",
+      "passed": true
+    },
+    {
+      "name": "mobile connection diagnostics include build versions and a clipboard fallback",
+      "passed": true
+    },
+    {
+      "name": "real Web Locks takeover loads latest progress and stale-tab close cannot overwrite it",
+      "passed": true
+    },
+    {
+      "name": "offline model control reflects local package mode",
+      "passed": true
+    },
+    {
+      "name": "no page errors or external network requests",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failedAssets": [],
+  "passed": true
+}

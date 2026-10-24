@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-10-24T10:43:44.518Z",
+  "modelRequested": true,
+  "checks": [
+    {
+      "name": "six modules boot and default model is Qwen3",
+      "passed": true
+    },
+    {
+      "name": "responsive width 1440",
+      "passed": true,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "name": "responsive width 980",
+      "passed": true,
+      "detail": {
+        "viewport": 980,
+        "document": 980
+      }
+    },
+    {
+      "name": "responsive width 390",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "name": "real first story choice survives save and reload",
+      "passed": true
+    },
+    {
+      "name": "mobile hunt goals save and survive a world heartbeat",
+      "passed": true
+    },
+    {
+      "name": "mobile guild services retain the selected equipment slot",
+      "passed": true
+    },
+    {
+      "name": "mobile connection diagnostics include build versions and a clipboard fallback",
+      "passed": true
+    },
+    {
+      "name": "real Web Locks takeover loads latest progress and stale-tab close cannot overwrite it",
+      "passed": true
+    },
+    {
+      "name": "offline model control reflects local package mode",
+      "passed": true
+    },
+    {
+      "name": "real browser CPU WASM generation with external network blocked",
+      "passed": true,
+      "detail": {
+        "tokens": 4,
+        "latencyMs": 8811.899999999441,
+        "text": "向南。"
+      }
+    },
+    {
+      "name": "feedback on a real model answer stays bound to its dialogue after reload",
+      "passed": true
+    },
+    {
+      "name": "no page errors or external network requests",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failedAssets": [],
+  "model": {
+    "loaded": "onnx-community/Qwen3-0.6B-ONNX",
+    "prompt": "从复苏之井去酒馆，第一步往哪个方向走？只回答方向。",
+    "answer": {
+      "id": "1792838646787-4",
+      "prompt": "从复苏之井去酒馆，第一步往哪个方向走？只回答方向。",
+      "text": "向南。",
+      "lang": "zh",
+      "source": "wasm",
+      "status": "complete",
+      "room": "r_town_square",
+      "latencyMs": 8811.899999999441,
+      "kind": "npc",
+      "npcId": "elder_thorne",
+      "eventId": "",
+      "eventToken": "",
+      "runtime": "@huggingface/transformers@3.8.1",
+      "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+      "dtype": "q8",
+      "facts": "当前位置：橡木港城镇广场。\n从这里前往镀金狮鹫酒馆：依次向南移动。",
+      "type": "complete",
+      "model": "onnx-community/Qwen3-0.6B-ONNX",
+      "device": "wasm",
+      "inputTokens": 132,
+      "outputTokens": 4,
+      "firstTokenMs": 7481.299999999814,
+      "tokensPerSecond": 0.45393161520219855,
+      "droppedMessages": 0,
+      "generation": {
+        "maxNewTokens": 128,
+        "doSample": false,
+        "repetitionPenalty": 1
+      }
+    },
+    "status": {
+      "backend": "wasm_onnx",
+      "status": "ready",
+      "detail": "",
+      "busy": false,
+      "model": "onnx-community/Qwen3-0.6B-ONNX",
+      "ready": true,
+      "actualLoadedModel": "onnx-community/Qwen3-0.6B-ONNX",
+      "inferenceCount": 1,
+      "loadCount": 1,
+      "lastResult": {
+        "source": "wasm",
+        "model": "onnx-community/Qwen3-0.6B-ONNX",
+        "latencyMs": 8811.899999999441,
+        "firstTokenMs": 7481.299999999814,
+        "inputTokens": 132,
+        "outputTokens": 4,
+        "tokensPerSecond": 0.45393161520219855,
+        "completedAt": "2026-10-24T10:44:15.667Z"
+      }
+    }
+  },
+  "passed": true
+}

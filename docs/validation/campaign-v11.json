@@ -1,0 +1,943 @@
+{
+  "generatedAt": "2026-10-24T10:44:01.670Z",
+  "scope": "V11 production rules: legal authored campaign and default guided journey; no injected progression.",
+  "policy": "Actual moves, authored choices, earned primary attributes and class talent, owned gear upgrades, nearest safe rest, visible intents, skills, overdrive and guard. No injected campaign progress, rewards, levels, victory flags, or health.",
+  "openings": [
+    {
+      "classId": "vanguard",
+      "seed": 1234,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 167,
+      "hp": 167,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 150,
+      "lowestSta": 22,
+      "damageTaken": 17,
+      "hitsTaken": 1,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "vanguard",
+      "seed": 7401,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 167,
+      "hp": 167,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 150,
+      "lowestSta": 22,
+      "damageTaken": 17,
+      "hitsTaken": 1,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "vanguard",
+      "seed": 20261022,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 167,
+      "hp": 167,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 150,
+      "lowestSta": 22,
+      "damageTaken": 17,
+      "hitsTaken": 1,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "arcanist",
+      "seed": 1234,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 132,
+      "hp": 132,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 93,
+      "lowestSta": 62,
+      "damageTaken": 60,
+      "hitsTaken": 3,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "arcanist",
+      "seed": 7401,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 132,
+      "hp": 132,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 6,
+      "lowestHp": 92,
+      "lowestSta": 57,
+      "damageTaken": 40,
+      "hitsTaken": 2,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          0
+        ]
+      ]
+    },
+    {
+      "classId": "arcanist",
+      "seed": 20261022,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 132,
+      "hp": 132,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 93,
+      "lowestSta": 62,
+      "damageTaken": 60,
+      "hitsTaken": 3,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "shadowblade",
+      "seed": 1234,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 142,
+      "hp": 142,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 118,
+      "lowestSta": 61,
+      "damageTaken": 38,
+      "hitsTaken": 2,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "shadowblade",
+      "seed": 7401,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 142,
+      "hp": 142,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 7,
+      "lowestHp": 117,
+      "lowestSta": 61,
+      "damageTaken": 61,
+      "hitsTaken": 3,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          1
+        ]
+      ]
+    },
+    {
+      "classId": "shadowblade",
+      "seed": 20261022,
+      "enemyId": "boss_garrick",
+      "level": 2,
+      "maxHp": 142,
+      "hp": 142,
+      "enemyHp": 963,
+      "enemyAttack": 31,
+      "turns": 6,
+      "lowestHp": 118,
+      "lowestSta": 84,
+      "damageTaken": 38,
+      "hitsTaken": 2,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "skill",
+          0
+        ]
+      ]
+    }
+  ],
+  "guided": [
+    {
+      "classId": "vanguard",
+      "level": 9,
+      "steps": 135,
+      "events": [
+        "first_oath",
+        "tavern_courier",
+        "wounded_scout",
+        "brom_apprentice",
+        "mill_wheel",
+        "menhir_root",
+        "elara_plan",
+        "bandit_ledger",
+        "river_cart",
+        "bone_ferry",
+        "vesper_names",
+        "forbidden_page",
+        "memory_bell",
+        "freed_souls",
+        "borin_valves",
+        "furnace_fire",
+        "bridge_rescue",
+        "geode_echo",
+        "rift_anchor",
+        "chrono_self",
+        "observatory_lens",
+        "conduit_choice",
+        "final_choice"
+      ],
+      "battles": [
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "boss_garrick",
+          "turns": 7
+        },
+        {
+          "id": "boss_malakor",
+          "turns": 6
+        },
+        {
+          "id": "boss_ignis_vulcan",
+          "turns": 9
+        },
+        {
+          "id": "boss_xalkorath",
+          "turns": 11
+        }
+      ],
+      "ending": "restoration"
+    },
+    {
+      "classId": "arcanist",
+      "level": 9,
+      "steps": 129,
+      "events": [
+        "first_oath",
+        "tavern_courier",
+        "wounded_scout",
+        "brom_apprentice",
+        "mill_wheel",
+        "menhir_root",
+        "elara_plan",
+        "bandit_ledger",
+        "river_cart",
+        "bone_ferry",
+        "vesper_names",
+        "forbidden_page",
+        "memory_bell",
+        "freed_souls",
+        "borin_valves",
+        "furnace_fire",
+        "bridge_rescue",
+        "geode_echo",
+        "rift_anchor",
+        "chrono_self",
+        "observatory_lens",
+        "conduit_choice",
+        "final_choice"
+      ],
+      "battles": [
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "boss_garrick",
+          "turns": 7
+        },
+        {
+          "id": "boss_malakor",
+          "turns": 5
+        },
+        {
+          "id": "boss_ignis_vulcan",
+          "turns": 6
+        },
+        {
+          "id": "boss_xalkorath",
+          "turns": 9
+        }
+      ],
+      "ending": "restoration"
+    },
+    {
+      "classId": "shadowblade",
+      "level": 9,
+      "steps": 130,
+      "events": [
+        "first_oath",
+        "tavern_courier",
+        "wounded_scout",
+        "brom_apprentice",
+        "mill_wheel",
+        "menhir_root",
+        "elara_plan",
+        "bandit_ledger",
+        "river_cart",
+        "bone_ferry",
+        "vesper_names",
+        "forbidden_page",
+        "memory_bell",
+        "freed_souls",
+        "borin_valves",
+        "furnace_fire",
+        "bridge_rescue",
+        "geode_echo",
+        "rift_anchor",
+        "chrono_self",
+        "observatory_lens",
+        "conduit_choice",
+        "final_choice"
+      ],
+      "battles": [
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "briar_wolf",
+          "turns": 1
+        },
+        {
+          "id": "boss_garrick",
+          "turns": 7
+        },
+        {
+          "id": "boss_malakor",
+          "turns": 5
+        },
+        {
+          "id": "boss_ignis_vulcan",
+          "turns": 7
+        },
+        {
+          "id": "boss_xalkorath",
+          "turns": 9
+        }
+      ],
+      "ending": "restoration"
+    }
+  ],
+  "main": {
+    "battles": [
+      {
+        "enemyId": "briar_wolf",
+        "level": 1,
+        "maxHp": 140,
+        "hp": 140,
+        "enemyHp": 80,
+        "enemyAttack": 14,
+        "turns": 1,
+        "lowestHp": 140,
+        "lowestSta": 94,
+        "damageTaken": 0,
+        "hitsTaken": 0,
+        "potionsUsed": 0,
+        "phases": [],
+        "actions": [
+          [
+            "ultimate"
+          ]
+        ]
+      },
+      {
+        "enemyId": "briar_wolf",
+        "level": 1,
+        "maxHp": 145,
+        "hp": 140,
+        "enemyHp": 80,
+        "enemyAttack": 14,
+        "turns": 1,
+        "lowestHp": 140,
+        "lowestSta": 79,
+        "damageTaken": 0,
+        "hitsTaken": 0,
+        "potionsUsed": 0,
+        "phases": [],
+        "actions": [
+          [
+            "skill",
+            0
+          ]
+        ]
+      },
+      {
+        "enemyId": "boss_garrick",
+        "level": 2,
+        "maxHp": 167,
+        "hp": 167,
+        "enemyHp": 963,
+        "enemyAttack": 31,
+        "turns": 7,
+        "lowestHp": 150,
+        "lowestSta": 22,
+        "damageTaken": 17,
+        "hitsTaken": 1,
+        "potionsUsed": 0,
+        "phases": [
+          1,
+          2
+        ],
+        "actions": [
+          [
+            "skill",
+            0
+          ],
+          [
+            "skill",
+            1
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "ultimate"
+          ],
+          [
+            "skill",
+            0
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "skill",
+            1
+          ]
+        ]
+      },
+      {
+        "enemyId": "boss_malakor",
+        "level": 4,
+        "maxHp": 211,
+        "hp": 211,
+        "enemyHp": 1044,
+        "enemyAttack": 53,
+        "turns": 6,
+        "lowestHp": 184,
+        "lowestSta": 65,
+        "damageTaken": 27,
+        "hitsTaken": 1,
+        "potionsUsed": 0,
+        "phases": [
+          1,
+          2
+        ],
+        "actions": [
+          [
+            "interrupt"
+          ],
+          [
+            "skill",
+            0
+          ],
+          [
+            "ultimate"
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "skill",
+            1
+          ],
+          [
+            "interrupt"
+          ]
+        ]
+      },
+      {
+        "enemyId": "boss_ignis_vulcan",
+        "level": 5,
+        "maxHp": 233,
+        "hp": 233,
+        "enemyHp": 2392,
+        "enemyAttack": 88,
+        "turns": 9,
+        "lowestHp": 192,
+        "lowestSta": 76,
+        "damageTaken": 75,
+        "hitsTaken": 2,
+        "potionsUsed": 0,
+        "phases": [
+          1,
+          2
+        ],
+        "actions": [
+          [
+            "skill",
+            0
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "ultimate"
+          ],
+          [
+            "skill",
+            1
+          ],
+          [
+            "skill",
+            0
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "attack"
+          ],
+          [
+            "attack"
+          ],
+          [
+            "ultimate"
+          ]
+        ]
+      },
+      {
+        "enemyId": "boss_xalkorath",
+        "level": 7,
+        "maxHp": 277,
+        "hp": 277,
+        "enemyHp": 3610,
+        "enemyAttack": 134,
+        "turns": 11,
+        "lowestHp": 226,
+        "lowestSta": 59,
+        "damageTaken": 98,
+        "hitsTaken": 2,
+        "potionsUsed": 0,
+        "phases": [
+          1,
+          2
+        ],
+        "actions": [
+          [
+            "skill",
+            0
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "skill",
+            1
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "skill",
+            0
+          ],
+          [
+            "ultimate"
+          ],
+          [
+            "interrupt"
+          ],
+          [
+            "guard"
+          ],
+          [
+            "skill",
+            0
+          ],
+          [
+            "skill",
+            1
+          ],
+          [
+            "interrupt"
+          ]
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "enemyId": "boss_garrick",
+        "attack": {
+          "hpLost": 17,
+          "staminaRecovered": 5,
+          "damageDealt": 80
+        },
+        "guard": {
+          "hpLost": 6,
+          "staminaRecovered": 10,
+          "damageDealt": 0
+        }
+      },
+      {
+        "enemyId": "boss_malakor",
+        "attack": {
+          "hpLost": 23,
+          "staminaRecovered": 5,
+          "damageDealt": 154
+        },
+        "guard": {
+          "hpLost": 8,
+          "staminaRecovered": 23,
+          "damageDealt": 0
+        }
+      }
+    ],
+    "optionalBattle": {
+      "enemyId": "boss_vaelen",
+      "level": 7,
+      "maxHp": 277,
+      "hp": 277,
+      "enemyHp": 2312,
+      "enemyAttack": 111,
+      "turns": 7,
+      "lowestHp": 236,
+      "lowestSta": 92,
+      "damageTaken": 41,
+      "hitsTaken": 1,
+      "potionsUsed": 0,
+      "phases": [
+        1,
+        2
+      ],
+      "actions": [
+        [
+          "skill",
+          0
+        ],
+        [
+          "skill",
+          1
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "attack"
+        ],
+        [
+          "skill",
+          0
+        ],
+        [
+          "interrupt"
+        ],
+        [
+          "ultimate"
+        ]
+      ]
+    },
+    "endings": [
+      {
+        "ending": "restoration",
+        "level": 9
+      },
+      {
+        "ending": "guardian",
+        "level": 9
+      },
+      {
+        "ending": "sovereign",
+        "level": 9
+      }
+    ]
+  },
+  "passedCases": [
+    "Every authored room and quest destination is reachable in both directions",
+    "vanguard completes chapters 1–2 legally from level 1 (seed 1234)",
+    "vanguard completes chapters 1–2 legally from level 1 (seed 7401)",
+    "vanguard completes chapters 1–2 legally from level 1 (seed 20261022)",
+    "arcanist completes chapters 1–2 legally from level 1 (seed 1234)",
+    "arcanist completes chapters 1–2 legally from level 1 (seed 7401)",
+    "arcanist completes chapters 1–2 legally from level 1 (seed 20261022)",
+    "shadowblade completes chapters 1–2 legally from level 1 (seed 1234)",
+    "shadowblade completes chapters 1–2 legally from level 1 (seed 7401)",
+    "shadowblade completes chapters 1–2 legally from level 1 (seed 20261022)",
+    "Legal five-chapter Vanguard campaign, meaningful guard branches, all 23 stories and all three saved endings",
+    "vanguard follows the default guided journey through 23 stories and a reachable restoration ending",
+    "arcanist follows the default guided journey through 23 stories and a reachable restoration ending",
+    "shadowblade follows the default guided journey through 23 stories and a reachable restoration ending"
+  ],
+  "passed": true,
+  "expectedCases": 14,
+  "sourceSha256": {
+    "core": "8100ef7afaf68d9a9032fd321827ca45df95feaebfab7bea2638b81efa4e1313",
+    "gameplay": "bc4cb85b0f1bc75d8a155858933be89289912c77be5b90116c06312931536a37",
+    "combat": "36d7c659cbd5a58c95eed5a8ab8debc14f2bfbb3cb691aa91bea7064146895d3",
+    "bootstrap": "af86ea3c04a2b2a2ae7ddf70496034b15d970b2b4fd5dfefc0904c4ab2df0cdc"
+  }
+}

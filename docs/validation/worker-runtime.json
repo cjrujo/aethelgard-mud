@@ -1,0 +1,21 @@
+{
+  "test": "local-workerd-receipt-recovery",
+  "passed": true,
+  "wrangler": "4.152.0",
+  "checks": [
+    "real Worker entrypoint, protocol 11, health and build",
+    "real WebSocket handshake, upgrade notice and complete duel",
+    "unacknowledged victory committed to SQLite",
+    "entire runtime stopped and restarted with the same SQLite directory",
+    "identical receipt restored for a new session",
+    "duplicate acknowledgement is idempotent",
+    "acknowledged receipt is absent after reconnect"
+  ],
+  "startedAt": "2026-10-24T10:43:43.758Z",
+  "build": {
+    "id": "6c661de50a5bddf1",
+    "protocol": 11,
+    "version": "11.0.0"
+  },
+  "durationMs": 8958
+}

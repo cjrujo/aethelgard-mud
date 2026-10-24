@@ -1,9 +1,11 @@
-/** v10 realm protocol. Reconstructed against the recovered real client.
+/** v11 realm protocol with durable reward receipts.
  * Battle state is authoritative within one live Durable Object. There is no
  * account authentication, persistent ranking, or claim of offline-save anti-cheat.
  * Native WebSocket accept() keeps this object active; battles end on a restart.
  */
-export const PROTOCOL = 10;
+import { BUILD } from "./build-info.js";
+import { ReceiptStore, RECEIPT_LIMIT, RECEIPT_BATCH, receiptSummary } from "./receipts.js";
+export const PROTOCOL = 11;
 export const LIMITS = Object.freeze({ sessions: 100, packet: 8192, roundMs: 20000,
   idleMs: 90000, handshakeMs: 15000, lobbyMs: 120000, queueMs: 180000, rounds: 30 });
 const CLASSES = new Set(["vanguard", "arcanist", "shadowblade"]);
@@ -54,8 +56,17 @@ export class AethelgardRealmDO {
     this.uuid = options.uuid || (() => crypto.randomUUID());
     this.schedule = options.schedule || ((fn, delay) => setTimeout(fn, delay));
     this.unschedule = options.unschedule || (id => clearTimeout(id));
-    this.disposed = false;
+    this.disposed = false; this.work = Promise.resolve();
+    this.receipts = new ReceiptStore(state.storage, this.uuid);
   }
+
+  enqueue(fn) {
+    const task = this.work.then(fn);
+    this.work = task.catch(error => console.error("Realm operation failed:", error?.name || "Error"));
+    this.state.waitUntil?.(this.work);
+    return task;
+  }
+  async idle() { let current; do { current = this.work; await current; } while (current !== this.work); }
 
   async fetch(request) {
     if (request.method !== "GET") return new Response("Use GET", { status: 405 });
@@ -65,7 +76,7 @@ export class AethelgardRealmDO {
       this.handleWebSocket(server);
       return new Response(null, { status: 101, webSocket: client });
     }
-    return new Response(JSON.stringify({ service: "Aethelgard live realm", protocol: PROTOCOL,
+    return new Response(JSON.stringify({ service: "Aethelgard live realm", protocol: PROTOCOL, build: BUILD, durableReceipts: true,
       onlinePlayers: [...this.sessions.values()].filter(s => s.ready).length,
       activeBattles: [...this.battles.values()].filter(b => b.status === "active").length,
       queued: { duel: this.queues.duel.length, team: this.queues.team.length } }),
@@ -74,13 +85,13 @@ export class AethelgardRealmDO {
 
   later(fn, delay) {
     if (this.disposed) return null;
-    const id = this.schedule(() => { this.timers.delete(id); fn(); }, delay);
+    const id = this.schedule(() => { this.timers.delete(id); return this.enqueue(fn); }, delay);
     this.timers.add(id); return id;
   }
   cancelTimer(id) { if (id != null) { this.unschedule(id); this.timers.delete(id); } }
   startSweep() {
     if (this.sweepTimer != null || !this.sessions.size || this.disposed) return;
-    this.sweepTimer = this.later(() => { this.sweepTimer = null; this.sweep(); this.startSweep(); }, 10000);
+    this.sweepTimer = this.later(async () => { this.sweepTimer = null; await this.sweep(); this.startSweep(); }, 10000);
   }
 
   handleWebSocket(ws) {
@@ -88,59 +99,99 @@ export class AethelgardRealmDO {
     ws.accept();
     const session = { id: `s-${this.uuid()}`, ws, ready: false, passport: null, battleId: null,
       queueMode: null, queueSince: 0, joinedAt: this.now(), lastSeen: this.now(),
-      rateSince: this.now(), rateCount: 0, lastChat: -Infinity };
+      rateSince: this.now(), rateCount: 0, lastChat: -Infinity, ownerKey: null, heroId: null, receiptInfo: null, lastReceiptSync: -Infinity, requestId: null };
     this.sessions.set(ws, session); this.byId.set(session.id, session);
     ws.addEventListener("message", event => this.handleMessage(ws, event.data));
-    ws.addEventListener("close", () => this.disconnect(ws));
-    ws.addEventListener("error", () => this.disconnect(ws));
-    this.send(session, { type: "welcome", protocol: PROTOCOL, sessionId: session.id });
+    ws.addEventListener("close", () => this.enqueue(() => this.disconnect(ws)));
+    ws.addEventListener("error", () => this.enqueue(() => this.disconnect(ws)));
+    this.send(session, { type: "welcome", protocol: PROTOCOL, build: BUILD, sessionId: session.id });
     this.startSweep(); return session.id;
   }
 
   send(session, packet) {
     if (!session || this.sessions.get(session.ws) !== session) return false;
     try { session.ws.send(JSON.stringify({ ...packet, serverTime: this.now() })); return true; }
-    catch { this.disconnect(session.ws); return false; }
+    catch { this.enqueue(() => this.disconnect(session.ws)); return false; }
   }
   error(session, code, message, messageZh = "请求被拒绝，请检查状态后重试。") {
-    this.send(session, { type: "error", code, message, messageZh }); return false;
+    this.send(session, { type: "error", code, message, messageZh, requestId: session.requestId }); return false;
   }
   busy(session) { return Boolean(session.queueMode || session.battleId); }
 
-  handleMessage(ws, raw) {
+  handleMessage(ws, raw) { return this.enqueue(() => this.processMessage(ws, raw)); }
+  async processMessage(ws, raw) {
     const session = this.sessions.get(ws); if (!session) return;
-    if (typeof raw !== "string" || raw.length > LIMITS.packet) { this.disconnect(ws, 1009, "Invalid packet size or type"); return; }
+    if (typeof raw !== "string" || raw.length > LIMITS.packet) { await this.disconnect(ws, 1009, "Invalid packet size or type"); return; }
     if (this.now() - session.rateSince >= 10000) { session.rateSince = this.now(); session.rateCount = 0; }
-    if (++session.rateCount > 45) { this.error(session, "rate_limit", "Too many requests.", "请求过于频繁。"); this.disconnect(ws, 1008, "Rate limit"); return; }
+    if (++session.rateCount > 45) { this.error(session, "rate_limit", "Too many requests.", "请求过于频繁。"); await this.disconnect(ws, 1008, "Rate limit"); return; }
     let packet;
     try { packet = JSON.parse(raw); } catch { this.error(session, "invalid_json", "Expected JSON.", "请发送有效 JSON。"); return; }
     if (!packet || Array.isArray(packet) || typeof packet.type !== "string") { this.error(session, "invalid_packet", "Expected a typed message."); return; }
     session.lastSeen = this.now();
-    if (!session.ready) {
-      if (packet.type !== "hello" || packet.protocol !== PROTOCOL) {
-        this.error(session, "protocol", "A v10 hello is required.", "需要先完成 v10 握手。"); return;
-      }
-      try { session.passport = validatePassport(packet.passport); }
-      catch (error) { this.error(session, "passport", error.message, "角色快照不合法。"); return; }
-      session.ready = true;
-      this.send(session, { type: "ready", protocol: PROTOCOL, sessionId: session.id });
-      this.broadcastPresence(); return;
-    }
-    switch (packet.type) {
-      case "ping": this.send(session, { type: "pong" }); break;
-      case "sync":
-        if (this.busy(session)) { this.error(session, "busy", "Leave the queue or battle before syncing.", "请退出匹配或结束战斗后同步角色。"); break; }
+    session.requestId = typeof packet.requestId === "string" ? packet.requestId.slice(0, 100) : null;
+    try {
+      if (!session.ready) {
+        if (packet.type !== "hello" || packet.protocol !== PROTOCOL) {
+          this.error(session, "protocol", `This server requires client protocol ${PROTOCOL}. Refresh or update your game.`, `服务器需要协议 ${PROTOCOL} 的客户端，请刷新网页或更新本地游戏。`); return;
+        }
         try { session.passport = validatePassport(packet.passport); }
-        catch (error) { this.error(session, "passport", error.message, "角色快照不合法。"); break; }
-        this.send(session, { type: "synced" }); this.broadcastPresence(); break;
-      case "chat": this.chat(session, packet.text); break;
-      case "raid_join": this.joinRaid(session); break;
-      case "raid_start": this.startRaid(session); break;
-      case "arena_queue": this.joinQueue(session, packet.mode); break;
-      case "queue_leave": this.leaveQueue(session); break;
-      case "battle_leave": this.leaveBattle(session); break;
-      case "battle_action": this.action(session, packet); break;
-      default: this.error(session, "unknown_message", "Unknown v10 message type.", "未知的 v10 消息类型。");
+        catch (error) { this.error(session, "passport", error.message, "角色快照不合法。"); return; }
+        const { key, record } = await this.receipts.open(packet.identity);
+        if (this.sessions.get(ws) !== session) return;
+        for (const existing of [...this.sessions.values()]) if (existing !== session && existing.ownerKey === key) {
+          this.error(existing, "session_replaced", "This saved hero connected from another window. The old battle is left.", "同一存档已在另一窗口连接；此窗口退出当前对局。");
+          await this.disconnect(existing.ws, 4001, "Saved hero reconnected");
+        }
+        session.ownerKey = key; session.heroId = record.heroId; session.receiptInfo = receiptSummary(record); session.ready = true;
+        this.send(session, { type: "ready", protocol: PROTOCOL, build: BUILD, sessionId: session.id, heroId: session.heroId, receipts: session.receiptInfo });
+        this.deliverReceipts(session, record); this.broadcastPresence(); return;
+      }
+      switch (packet.type) {
+        case "ping": this.send(session, { type: "pong", receipts: session.receiptInfo }); break;
+        case "sync":
+          if (this.busy(session)) { this.error(session, "busy", "Leave the queue or battle before syncing.", "请退出匹配或结束战斗后同步角色。"); break; }
+          try { session.passport = validatePassport(packet.passport); }
+          catch (error) { this.error(session, "passport", error.message, "角色快照不合法。"); break; }
+          this.send(session, { type: "synced" }); this.broadcastPresence(); break;
+        case "receipt_sync": {
+          if (this.now() - session.lastReceiptSync < 5000) break;
+          session.lastReceiptSync = this.now();
+          const record = await this.receipts.get(session.ownerKey);
+          session.receiptInfo = receiptSummary(record);
+          this.send(session, { type: "receipts_status", receipts: session.receiptInfo }); this.deliverReceipts(session, record); break;
+        }
+        case "receipt_ack": {
+          session.receiptInfo = await this.receipts.ack(session.ownerKey, session.heroId, packet);
+          this.send(session, { type: "receipt_acked", rewardId: packet.rewardId, receipts: session.receiptInfo }); break;
+        }
+        case "chat": this.chat(session, packet.text); break;
+        case "raid_join": if (this.canJoin(session)) this.joinRaid(session); break;
+        case "raid_start": this.startRaid(session); break;
+        case "arena_queue": if (this.canJoin(session)) this.joinQueue(session, packet.mode); break;
+        case "queue_leave": this.leaveQueue(session); break;
+        case "battle_leave": await this.leaveBattle(session); break;
+        case "battle_action": await this.action(session, packet); break;
+        default: this.error(session, "unknown_message", "Unknown v11 message type.", "未知的 v11 消息类型。");
+      }
+    } catch (error) {
+      const code = error.code || "storage_unavailable";
+      const messages = {
+        identity: "需要已保存英雄的恢复身份，请先成功保存后再连接。",
+        identity_mismatch: "恢复凭证不属于当前英雄，请恢复对应存档后再试。",
+        receipt_owner: "该奖励收据不属于当前英雄或领域。",
+        receipt: "奖励确认无效，请重新连接并补领。",
+        receipts_full: "待领取奖励已满，请先领取后再进入新对局。"
+      };
+      this.error(session, code, error.code ? error.message : "Reward storage is temporarily unavailable. Reconnect to retry.", messages[code] || "奖励存储暂时不可用，请稍后重新连接。");
+    } finally { session.requestId = null; }
+  }
+  canJoin(session) {
+    if ((session.receiptInfo?.pending || 0) >= RECEIPT_LIMIT) return this.error(session, "receipts_full", "Collect pending rewards before joining another expedition.", "请先领取待收奖励，再加入下一场对局。");
+    return true;
+  }
+  deliverReceipts(session, record) {
+    for (const receipt of record.pending.slice(0, RECEIPT_BATCH)) {
+      if (!this.send(session, { type: "battle_result", ...receipt, sessionId: session.id, heroId: session.heroId })) break;
     }
   }
 
@@ -162,7 +213,7 @@ export class AethelgardRealmDO {
   makeMember(session, kind, team = 0) {
     const p = session.passport, stats = kind === "arena" ? ARENA[p.classId] : p;
     return { id: session.id, alias: p.alias, classId: p.classId, level: p.level, team,
-      maxHp: stats.maxHp, hp: stats.maxHp, atk: stats.atk, mag: stats.mag, def: stats.def,
+      ownerKey: session.ownerKey, heroId: session.heroId, maxHp: stats.maxHp, hp: stats.maxHp, atk: stats.atk, mag: stats.mag, def: stats.def,
       skillCd: 0, heals: 2, contribution: 0, damage: 0, disconnected: false, action: null, guarding: false };
   }
   makeBattle(kind, mode, room) {
@@ -248,7 +299,7 @@ export class AethelgardRealmDO {
     this.cancelTimer(b.timer); b.timer = this.later(() => this.resolveRound(b), LIMITS.roundMs);
     this.publishBattle(b);
   }
-  action(session, packet) {
+  async action(session, packet) {
     const b = this.battles.get(session.battleId), m = b?.members.find(member => member.id === session.id);
     if (!b || b.status !== "active" || packet.battleId !== b.id || packet.round !== b.round || !m || m.hp <= 0 || m.disconnected) return this.error(session, "battle_state", "This action does not belong to your active round.", "该行动不属于你当前的有效回合。");
     if (m.action) return this.error(session, "already_acted", "One action per round.", "每回合只能行动一次。");
@@ -264,13 +315,13 @@ export class AethelgardRealmDO {
     }
     m.action = { kind: packet.action, targetId, explicit: true }; m.contribution++;
     this.publishBattle(b);
-    if (b.members.filter(member => member.hp > 0 && !member.disconnected).every(member => member.action)) this.resolveRound(b);
+    if (b.members.filter(member => member.hp > 0 && !member.disconnected).every(member => member.action)) await this.resolveRound(b);
   }
   hit(raw, defense, guarded) {
     const base = Math.max(3, Math.round(raw - defense * .45));
     return guarded ? Math.max(1, Math.ceil(base * .35)) : base;
   }
-  resolveRound(b) {
+  async resolveRound(b) {
     if (b.status !== "active") return;
     this.cancelTimer(b.timer); b.timer = null;
     const alive = b.members.filter(m => m.hp > 0 && !m.disconnected), usedSkills = new Set();
@@ -299,7 +350,7 @@ export class AethelgardRealmDO {
     }
     if (b.boss) b.boss.hp = Math.max(0, b.boss.hp - (damage.get("boss") || 0));
     else for (const m of alive) m.hp = Math.max(0, m.hp - (damage.get(m.id) || 0));
-    if (b.boss?.hp === 0) { this.finish(b, 0); return; }
+    if (b.boss?.hp === 0) { await this.finish(b, 0); return; }
     if (b.boss) {
       if (b.boss.phase === 1 && b.boss.hp < b.boss.maxHp * .4) { b.boss.phase = 2; this.log(b, "The Riftwarden becomes enraged!", "裂隙守卫进入狂暴阶段！"); }
       if (b.boss.intent === "recover") {
@@ -315,44 +366,64 @@ export class AethelgardRealmDO {
       }
     }
     for (const m of b.members) if (m.skillCd && !usedSkills.has(m.id)) m.skillCd--;
-    if (this.checkEnd(b)) return;
-    if (b.round >= LIMITS.rounds) { this.finish(b, null); return; }
+    if (await this.checkEnd(b)) return;
+    if (b.round >= LIMITS.rounds) { await this.finish(b, null); return; }
     b.round++; this.beginRound(b);
   }
-  checkEnd(b) {
+  async checkEnd(b) {
     if (b.status !== "active") return true;
     const living = b.members.filter(m => m.hp > 0 && !m.disconnected);
-    if (b.kind === "raid") { if (!living.length) { this.finish(b, 1); return true; } }
+    if (b.kind === "raid") { if (!living.length) { await this.finish(b, 1); return true; } }
     else {
       const teams = new Set(living.map(m => m.team));
-      if (teams.size < 2) { this.finish(b, teams.size ? [...teams][0] : null); return true; }
+      if (teams.size < 2) { await this.finish(b, teams.size ? [...teams][0] : null); return true; }
     }
     return false;
   }
-  finish(b, winningTeam) {
-    if (b.status === "finished" || b.resultsSent) return;
-    this.cancelTimer(b.timer); b.timer = null; b.status = "finished"; b.deadline = null; b.resultsSent = true;
-    this.log(b, winningTeam === null ? "The battle ends in a draw." : "The battle is over.", winningTeam === null ? "战斗以平局结束。" : "战斗结束。");
+  async finish(b, winningTeam) {
+    if (b.resultsSent) return;
+    if (!b.settlement) {
+      this.cancelTimer(b.timer); b.timer = null; b.status = "settling"; b.deadline = null;
+      b.settlement = [];
+      for (const m of b.members) {
+        const s = this.byId.get(m.id); if (!s || s.battleId !== b.id) continue;
+        const outcome = winningTeam === null ? "draw" : m.team === winningTeam ? "victory" : "defeat";
+        const eligible = outcome === "victory" && !m.disconnected && m.contribution > 0;
+        const reward = eligible ? b.kind === "raid"
+          ? { gold: 120 + m.level * 4, xp: 160 + m.level * 4, shards: 2, glory: 5, loot: true }
+          : { gold: 35, xp: 60, shards: 1, glory: b.mode === "team" ? 8 : 4, loot: false }
+          : zeroReward();
+        b.settlement.push({ ownerKey: m.ownerKey, heroId: m.heroId, battleId: b.id, kind: b.kind, mode: b.mode, outcome, eligible, reward, createdAt: this.now() });
+      }
+      b.winningTeam = winningTeam; this.publishBattle(b);
+    }
+    let outcomes;
+    try { outcomes = await this.receipts.settle(b.settlement); }
+    catch {
+      this.log(b, "Reward storage is unavailable. Your result is awaiting a retry; do not start another battle.", "奖励存储暂时不可用，正在重试保存结算，请稍候。");
+      this.publishBattle(b);
+      this.cancelTimer(b.timer); b.timer = this.later(() => this.finish(b, b.winningTeam), 5000);
+      return;
+    }
+    this.cancelTimer(b.timer); b.timer = null; b.status = "finished"; b.resultsSent = true;
+    this.log(b, b.winningTeam === null ? "The battle ends in a draw." : "The battle is over. Your result is safely recorded.", b.winningTeam === null ? "战斗以平局结束，结算已保存。" : "战斗结束，结算已安全保存。");
     this.publishBattle(b);
-    for (const m of b.members) {
-      const s = this.byId.get(m.id); if (!s || s.battleId !== b.id) continue;
-      const outcome = winningTeam === null ? "draw" : m.team === winningTeam ? "victory" : "defeat";
-      const eligible = outcome === "victory" && !m.disconnected && m.contribution > 0;
-      const reward = eligible ? b.kind === "raid"
-        ? { gold: 120 + m.level * 4, xp: 160 + m.level * 4, shards: 2, glory: 5, loot: true }
-        : { gold: 35, xp: 60, shards: 1, glory: b.mode === "team" ? 8 : 4, loot: false }
-        : zeroReward();
-      this.send(s, { type: "battle_result", battleId: b.id, sessionId: s.id, rewardId: `${b.id}:${s.id}`, outcome, eligible, reward });
-      s.battleId = null;
+    for (const result of outcomes) {
+      // Persisted receipts remain claimable even if sending this packet fails.
+      const s = [...this.sessions.values()].find(s => s.ready && s.ownerKey === result.ownerKey);
+      if (!s) continue;
+      s.receiptInfo = result.summary;
+      if (s.battleId === b.id) s.battleId = null;
+      this.send(s, { type: "battle_result", ...result.receipt, sessionId: s.id, heroId: s.heroId });
     }
     this.broadcastPresence();
     this.later(() => this.battles.delete(b.id), 60000);
   }
 
-  leaveBattle(session, notify = true) {
+  async leaveBattle(session, notify = true) {
     const b = this.battles.get(session.battleId); session.battleId = null;
     if (notify) this.send(session, { type: "battle_left" });
-    if (!b || b.status === "finished") return;
+    if (!b || ["settling", "finished"].includes(b.status)) return;
     if (b.status === "lobby") {
       b.members = b.members.filter(m => m.id !== session.id);
       if (!b.members.length) this.battles.delete(b.id);
@@ -361,26 +432,26 @@ export class AethelgardRealmDO {
       const m = b.members.find(member => member.id === session.id);
       if (m) { m.disconnected = true; m.hp = 0; m.action = null; }
       this.log(b, `${session.passport.alias} left the battle.`, `${session.passport.alias} 离开了战斗。`);
-      if (!this.checkEnd(b)) {
+      if (!await this.checkEnd(b)) {
         const alive = b.members.filter(member => member.hp > 0 && !member.disconnected);
-        if (alive.every(member => member.action)) this.resolveRound(b); else this.publishBattle(b);
+        if (alive.every(member => member.action)) await this.resolveRound(b); else this.publishBattle(b);
       }
     }
     this.broadcastPresence();
   }
-  disconnect(ws, code = 1000, reason = "Connection closed") {
+  async disconnect(ws, code = 1000, reason = "Connection closed") {
     const session = this.sessions.get(ws); if (!session) return;
     this.sessions.delete(ws); this.byId.delete(session.id);
     if (session.queueMode) this.leaveQueue(session, false);
-    if (session.battleId) this.leaveBattle(session, false);
+    if (session.battleId) await this.leaveBattle(session, false);
     try { ws.close(code, reason); } catch {}
     this.broadcastPresence();
     if (!this.sessions.size) { this.cancelTimer(this.sweepTimer); this.sweepTimer = null; }
   }
-  sweep() {
+  async sweep() {
     const now = this.now();
     for (const s of [...this.sessions.values()]) {
-      if ((!s.ready && now - s.joinedAt >= LIMITS.handshakeMs) || now - s.lastSeen >= LIMITS.idleMs) { this.disconnect(s.ws, 1001, "Session timed out"); continue; }
+      if ((!s.ready && now - s.joinedAt >= LIMITS.handshakeMs) || now - s.lastSeen >= LIMITS.idleMs) { await this.disconnect(s.ws, 1001, "Session timed out"); continue; }
       if (s.queueMode && now - s.queueSince >= LIMITS.queueMs) { this.leaveQueue(s); this.error(s, "queue_timeout", "Matchmaking expired. Queue again when other players are ready.", "匹配已超时，请在其他玩家准备好后重新排队。"); }
     }
     for (const b of [...this.battles.values()]) if (b.status === "lobby" && now - b.createdAt >= LIMITS.lobbyMs) {
@@ -393,7 +464,8 @@ export class AethelgardRealmDO {
   }
   dispose() {
     this.disposed = true;
-    for (const ws of [...this.sessions.keys()]) this.disconnect(ws);
+    const sockets = [...this.sessions.keys()]; this.sessions.clear(); this.byId.clear();
+    for (const ws of sockets) { try { ws.close(1001, "Realm stopped"); } catch {} }
     for (const timer of this.timers) this.unschedule(timer);
     this.timers.clear(); this.battles.clear(); this.queues = { duel: [], team: [] };
   }

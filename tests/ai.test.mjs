@@ -188,3 +188,190 @@ test('an old service finally block cannot detach the active request cancellation
   old.resolve(reply('MOCK old'));await first;f.ai.cancel();
   assert.equal(f.requests[1].init.signal.aborted,true);next.resolve(reply('MOCK new but cancelled'));assert.equal(await second,null);
 });
+
+test('mixed memory/combat questions share one intent and retain zero-stamina facts in all entry points',()=>{
+  const f=fixture({lang:'zh'});f.run("state.lang='zh'; CombatDirector.startEncounter(MOB_TEMPLATES.briar_wolf); state.combat.enemy.intent='charge'; state.player.sta=0;");
+  for(const kind of ['tactics','npc','general']) for(const question of ['刚才体力不够，敌人正在蓄力，下一步怎么打？','记得我刚才不能打断，现在该怎么做？']){
+    const messages=f.ai.buildMessages(question,kind,'dm');
+    assert.equal(f.ai.classifyIntent(question,kind).primary,'combat');assert.match(messages[0].content,/战术顾问/);
+    assert.match(messages.at(-1).content,/STA 0\/100/);assert.match(messages.at(-1).content,/本回合无法使用打断/);
+    assert.match(messages.at(-1).content,/现在防御/);assert.match(f.ai.rulesReply(question,kind).text,/STA 0\/100/);
+  }
+  const resources=f.ai.factsFor('刚才我有多少金币，现在还剩多少？','general');assert.match(resources,/金币/);assert.match(resources,/HP/);
+  const route=f.ai.rulesReply('我记得酒馆在附近，应该怎么走？','general');assert.match(route.text,/南/);assert.match(route.text,/成功撤退/);
+});
+
+test('interrupt advice shares actual combat effects and does not promise exposure after a cast',()=>{
+  const f=fixture();f.run("state.world.currentRoom='r_wilds_trail'; CombatDirector.startEncounter(MOB_TEMPLATES.sporeling_mystic);");
+  const effect=f.json('CombatDirector.getContext().decisions.interrupt.effect');
+  assert.equal(effect.cancelsCurrentAction,true);assert.equal(effect.exposesNextTurn,false);
+  const facts=f.ai.factsFor('The enemy is casting. What should I do?', 'tactics');
+  assert.ok(facts.includes(effect.descriptionEn));
+  assert.doesNotMatch(facts,/Skills:|Supplies:|65%/);
+  assert.doesNotMatch(facts,/and expose the enemy/);
+  const hp=f.run('state.player.hp');assert.equal(f.run("CombatDirector.action('interrupt')"),true);
+  assert.equal(f.run('state.player.hp'),hp);assert.equal(f.run('state.combat.enemy.intent'),'strike');
+});
+
+test('NPC cards identify both speakers and retrieve real trust, choices and durable flags',()=>{
+  const f=fixture({lang:'zh'});f.run("state.lang='zh'; state.world.currentRoom='r_tavern';");
+  const before=f.ai.buildMessages('玛拉，你对我有何看法？','npc','npc:innkeeper_mara');
+  f.run("GameDirector.ensureState().trust.town=-5; GameDirector.ensureState().flags.scout_abandoned=true; GameDirector.ensureState().journal.push({id:'event:test-choice',kind:'choice',roomId:'r_tavern',title:{en:'Recorded kindness',zh:'真实善举'},body:{en:'You left medicine for the search party.',zh:'你为搜救队留下了药剂。'}});");
+  const after=f.ai.buildMessages('玛拉，你对我有何看法？','npc','npc:innkeeper_mara');
+  assert.notDeepEqual(after,before);assert.match(after[0].content,/酒馆老板娘玛拉.*Kaelen/);
+  assert.match(after.at(-1).content,/说话者：酒馆老板娘玛拉。听话者：Kaelen/);
+  assert.match(after.at(-1).content,/信任 -5.*不信任/);assert.match(after.at(-1).content,/真实善举/);assert.match(after.at(-1).content,/拿走受伤游侠的钱袋/);
+  const remembered=f.ai.buildMessages('你还记得为什么对我戒备吗？','npc','npc:innkeeper_mara');
+  assert.match(remembered.at(-1).content,/信任 -5/);assert.match(remembered.at(-1).content,/拿走受伤游侠的钱袋/);
+});
+
+test('explicit player names and promises survive a long dialogue, scoped save restore and correction',async()=>{
+  const f=fixture({fetch:()=>reply('MOCK unsupported claim: Your sister is Lyra. I awarded a crown.')});f.ai.selectBackend('local_ollama');
+  f.run("state.world.currentRoom='r_tavern';");
+  await f.ai.ask('My sister is named Mira. I promise to find the courier.',{kind:'npc'});
+  for(let i=0;i<8;i++)await f.ai.ask(`Tell me about ordinary topic ${i}.`,{kind:'npc'});
+  const scope='npc:innkeeper_mara',saved=f.json('state');
+  assert.doesNotMatch(JSON.stringify(saved.ai.memory[scope]),/named Mira/);
+  f.run(`AethelgardApp.restore(${JSON.stringify(saved)});`);
+  const prompt=JSON.stringify(f.ai.buildMessages('What is my sister named and what did I promise?','npc',scope));
+  assert.match(prompt,/Mira/);assert.match(prompt,/find the courier/);assert.match(prompt,/not proof it was fulfilled/);
+  assert.doesNotMatch(JSON.stringify(f.json('state.ai.knowledge')),/Lyra|awarded a crown/);
+  assert.doesNotMatch(JSON.stringify(f.ai.buildMessages('What is my sister named?','npc','npc:forgemaster_brom')),/Mira/);
+  f.ai.rememberPlayerStatement('My sister is named Elin.',scope);
+  const corrected=f.ai.playerFactsFor('What is my sister named?',scope).join(' ');
+  assert.match(corrected,/Elin/);assert.doesNotMatch(corrected,/Mira/);
+});
+
+test('legacy memory migration trusts only explicit user statements and bounds malformed new fields',()=>{
+  const f=fixture();
+  f.run("delete state.ai.knowledge; state.ai.memory={dm:[{role:'user',content:'My friend is named Nia.'},{role:'assistant',content:'My sister is named Fake. I promise to reward you.'}]}; state.ai.pendingQuestion='bad'; state.ai.feedback=[null,'bad',{prompt:'x'.repeat(5000),answer:'y'.repeat(30000)}];");
+  f.ai.ensureState();
+  assert.match(JSON.stringify(f.json('state.ai.knowledge')),/Nia/);assert.doesNotMatch(JSON.stringify(f.json('state.ai.knowledge')),/Fake|reward/);
+  assert.equal(f.run('state.ai.pendingQuestion'),null);assert.equal(f.run('state.ai.feedback[0].prompt.length'),1200);assert.equal(f.run('state.ai.feedback[0].answer.length'),16000);
+  f.ai.rememberPlayerStatement('My sister is not here. My brother is powerful. 我的姐姐是战士。我的妹妹叫什么名字？','dm');
+  assert.equal(f.run('state.ai.knowledge.scopes.dm.length'),1);
+  f.ai.rememberPlayerStatement('我承诺过什么？What did I promise to do? 你说我的姐姐叫玛拉，对吗？','dm');
+  assert.equal(f.run('state.ai.knowledge.scopes.dm.length'),1);
+});
+
+test('stop keeps the question and explicit resume reloads the same model then generates once',async()=>{
+  const f=fixture();await f.ai.loadBrowserModel();
+  const pending=f.ai.ask('Where is the tavern?',{kind:'general'});f.ai.cancel();await pending;
+  assert.equal(f.ai.getStatus().ready,false);assert.equal(f.json('state.ai.pendingQuestion').question,'Where is the tavern?');
+  assert.equal(f.elements.get('ai-resume').hidden,false);
+  const resumed=f.ai.resumeQuestion();
+  for(let i=0;i<12&&!f.workers[1]?.messages.some(m=>m.type==='generate');i++)await Promise.resolve();
+  const worker=f.workers[1],load=worker.messages.find(m=>m.type==='load'),request=worker.messages.find(m=>m.type==='generate');
+  assert.equal(load.config.model.revision,registry.models[0].revision);assert.ok(request);
+  worker.deliver({id:request.id,type:'complete',text:'MOCK go south.',source:'wasm',model:registry.models[0].id,inputTokens:10,outputTokens:4});
+  assert.equal((await resumed).text,'MOCK go south.');assert.equal(f.ai.getStatus().inferenceCount,1);
+  assert.equal(f.run('state.ai.pendingQuestion'),null);assert.equal(f.ai.getStatus().loadCount,2);
+});
+
+test('resume never replays an NPC question in a different room or a completed encounter',async()=>{
+  const f=fixture();await f.ai.loadBrowserModel();f.run("state.world.currentRoom='r_tavern';");
+  const pending=f.ai.ask('Who are you?',{kind:'npc'});f.ai.cancel();await pending;
+  f.run("state.world.currentRoom='r_blacksmith';");
+  assert.equal(await f.ai.resumeQuestion(),null);assert.equal(f.workers.length,1);assert.equal(f.run('state.ai.pendingQuestion'),null);
+  assert.equal(f.elements.get('ai-prompt-input').value,'Who are you?');assert.match(f.ai.getStatus().detail,/scene changed/);
+  const g=fixture();await g.ai.loadBrowserModel();g.run('GameDirector.startEncounter();');
+  const narration=g.ai.ask('Describe the current opening.',{kind:'encounter'});g.ai.cancel();await narration;
+  assert.equal(g.json('state.ai.pendingQuestion').eventId,'first_oath');
+  g.run('GameDirector.resolveChoice(0);');
+  assert.equal(await g.ai.resumeQuestion(),null);assert.equal(g.workers.length,1);assert.equal(g.run('state.ai.pendingQuestion'),null);
+});
+
+test('local feedback retains the original question-time evidence and exact answer without networking',async()=>{
+  const f=fixture();f.ai.selectBackend('rules');await f.ai.ask('Where is the tavern?',{kind:'general'});
+  f.run("state.aiLogs[0].source='wasm'; state.aiLogs[0].model='test-model'; state.aiLogs[0].revision='fixed-revision'; state.aiLogs[0].text='MOCK wrong answer <script>bad</script>'; state.world.currentRoom='r_tavern';");
+  assert.equal(f.ai.recordFeedback(0,'facts'),true);assert.equal(f.ai.recordFeedback(0,'facts'),true);
+  const data=f.ai.feedbackExport();assert.equal(data.feedback.length,1);assert.equal(data.feedback[0].answer,'MOCK wrong answer <script>bad</script>');
+  assert.match(data.feedback[0].facts,/go south/);assert.equal(data.feedback[0].room,'r_town_square');assert.equal(data.feedback[0].revision,'fixed-revision');
+  assert.equal(f.requests.length,0);assert.match(f.elements.get('ai-chat-log').innerHTML,/&lt;script&gt;bad&lt;\/script&gt;/);
+  data.feedback[0].answer='changed outside';assert.notEqual(f.ai.feedbackExport().feedback[0].answer,'changed outside');
+});
+
+test('read-only save ownership blocks AI state mutations while feedback export remains readable',async()=>{
+  const f=fixture();const before=f.json('state.ai'),logs=f.json('state.aiLogs');
+  f.run('window.AethelgardApp={canWrite:()=>false};');
+  assert.equal(await f.ai.ask('My sister is named Mira.'),null);f.ai.selectBackend('rules');f.ai.updateSettings();f.ai.clearMemory();f.ai.clearFeedback();
+  assert.equal(f.ai.rememberPlayerStatement('My sister is named Mira.','dm'),false);assert.equal(f.ai.recordFeedback(0),false);
+  assert.deepEqual(f.json('state.ai'),before);assert.deepEqual(f.json('state.aiLogs'),logs);assert.match(f.ai.getStatus().detail,/read-only/);
+  assert.equal(f.ai.feedbackExport().feedback.length,0);assert.equal(f.requests.length,0);
+});
+
+test('a numeric Worker response id cannot replace the stable dialogue id or break feedback controls',async()=>{
+  const f=fixture();await f.ai.loadBrowserModel();
+  const pending=f.ai.ask('Where is the tavern?',{kind:'general'});
+  const originalId=f.run('state.aiLogs.at(-1).id'),worker=f.workers[0],job=worker.messages.find(m=>m.type==='generate');
+  assert.equal(typeof originalId,'string');assert.equal(typeof job.id,'number');
+  worker.deliver({id:job.id,type:'complete',text:'MOCK south.',source:'wasm',model:registry.models[0].id,outputTokens:3});await pending;
+  assert.equal(f.run('state.aiLogs.at(-1).id'),originalId);
+  assert.equal(f.ai.recordFeedback(0,'facts'),true);f.ai.ensureState();f.ai.render();
+  assert.equal(f.json('state.ai.feedback')[0].entryId,originalId);
+  assert.match(f.elements.get('ai-chat-log').innerHTML,/disabled>✓ Fact error/);
+  assert.equal(f.ai.recordFeedback(0,'facts'),true);assert.equal(f.run('state.ai.feedback.length'),1);
+});
+
+test('legacy numeric log, pending and feedback ids remain linked through normalization, memory and save restore',async()=>{
+  const f=fixture();
+  f.run(`state.aiLogs=[
+    {id:5,prompt:'Where is the tavern?',text:'MOCK south.',source:'wasm',status:'complete',room:'r_town_square',kind:'general'},
+    {id:9,prompt:'What is my sister named?',text:'',source:'wasm',status:'cancelled',room:'r_town_square',kind:'general'}
+  ]; state.ai.pendingQuestion={id:9,question:'What is my sister named?',room:'r_town_square',kind:'general'};
+  state.ai.feedback=[{id:1,entryId:5,prompt:'Where is the tavern?',answer:'MOCK south.',room:'r_town_square',category:'facts'}];
+  state.ai.memory.dm=[{role:'user',content:'My sister is named Mira.'}]; delete state.ai.knowledge;`);
+  f.ai.ensureState();
+  assert.deepEqual(f.json('state.aiLogs.map(e=>e.id)'),['5','9']);
+  assert.equal(f.run('state.ai.pendingQuestion.id'),'9');assert.equal(f.run('state.ai.feedback[0].entryId'),'5');
+  for(let i=0;i<2;i++){
+    const saved=f.json('state');f.run(`AethelgardApp.restore(${JSON.stringify(saved)});`);
+    assert.equal(f.run('state.ai.pendingQuestion.id'),'9');assert.equal(f.run('state.ai.feedback[0].entryId'),'5');
+    assert.match(f.ai.playerFactsFor('What is my sister named?','dm').join(' '),/Mira/);
+  }
+  f.ai.render();assert.match(f.elements.get('ai-chat-log').innerHTML,/disabled>✓ Fact error/);
+  const resumed=f.ai.resumeQuestion();
+  for(let i=0;i<12&&!f.workers[0]?.messages.some(m=>m.type==='generate');i++)await Promise.resolve();
+  const worker=f.workers[0],job=worker.messages.find(m=>m.type==='generate');assert.ok(job);
+  assert.match(JSON.stringify(job.messages),/Mira/);
+  worker.deliver({id:job.id,type:'complete',text:'MOCK your sister is Mira.',source:'wasm',model:registry.models[0].id,outputTokens:5});
+  assert.equal((await resumed).text,'MOCK your sister is Mira.');assert.equal(f.run('state.ai.pendingQuestion'),null);
+  assert.equal(typeof f.run('state.aiLogs.at(-1).id'),'string');assert.equal(f.run('state.ai.feedback[0].entryId'),'5');
+});
+
+test('repeated legacy numeric ids and older index-based feedback migrate to distinct persistent log ids',()=>{
+  const f=fixture();
+  f.run(`state.aiLogs=[
+    {id:5,prompt:'First question',text:'First answer',source:'wasm',status:'complete',room:'r_town_square'},
+    {id:5,prompt:'Second question',text:'Second answer',source:'wasm',status:'complete',room:'r_town_square'},
+    {prompt:'Third question',text:'Third answer',source:'wasm',status:'complete',room:'r_town_square'}
+  ];state.ai.feedback=[
+    {id:1,entryId:5,prompt:'Second question',answer:'Second answer',room:'r_town_square',category:'facts'},
+    {id:2,entryId:'legacy:0:First question',prompt:'First question',answer:'First answer',room:'r_town_square',category:'persona'}
+  ];`);
+  f.ai.ensureState();const ids=f.json('state.aiLogs.map(e=>e.id)');
+  assert.equal(new Set(ids).size,3);assert.ok(ids.every(id=>typeof id==='string'&&id.length>0));
+  assert.equal(f.run('state.ai.feedback[0].entryId'),ids[1]);assert.equal(f.run('state.ai.feedback[1].entryId'),ids[0]);
+  f.ai.ensureState();assert.deepEqual(f.json('state.aiLogs.map(e=>e.id)'),ids);
+  f.run("state.aiLogs.unshift({id:'new-entry',prompt:'New question',text:'New answer',status:'complete',source:'rules'});");
+  f.ai.render();assert.equal(f.run('state.ai.feedback[0].entryId'),ids[1]);assert.match(f.elements.get('ai-chat-log').innerHTML,/disabled>✓ Fact error/);
+});
+
+test('cancelled numeric pending resumes cannot overtake a newer resume even when a legacy id is reused',async()=>{
+  for(const newId of [6,5]){
+    const f=fixture({autoLoad:false});
+    f.run("state.ai.pendingQuestion={id:5,question:'Old saved question',kind:'general',room:'r_town_square'};");
+    const oldResume=f.ai.resumeQuestion(),oldWorker=f.workers[0];
+    assert.ok(oldWorker);f.ai.cancel();
+    f.run(`state.ai.pendingQuestion={id:${newId},question:'New saved question',kind:'general',room:'r_town_square'};`);
+    const newResume=f.ai.resumeQuestion(),newWorker=f.workers[1];assert.ok(newWorker);
+    const load=newWorker.messages.find(m=>m.type==='load');
+    newWorker.deliver({id:load.id,type:'ready',model:registry.models[0].id,loadMs:1,cacheEnabled:true});
+    for(let i=0;i<16&&!newWorker.messages.some(m=>m.type==='generate');i++)await Promise.resolve();
+    assert.equal(await oldResume,null);
+    const generations=newWorker.messages.filter(m=>m.type==='generate');assert.equal(generations.length,1);
+    assert.match(generations[0].messages.at(-1).content,/New saved question/);assert.doesNotMatch(generations[0].messages.at(-1).content,/Old saved question/);
+    newWorker.deliver({id:generations[0].id,type:'complete',text:'MOCK newest answer',source:'wasm',model:registry.models[0].id,outputTokens:3});
+    assert.equal((await newResume).text,'MOCK newest answer');assert.equal(f.run('state.ai.pendingQuestion'),null);assert.equal(f.ai.getStatus().inferenceCount,1);
+  }
+});

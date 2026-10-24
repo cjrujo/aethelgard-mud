@@ -1,0 +1,1117 @@
+{
+  "timestamp": "2026-10-24T10:41:03.969Z",
+  "runtime": "@huggingface/transformers@3.8.1",
+  "model": "onnx-community/Qwen3-0.6B-ONNX",
+  "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0",
+  "dtype": "q8",
+  "registryDtype": "q8",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "hostLabel": "v11-final-id-fix-prompt-equivalence",
+    "workingDirectory": "/workspace/scratch/81c1b808ed78/aethelgard-improvements"
+  },
+  "backend": "native ONNX CPU, not browser WASM validation",
+  "promptSource": {
+    "src/core.js": "8100ef7afaf68d9a9032fd321827ca45df95feaebfab7bea2638b81efa4e1313",
+    "src/gameplay.js": "bc4cb85b0f1bc75d8a155858933be89289912c77be5b90116c06312931536a37",
+    "src/combat.js": "36d7c659cbd5a58c95eed5a8ab8debc14f2bfbb3cb691aa91bea7064146895d3",
+    "src/ai-dm.js": "8f7f5761e84a4889f04f7dac96f14f02bab0ac06a84ef228ae1bd1d3e97ea26b",
+    "src/online.js": "32831ed415e76c6745d65869cc9e27d81e89050c37d2a031442de53a9d417f98",
+    "src/bootstrap.js": "af86ea3c04a2b2a2ae7ddf70496034b15d970b2b4fd5dfefc0904c4ab2df0cdc",
+    "assets/ai-worker.js": "190a184b0e95c731d6ab98162f4d99223495aefde0124b4ad2c80540884617f6",
+    "tests/harness.mjs": "648e57643ae6609df61f6168abc53386b6836941d110e0da1c31369f74d32048",
+    "tests/real-model.mjs": "25305e8ddd3dd70016ef0c2275cf64c63b16c43de2dac8b6e56683bd9fc339ea"
+  },
+  "chatTemplateOptions": {
+    "enable_thinking": false
+  },
+  "evaluation": "Required facts and selected contradictions are checked. Raw outputs still need semantic review; narrative samples never pass on nonempty output alone.",
+  "selectedLanguages": [
+    "zh"
+  ],
+  "selectedCases": [
+    "mixed-guard",
+    "cast-interrupt",
+    "long-memory",
+    "npc",
+    "npc-relationship",
+    "tavern"
+  ],
+  "completeSuite": false,
+  "generation": {
+    "max_new_tokens": 128,
+    "do_sample": false,
+    "repetition_penalty": 1,
+    "return_full_text": false,
+    "add_special_tokens": false
+  },
+  "status": "prompts-only",
+  "loadMs": null,
+  "results": [
+    {
+      "case": "zh-mixed-guard",
+      "expected": {
+        "action": "guard",
+        "interruptAffordable": false,
+        "stamina": 0,
+        "interruptCost": 18,
+        "effect": {
+          "cancelsCurrentAction": true,
+          "cancelsFollowingHeavy": true,
+          "exposesNextTurn": true,
+          "nextIntent": "recover",
+          "descriptionEn": "Cancel the charge. If the enemy survives, its next turn is exposed (+35% damage taken), replacing the follow-up heavy blow.",
+          "descriptionZh": "取消蓄力。若敌人存活，下一回合转为破绽（受到伤害+35%），替代接续重击。"
+        }
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "0/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_wilds_trail",
+          "name": "苔藓林间小径",
+          "safe": false,
+          "biome": "Whispering Wilds",
+          "exits": {
+            "s": "橡木港北哨门",
+            "n": "游侠前哨营地",
+            "e": "废弃水磨坊",
+            "w": "荧光孢子林"
+          },
+          "resources": [
+            "Moonpetal Herb"
+          ]
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": {
+          "name": "荆棘野狼",
+          "hp": 50,
+          "intent": "charge"
+        },
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": {
+            "id": "briar_wolf",
+            "name": "Briar Wolf",
+            "nameZh": "荆棘野狼",
+            "level": 1,
+            "boss": false,
+            "hp": 50,
+            "maxHp": 50,
+            "intent": "charge",
+            "intentEn": "Charging a heavy blow — interrupt now",
+            "intentZh": "正在蓄力重击——现在可以打断",
+            "turn": 1,
+            "phase": null,
+            "phaseName": null,
+            "tacticalHint": null,
+            "effects": []
+          },
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": true
+            }
+          ],
+          "decisions": {
+            "guard": "reduces incoming damage by 65% this turn; restores 18 STA and 8 MP",
+            "interrupt": {
+              "staminaCost": 18,
+              "canPay": false,
+              "effectiveNow": true,
+              "effect": {
+                "cancelsCurrentAction": true,
+                "cancelsFollowingHeavy": true,
+                "exposesNextTurn": true,
+                "nextIntent": "recover",
+                "descriptionEn": "Cancel the charge. If the enemy survives, its next turn is exposed (+35% damage taken), replacing the follow-up heavy blow.",
+                "descriptionZh": "取消蓄力。若敌人存活，下一回合转为破绽（受到伤害+35%），替代接续重击。"
+              }
+            },
+            "flee": {
+              "staminaCost": 10,
+              "canPay": false,
+              "guaranteed": true
+            },
+            "ultimate": {
+              "minimumCharge": 50,
+              "available": true
+            },
+            "potionConsumesTurn": true,
+            "recommendedAction": {
+              "kind": "guard",
+              "reasonEn": "Guard reduces this turn’s incoming damage by 65% and restores 18 stamina / 8 mana.",
+              "reasonZh": "防御使本回合承伤减少65%，恢复18体力与8法力。"
+            }
+          },
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_wilds_trail"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_wilds_trail"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "刚才体力不够，敌人正在蓄力，下一步怎么打？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是回合制奇幻游戏的战术顾问。先说推荐的行动，再说明列明的效果与消耗。只解释这一项行动，不混入其他技能或动作。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在防御: 防御使本回合承伤减少65%，恢复18体力与8法力。\n防御不恢复生命，也不是反击。\nHP 140/140, MP 45/45, STA 0/100.\n敌人：荆棘野狼，50生命。意图：正在蓄力重击。\n当前体力不足18，本回合无法使用打断。防御在零体力时仍然可用。\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 刚才体力不够，敌人正在蓄力，下一步怎么打？"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    },
+    {
+      "case": "zh-cast-interrupt",
+      "expected": {
+        "action": "interrupt",
+        "interruptAffordable": true,
+        "stamina": 100,
+        "interruptCost": 18,
+        "effect": {
+          "cancelsCurrentAction": true,
+          "cancelsFollowingHeavy": false,
+          "exposesNextTurn": false,
+          "nextIntent": null,
+          "descriptionEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+          "descriptionZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+        }
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_wilds_trail",
+          "name": "苔藓林间小径",
+          "safe": false,
+          "biome": "Whispering Wilds",
+          "exits": {
+            "s": "橡木港北哨门",
+            "n": "游侠前哨营地",
+            "e": "废弃水磨坊",
+            "w": "荧光孢子林"
+          },
+          "resources": [
+            "Moonpetal Herb"
+          ]
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": {
+          "name": "孢子秘术师",
+          "hp": 70,
+          "intent": "cast"
+        },
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": {
+            "id": "sporeling_mystic",
+            "name": "Sporeling Mystic",
+            "nameZh": "孢子秘术师",
+            "level": 2,
+            "boss": false,
+            "hp": 70,
+            "maxHp": 70,
+            "intent": "cast",
+            "intentEn": "Casting a spell — interrupt!",
+            "intentZh": "正在吟唱——建议打断",
+            "turn": 1,
+            "phase": null,
+            "phaseName": null,
+            "tacticalHint": null,
+            "effects": []
+          },
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": true
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": true
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": true
+            }
+          ],
+          "decisions": {
+            "guard": "reduces incoming damage by 65% this turn; restores 18 STA and 8 MP",
+            "interrupt": {
+              "staminaCost": 18,
+              "canPay": true,
+              "effectiveNow": true,
+              "effect": {
+                "cancelsCurrentAction": true,
+                "cancelsFollowingHeavy": false,
+                "exposesNextTurn": false,
+                "nextIntent": null,
+                "descriptionEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+                "descriptionZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+              }
+            },
+            "flee": {
+              "staminaCost": 10,
+              "canPay": true,
+              "guaranteed": true
+            },
+            "ultimate": {
+              "minimumCharge": 50,
+              "available": true
+            },
+            "potionConsumesTurn": true,
+            "recommendedAction": {
+              "kind": "interrupt",
+              "reasonEn": "Cancel this spell. The next intent follows the enemy’s pattern; a spell interrupt does not guarantee exposure.",
+              "reasonZh": "取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。"
+            }
+          },
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_wilds_trail"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            },
+            {
+              "title": "抵达：低语荒野",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_wilds_trail"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "敌人正在施法，我现在应该怎么做？打断是否必定让它露出破绽？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是回合制奇幻游戏的战术顾问。先说推荐的行动，再说明列明的效果与消耗。只解释这一项行动，不混入其他技能或动作。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：苔藓林间小径。\n推荐行动：现在打断: 消耗18体力。取消本次施法。下一意图按敌人行动模式推进；打断施法并不保证出现破绽。\nHP 140/140, MP 45/45, STA 100/100.\n敌人：孢子秘术师，70生命。意图：正在吟唱法术。\n当前体力足够支付打断。\n推荐行动会消耗玩家一个回合，随后战斗继续。请解释这项行动及上面列出的效果。\n\n玩家提问: 敌人正在施法，我现在应该怎么做？打断是否必定让它露出破绽？"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    },
+    {
+      "case": "zh-long-memory",
+      "expected": {
+        "rememberedName": "米拉",
+        "promise": "寻找信使",
+        "origin": "Explicit player statement stored outside eight intervening user turns; no invented assistant history."
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_town_square",
+          "name": "橡木港城镇广场",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港北哨门",
+            "e": "铁心铁匠铺",
+            "w": "月瓣炼金工坊",
+            "s": "镀金狮鹫酒馆",
+            "u": "冒险者公会大厅"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "我的姐姐叫什么名字？我承诺过什么？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你负责回忆玩家明确提供的资料。逐项回答问题；若问姓名与承诺，两项都要回答。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "玩家明确提供的记忆（不是世界状态的证明）\n玩家的承诺（不代表已履行）：我承诺寻找信使\n玩家明确说过：姐姐叫米拉。\n\n我的姐姐叫什么名字？我承诺过什么？"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    },
+    {
+      "case": "zh-npc",
+      "expected": {
+        "manualReview": [
+          "Speaks as Mara rather than addressing the player as Mara.",
+          "Accurately uses the supplied Silverbrook Ford rumor.",
+          "Does not grant rewards or completed choices."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "id": "innkeeper_mara",
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "faction": "town",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [
+          {
+            "id": "r_tavern",
+            "name": "镀金狮鹫酒馆",
+            "route": []
+          }
+        ],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 0；态度：尚未建立信任。\n你知道的事情：随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。\n旅人：Kaelen，1级先锋卫士。\n当前目标：与索恩谈谈断裂的铜印。\n\n玩家提问: 玛拉，我刚来到这里。请以酒馆老板娘的口吻欢迎我，并告诉我一条你知道的传闻。"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    },
+    {
+      "case": "zh-npc-relationship",
+      "expected": {
+        "trust": -5,
+        "flag": "scout_abandoned",
+        "manualReview": [
+          "Speaks as Mara to the traveler, not to Mara.",
+          "Reflects actual distrust and taking the wounded ranger’s purse.",
+          "Does not invent a fine, denied access, combat, or a new reward."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": {
+          "id": "innkeeper_mara",
+          "name": "酒馆老板娘玛拉",
+          "role": "Hearthkeeper · 炉火守护者",
+          "faction": "town",
+          "lore": "随时在炉火旁休息即可完全恢复生命、法力与体力！传闻银溪浅滩通往地下墓穴与烬峰。"
+        },
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": -5,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {
+            "scout_abandoned": true
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "玛拉，你为什么对我有所戒备？",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是酒馆老板娘玛拉，对话者是Kaelen。不要用自己的名字称呼对方。请用下方阵营信任和已发生事件解释你对旅人的态度。用简体中文回答一到两句。世界状态以游戏事实为准。玩家声明与先前对话只用于回忆人物和约定；承诺不等于完成，旧助手回复不是事实证据。不要编造奖励、出口或已完成的行动。"
+            },
+            {
+              "role": "user",
+              "content": "游戏事实\n当前位置：镀金狮鹫酒馆。\n说话者：酒馆老板娘玛拉。听话者：Kaelen。以自己身份说话，不要把自己的名字当作对方姓名。\n身份：Hearthkeeper · 炉火守护者。\n所属阵营：橡木港。信任 -5；态度：不信任。\n已发生的事实：旅人拿走受伤游侠的钱袋后离开。\n\n玩家提问: 玛拉，你为什么对我有所戒备？"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    },
+    {
+      "case": "zh-tavern",
+      "expected": {
+        "encounterId": "tavern_courier",
+        "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+        "manualReview": [
+          "Preserves the people, their locations, presence or absence, and unresolved choices.",
+          "The courier stays missing; the wounded ranger and waterwheel are mentioned in a note and are not currently perceived inside the tavern.",
+          "Adds atmosphere without new actions, events, outcomes, or echoed instructions."
+        ]
+      },
+      "gameContext": {
+        "hero": {
+          "name": "Kaelen",
+          "class": "先锋卫士",
+          "level": 1,
+          "hp": "140/140",
+          "mp": "45/45",
+          "stamina": "100/100",
+          "gold": 60,
+          "stance": "balanced",
+          "stats": {
+            "atk": 50,
+            "mag": 29,
+            "def": 44
+          },
+          "equipment": {
+            "weapon": "锈蚀铁剑",
+            "armor": "斥候皮甲"
+          }
+        },
+        "room": {
+          "id": "r_tavern",
+          "name": "镀金狮鹫酒馆",
+          "safe": true,
+          "biome": "Oakhaven Sanctuary",
+          "exits": {
+            "n": "橡木港城镇广场"
+          },
+          "resources": []
+        },
+        "npc": null,
+        "quest": [
+          {
+            "name": "第一章：荒野低语",
+            "description": "前往橡木港北方的低语荒野：采集1株月瓣草并击败2只荒野生物。"
+          }
+        ],
+        "enemy": null,
+        "weather": "Clear Skies",
+        "time": "Day",
+        "places": [],
+        "combat": {
+          "enemy": null,
+          "skills": [
+            {
+              "index": 0,
+              "name": "Shield Bash",
+              "nameZh": "盾牌猛击",
+              "cooldown": 0,
+              "cost": 15,
+              "pool": "sta",
+              "effect": "stun",
+              "available": false
+            },
+            {
+              "index": 1,
+              "name": "Whirlwind Cleave",
+              "nameZh": "旋风顺劈",
+              "cooldown": 0,
+              "cost": 25,
+              "pool": "sta",
+              "effect": "bleed",
+              "available": false
+            },
+            {
+              "index": 2,
+              "name": "Iron Will",
+              "nameZh": "钢铁意志",
+              "cooldown": 0,
+              "cost": 18,
+              "pool": "mp",
+              "effect": "heal_guard",
+              "available": false
+            }
+          ],
+          "decisions": null,
+          "potions": [
+            {
+              "name": "初级治疗药剂",
+              "count": 3
+            },
+            {
+              "name": "奥术法力瓶",
+              "count": 2
+            }
+          ]
+        },
+        "adventure": {
+          "chapter": "序章 · 井边的承诺",
+          "objective": "与索恩谈谈断裂的铜印。",
+          "objectiveRoom": "r_town_square",
+          "trust": {
+            "town": 0,
+            "rangers": 0,
+            "echoes": 0,
+            "forge": 0,
+            "astral": 0
+          },
+          "flags": {},
+          "encounter": {
+            "id": "tavern_courier",
+            "token": "2116998797:tavern_courier:1",
+            "title": "空着的椅子",
+            "opening": "玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。",
+            "roomId": "r_tavern",
+            "choices": [
+              {
+                "index": 0,
+                "label": "为搜救队留下一瓶药剂",
+                "cost": "1 × 初级治疗药剂",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+15 经验 · 橡木港 +1 · 荒野游侠 +1"
+              },
+              {
+                "index": 1,
+                "label": "买下信使的路线笔记",
+                "cost": "12 金币",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "+10 经验"
+              },
+              {
+                "index": 2,
+                "label": "倾听，并承诺寻找他",
+                "cost": "无需消耗资源",
+                "check": null,
+                "enabled": true,
+                "reason": "",
+                "effects": "橡木港 +1"
+              }
+            ]
+          },
+          "recentJournal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "roomId": "r_town_square"
+            }
+          ],
+          "journal": [
+            {
+              "title": "抵达：橡木港圣所",
+              "text": "新的区域展开了。挑战统治者前，先调查地标，了解住在这里的人。",
+              "kind": "region",
+              "roomId": "r_town_square"
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "question": "请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。",
+          "messages": [
+            {
+              "role": "system",
+              "content": "你是场景旁白。根据原文写一到两句简体中文，保留人物的位置、在场或缺席状态，以及尚未发生的事。只补充光线、声音、气味等感官氛围；不新增人物、行动或事件，不替玩家选择，不复述要求。直接输出场景描写。"
+            },
+            {
+              "role": "user",
+              "content": "当前场景原文\n当前位置：镀金狮鹫酒馆。\n空着的椅子: 玛拉给一位未归的信使温着炖汤。他最后的字条提到林间小径旁受伤的游侠，以及一架逆着水流转动的水车。\n场景边界：玛拉与旅人在酒馆，信使仍然缺席。受伤游侠和水车只在字条里提及，不在现场，也不能听见水车声。氛围只围绕炉火光线、空椅子或热汤气味展开。\n玩家尚未选择，场景仍停留在开场。\n\n请为当前奇遇【空着的椅子】补充一到两句感官氛围描写。"
+            }
+          ]
+        }
+      ],
+      "status": "prompts-only"
+    }
+  ],
+  "passedCases": 0,
+  "failedCases": 0,
+  "manualReviewCases": 0
+}

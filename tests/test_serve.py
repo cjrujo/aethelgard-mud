@@ -1,4 +1,5 @@
 import functools
+import errno
 import http.client
 import importlib.util
 import json
@@ -6,6 +7,7 @@ from pathlib import Path
 import tempfile
 import threading
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("serve", Path(__file__).resolve().parents[1] / "tools/serve.py")
@@ -99,6 +101,36 @@ class ServerTests(unittest.TestCase):
         self.assertIn(b'"done":true', result[2])
         self.assertEqual(captured[0].destination, ("127.0.0.1", 11434))
         self.assertEqual(captured[0].sent[0], ("POST", "/api/chat"))
+
+
+class LauncherPortTests(unittest.TestCase):
+    def test_default_fallback_is_remembered_for_the_next_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+            def bind(port, root):
+                calls.append(port)
+                if port == 8765:
+                    raise OSError(errno.EADDRINUSE, "occupied")
+                return SimpleNamespace(server_port=port)
+            with patch.object(serve, "make_server", side_effect=bind):
+                server, previous = serve.start_server(directory=directory)
+                self.assertEqual((server.server_port, previous), (18865, 8765))
+                again, previous = serve.start_server(directory=directory)
+            self.assertEqual(calls, [8765, 18865, 18865])
+            self.assertEqual((again.server_port, previous), (18865, None))
+
+    def test_an_explicit_port_never_silently_changes_the_save_origin(self):
+        with patch.object(serve, "make_server", side_effect=OSError(errno.EACCES, "reserved")) as bind:
+            with self.assertRaises(OSError):
+                serve.start_server(port=18865)
+            self.assertEqual(bind.call_count, 1)
+
+    def test_invalid_remembered_configuration_uses_the_standard_preference(self):
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / ".launcher-port.json").write_text('{"port": "bad"}')
+            with patch.object(serve, "make_server", return_value=SimpleNamespace(server_port=8765)) as bind:
+                serve.start_server(directory=directory)
+                self.assertEqual(bind.call_args.args[0], 8765)
 
 
 if __name__ == "__main__":
