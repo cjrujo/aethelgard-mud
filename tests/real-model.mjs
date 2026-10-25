@@ -25,7 +25,7 @@ const caseTypes = ['route', 'interrupt', 'cast-interrupt', 'guard', 'mixed-guard
 assert.ok(!selectedCases || selectedCases.every(type => caseTypes.includes(type)), 'Unknown test case');
 const repetitionPenalty = Number(option('repetition-penalty') || 1.0);
 assert.ok(Number.isFinite(repetitionPenalty) && repetitionPenalty > 0, 'Invalid repetition penalty');
-const modules = ['core', 'gameplay', 'combat', 'ai-dm', 'online', 'bootstrap'];
+const modules = ['core', 'gameplay', 'combat', 'auto-gather', 'map-controls', 'ai-dm', 'online', 'bootstrap'];
 
 function fixtures() {
   const list = [];

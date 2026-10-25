@@ -78,7 +78,7 @@ export function clientHarness(t, options = {}) {
     receive(packet) { this.onmessage?.({ data: JSON.stringify(packet) }); }
     close(code = 1000) { if (this.readyState === 3) return; this.readyState = 3; this.onclose?.({ code }); this.onClientClose?.(code); }
   }
-  const h = createHarness({ modules: ['core', 'gameplay', 'combat', 'online', 'bootstrap'], storage: options.storage,
+  const h = createHarness({ modules: ['core', 'gameplay', 'combat', 'auto-gather', 'map-controls', 'online', 'bootstrap'], storage: options.storage,
     globals: { WebSocket: MockWebSocket, ...(options.globals || {}) } });
   t?.after(() => { h.run('OnlineRealm.disconnect(true)'); h.dispose(); });
   h.document.getElementById('input-cf-worker-url').value = 'wss://realm.example/';

@@ -1,5 +1,5 @@
 /* Offline shell and pinned runtime. Transformers.js owns its model weight cache. */
-const CACHE = 'aethelgard-shell-6c661de50a5bddf1';
+const CACHE = 'aethelgard-shell-71eebbc12f258f53';
 const RUNTIME = 'aethelgard-runtime-transformers-3.8.1';
 const SHELL = ['./', 'index.html', 'open_world_mud.html', 'assets/game.css', 'assets/ai-worker.js', 'models/registry.json'];
 self.addEventListener('install', event => {

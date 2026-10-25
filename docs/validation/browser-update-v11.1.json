@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-10-24T19:20:50.946Z",
+  "checks": [
+    {
+      "name": "real offline shell installs and controls the current page",
+      "passed": true,
+      "detail": {
+        "id": "71eebbc12f258f53",
+        "protocol": 11,
+        "version": "11.1.0"
+      }
+    },
+    {
+      "name": "cached query-string navigation works offline and keeps the hero",
+      "passed": true
+    },
+    {
+      "name": "a downloaded replacement waits; ordinary reload retains a coherent current shell",
+      "passed": true
+    },
+    {
+      "name": "Save and update activates a waiting build offline, reloads once and preserves progress",
+      "passed": true
+    },
+    {
+      "name": "updated root navigation with a query remains available offline",
+      "passed": true
+    },
+    {
+      "name": "no page errors or external requests",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "passed": true
+}

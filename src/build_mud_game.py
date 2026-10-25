@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parent.parent
-MODULES = ("core", "gameplay", "combat", "ai-dm", "online", "bootstrap")
+MODULES = ("core", "gameplay", "combat", "auto-gather", "map-controls", "ai-dm", "online", "bootstrap")
 PROTOCOL = 11
 
 

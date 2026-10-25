@@ -19,7 +19,7 @@ function fixture(options={}) {
     deliver(data) { this.onmessage?.({data}); }
     terminate() { this.terminated=true; }
   }
-  const f=createHarness({modules:['core','gameplay','combat','ai-dm','bootstrap'],lang:options.lang || 'en',storage:options.storage,
+  const f=createHarness({modules:['core','gameplay','combat','auto-gather','map-controls','ai-dm','bootstrap'],lang:options.lang || 'en',storage:options.storage,
     globals:{AETHELGARD_MODEL_REGISTRY:registry,Worker:MockWorker,DOMException,
       fetch:(url,init)=>{requests.push({url:String(url),init});if(options.fetch)return options.fetch(url,init);throw new Error('Unexpected MOCK network request');},...options.globals}});
   f.run('AethelgardApp.restore(createInitialState()); AethelgardAI.ensureState();');

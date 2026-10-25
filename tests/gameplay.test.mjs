@@ -223,7 +223,7 @@ test('Legacy v9 saves migrate with defaults and never resume unattended attacks 
 
 test('Every direct static UI handler resolves and all production modules render together', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(projectRoot, 'models/registry.json'), 'utf8'));
-  const h = createHarness({ modules: ['core', 'gameplay', 'combat', 'ai-dm', 'online', 'bootstrap'], globals: { AETHELGARD_MODEL_REGISTRY: registry } });
+  const h = createHarness({ modules: ['core', 'gameplay', 'combat', 'auto-gather', 'map-controls', 'ai-dm', 'online', 'bootstrap'], globals: { AETHELGARD_MODEL_REGISTRY: registry } });
   const html = fs.readFileSync(path.join(projectRoot, 'src/game.html'), 'utf8');
   const handlers = [...new Set([...html.matchAll(/\bon(?:click|submit|change)="([^"]+)"/g)].flatMap(match => [...match[1].matchAll(/(?:^|;)\s*([A-Za-z_$][\w$]*)\s*\(/g)].map(call => call[1])))];
   assert.ok(handlers.length > 0, 'the template must contain discoverable event handlers');

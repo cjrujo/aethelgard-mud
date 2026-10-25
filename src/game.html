@@ -89,7 +89,7 @@
         </div>
         <div class="flex items-center gap-1.5">
           <h1 class="font-display-mud font-bold text-xs sm:text-sm tracking-wide text-amber-300">AETHELGARD · 艾瑟尔加德</h1>
-          <span id="app-build-label" class="text-[10px] text-slate-400" aria-label="Game build">v11.0.0</span>
+          <span id="app-build-label" class="text-[10px] text-slate-400" aria-label="Game build">v11.1.0</span>
           <span id="header-biome-badge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Oakhaven Sanctuary · 橡木港圣所</span>
           <span id="header-rift-wave-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/90 text-purple-300 border border-purple-500/60">Rift Wave 1</span>
           <span id="header-ai-badge" class="hidden sm:inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-950/90 text-sky-300 border border-sky-700/50">🧠 AI · 尚未加载</span>
@@ -517,31 +517,34 @@
           <div class="flex flex-wrap items-center gap-1 text-[10px]">
             <button id="macro-look" type="button" onclick="executeCommand('look')" data-zh="观察" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300">👁️ Look</button>
             <button id="macro-harvest" type="button" onclick="executeCommand('harvest')" data-zh="采集" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-300">🌿 Harvest</button>
+            <button id="btn-auto-gather" type="button" onclick="AutoGather.toggle()" aria-pressed="false" aria-describedby="auto-gather-status" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-300">🌿 Auto-Gather: OFF · 自动采集：关闭</button>
             <button id="macro-rest" type="button" onclick="executeCommand('rest')" data-zh="休息" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-300">💤 Rest</button>
             <button id="macro-bounty" type="button" onclick="executeCommand('bounty')" data-zh="悬赏" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300">📜 Bounty</button>
             <button id="macro-rift" type="button" onclick="executeCommand('rift')" data-zh="无尽裂隙" class="bi-inline px-1.5 py-0.2 rounded bg-purple-950/60 hover:bg-purple-900/70 border border-purple-700/50 text-purple-200">🌀 Endless Rift</button>
             <button id="macro-ai" type="button" onclick="triggerAiEncounter()" class="px-1.5 py-0.2 rounded bg-sky-950/70 hover:bg-sky-900/80 border border-sky-700/50 text-sky-200">🧠 AI Event·奇遇</button>
             <button id="macro-help" type="button" onclick="executeCommand('help')" data-zh="指令" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400">❓ Commands</button>
           </div>
+          <p id="auto-gather-status" class="text-[10px] text-slate-400 leading-snug" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT COLUMN: LARGE PLAYER-CENTERED WORLD ATLAS + TABBED INSPECTOR (4 cols) -->
+    <!-- RIGHT COLUMN: DRAGGABLE WORLD ATLAS + TABBED INSPECTOR (4 cols) -->
     <section class="col-span-12 lg:col-span-4 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
 
-      <!-- Large Interactive Player-Centered World Map Card -->
+      <!-- Interactive map with a camera independent of hero movement -->
       <div id="world-atlas-card" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg">
         <!-- Map Header + Zoom Controls + Scout Button -->
         <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
-          <div class="flex items-center gap-1.5">
+          <div class="flex flex-wrap items-center gap-1.5">
             <h3 class="text-[11px] font-bold uppercase tracking-wider text-amber-300">World Atlas · 世界星图 (<span id="explored-count">1</span>/32)</h3>
-            <span data-i18n="autoCentered" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎯 Auto-Centered · 自动居中</span>
+            <span id="map-view-mode" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎯 Follow hero · 跟随角色</span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="map-toolbar flex flex-wrap items-center gap-1">
             <button id="btn-map-zoom-in" onclick="adjustMapZoom(0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom In / 放大">🔍+</button>
             <button id="btn-map-zoom-out" onclick="adjustMapZoom(-0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom Out / 缩小">🔍-</button>
-            <button id="btn-map-reset-zoom" onclick="resetMapZoom()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Center on Hero / 居中">🎯1:1</button>
+            <button id="btn-map-reset-zoom" type="button" onclick="resetMapZoom()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Center on Hero / 回到角色">🎯 Hero</button>
+            <button id="btn-map-fit-all" type="button" onclick="WorldMap.fitAll()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Show the complete map / 显示全图">▣ Fit all</button>
             <button id="btn-reveal-map" onclick="revealAtlasHint()" data-zh="侦察" class="bi-inline text-[10px] px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300">
               🧭 Scout Region
             </button>
@@ -551,12 +554,15 @@
           </div>
         </div>
 
-        <!-- Full-Width Large SVG Map Container (h-52 = 208px) with Floating Corner Compass -->
+        <!-- The canvas stays unobstructed so every map location can be inspected. -->
         <div id="world-minimap-container" class="bg-[#070a11] border border-slate-800 rounded-lg overflow-hidden relative h-48 sm:h-52 w-full">
-          <svg id="world-minimap" viewBox="-15 185 250 150" class="w-full h-full select-none"></svg>
+          <svg id="world-minimap" viewBox="-15 185 250 150" preserveAspectRatio="xMidYMid meet" tabindex="0" role="group" aria-label="Interactive world map / 可拖动的世界地图" aria-describedby="map-interaction-hint" class="w-full h-full select-none"></svg>
+        </div>
 
-          <!-- Floating Translucent Compass Pad in Top-Right Corner -->
-          <div class="absolute top-1.5 right-1.5 bg-slate-950/85 backdrop-blur-sm border border-slate-700/80 rounded-lg p-1 shadow-lg w-[88px]">
+        <div class="map-navigation">
+          <p id="map-interaction-hint">Drag to explore · wheel to zoom · click a place to travel. / 拖动查看 · 滚轮缩放 · 点击地点寻路。</p>
+          <!-- Navigation sits outside the canvas and does not cover markers. -->
+          <div class="map-compass bg-slate-950/85 border border-slate-700/80 rounded-lg p-1 shadow-lg">
             <div class="grid grid-cols-3 gap-0.5">
               <button id="nav-up" onclick="executeCommand('u')" class="py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[9px] font-bold text-amber-300" title="Up (u)">▲U</button>
               <button id="nav-n" onclick="executeCommand('n')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="North (n)">N</button>

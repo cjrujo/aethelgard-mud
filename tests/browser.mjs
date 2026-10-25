@@ -49,7 +49,7 @@ try {
   await page.goto(base, { waitUntil: 'load' });
   await writerReady(page);
   assert.equal(await page.evaluate(() => AethelgardAI.getStatus().model), 'onnx-community/Qwen3-0.6B-ONNX');
-  check('six modules boot and default model is Qwen3');
+  check('game modules boot and default model is Qwen3');
   for (const width of [1440, 980, 390]) {
     await page.setViewportSize({ width, height: 900 });
     const metrics = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
@@ -92,7 +92,8 @@ try {
   check('mobile guild services retain the selected equipment slot');
   await page.evaluate(() => { GameDirector.close(); OnlineRealm.open(); });
   await page.locator('#online-diagnostics-title').click();
-  assert.match(await page.locator('#online-diagnostics').innerText(), /11\.0\.0.*协议 11/);
+  assert.ok((await page.locator('#online-diagnostics').innerText()).includes(await page.evaluate(() => AETHELGARD_BUILD.version)));
+  assert.match(await page.locator('#online-diagnostics').innerText(), /协议 11/);
   await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async () => { throw new Error('Clipboard permission denied by browser regression'); } } }));
   await page.locator('#online-copy-diagnostics').click();
   await page.locator('#online-diagnostics-copy').waitFor({ state: 'visible' });

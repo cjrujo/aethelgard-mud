@@ -89,7 +89,7 @@
         </div>
         <div class="flex items-center gap-1.5">
           <h1 class="font-display-mud font-bold text-xs sm:text-sm tracking-wide text-amber-300">AETHELGARD · 艾瑟尔加德</h1>
-          <span id="app-build-label" class="text-[10px] text-slate-400" aria-label="Game build">v11.0.0</span>
+          <span id="app-build-label" class="text-[10px] text-slate-400" aria-label="Game build">v11.1.0</span>
           <span id="header-biome-badge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Oakhaven Sanctuary · 橡木港圣所</span>
           <span id="header-rift-wave-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/90 text-purple-300 border border-purple-500/60">Rift Wave 1</span>
           <span id="header-ai-badge" class="hidden sm:inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-950/90 text-sky-300 border border-sky-700/50">🧠 AI · 尚未加载</span>
@@ -517,31 +517,34 @@
           <div class="flex flex-wrap items-center gap-1 text-[10px]">
             <button id="macro-look" type="button" onclick="executeCommand('look')" data-zh="观察" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300">👁️ Look</button>
             <button id="macro-harvest" type="button" onclick="executeCommand('harvest')" data-zh="采集" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-300">🌿 Harvest</button>
+            <button id="btn-auto-gather" type="button" onclick="AutoGather.toggle()" aria-pressed="false" aria-describedby="auto-gather-status" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-300">🌿 Auto-Gather: OFF · 自动采集：关闭</button>
             <button id="macro-rest" type="button" onclick="executeCommand('rest')" data-zh="休息" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-300">💤 Rest</button>
             <button id="macro-bounty" type="button" onclick="executeCommand('bounty')" data-zh="悬赏" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300">📜 Bounty</button>
             <button id="macro-rift" type="button" onclick="executeCommand('rift')" data-zh="无尽裂隙" class="bi-inline px-1.5 py-0.2 rounded bg-purple-950/60 hover:bg-purple-900/70 border border-purple-700/50 text-purple-200">🌀 Endless Rift</button>
             <button id="macro-ai" type="button" onclick="triggerAiEncounter()" class="px-1.5 py-0.2 rounded bg-sky-950/70 hover:bg-sky-900/80 border border-sky-700/50 text-sky-200">🧠 AI Event·奇遇</button>
             <button id="macro-help" type="button" onclick="executeCommand('help')" data-zh="指令" class="bi-inline px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400">❓ Commands</button>
           </div>
+          <p id="auto-gather-status" class="text-[10px] text-slate-400 leading-snug" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT COLUMN: LARGE PLAYER-CENTERED WORLD ATLAS + TABBED INSPECTOR (4 cols) -->
+    <!-- RIGHT COLUMN: DRAGGABLE WORLD ATLAS + TABBED INSPECTOR (4 cols) -->
     <section class="col-span-12 lg:col-span-4 h-full min-h-0 flex flex-col gap-1.5 overflow-hidden">
 
-      <!-- Large Interactive Player-Centered World Map Card -->
+      <!-- Interactive map with a camera independent of hero movement -->
       <div id="world-atlas-card" class="shrink-0 bg-[#0f1420] border border-slate-800/90 rounded-xl p-2 shadow-lg">
         <!-- Map Header + Zoom Controls + Scout Button -->
         <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
-          <div class="flex items-center gap-1.5">
+          <div class="flex flex-wrap items-center gap-1.5">
             <h3 class="text-[11px] font-bold uppercase tracking-wider text-amber-300">World Atlas · 世界星图 (<span id="explored-count">1</span>/32)</h3>
-            <span data-i18n="autoCentered" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎯 Auto-Centered · 自动居中</span>
+            <span id="map-view-mode" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎯 Follow hero · 跟随角色</span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="map-toolbar flex flex-wrap items-center gap-1">
             <button id="btn-map-zoom-in" onclick="adjustMapZoom(0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom In / 放大">🔍+</button>
             <button id="btn-map-zoom-out" onclick="adjustMapZoom(-0.25)" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200" title="Zoom Out / 缩小">🔍-</button>
-            <button id="btn-map-reset-zoom" onclick="resetMapZoom()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Center on Hero / 居中">🎯1:1</button>
+            <button id="btn-map-reset-zoom" type="button" onclick="resetMapZoom()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Center on Hero / 回到角色">🎯 Hero</button>
+            <button id="btn-map-fit-all" type="button" onclick="WorldMap.fitAll()" class="px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300" title="Show the complete map / 显示全图">▣ Fit all</button>
             <button id="btn-reveal-map" onclick="revealAtlasHint()" data-zh="侦察" class="bi-inline text-[10px] px-1.5 py-0.2 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300">
               🧭 Scout Region
             </button>
@@ -551,12 +554,15 @@
           </div>
         </div>
 
-        <!-- Full-Width Large SVG Map Container (h-52 = 208px) with Floating Corner Compass -->
+        <!-- The canvas stays unobstructed so every map location can be inspected. -->
         <div id="world-minimap-container" class="bg-[#070a11] border border-slate-800 rounded-lg overflow-hidden relative h-48 sm:h-52 w-full">
-          <svg id="world-minimap" viewBox="-15 185 250 150" class="w-full h-full select-none"></svg>
+          <svg id="world-minimap" viewBox="-15 185 250 150" preserveAspectRatio="xMidYMid meet" tabindex="0" role="group" aria-label="Interactive world map / 可拖动的世界地图" aria-describedby="map-interaction-hint" class="w-full h-full select-none"></svg>
+        </div>
 
-          <!-- Floating Translucent Compass Pad in Top-Right Corner -->
-          <div class="absolute top-1.5 right-1.5 bg-slate-950/85 backdrop-blur-sm border border-slate-700/80 rounded-lg p-1 shadow-lg w-[88px]">
+        <div class="map-navigation">
+          <p id="map-interaction-hint">Drag to explore · wheel to zoom · click a place to travel. / 拖动查看 · 滚轮缩放 · 点击地点寻路。</p>
+          <!-- Navigation sits outside the canvas and does not cover markers. -->
+          <div class="map-compass bg-slate-950/85 border border-slate-700/80 rounded-lg p-1 shadow-lg">
             <div class="grid grid-cols-3 gap-0.5">
               <button id="nav-up" onclick="executeCommand('u')" class="py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[9px] font-bold text-amber-300" title="Up (u)">▲U</button>
               <button id="nav-n" onclick="executeCommand('n')" class="py-0.5 rounded bg-slate-800 hover:bg-amber-500/30 border border-slate-600 text-[10px] font-bold text-white" title="North (n)">N</button>
@@ -931,7 +937,7 @@
 
 
   <script>
-window.AETHELGARD_BUILD = Object.freeze({"id": "6c661de50a5bddf1", "protocol": 11, "version": "11.0.0"});
+window.AETHELGARD_BUILD = Object.freeze({"id": "71eebbc12f258f53", "protocol": 11, "version": "11.1.0"});
 
 window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1", "runtimeUrl": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.min.js", "runtimeFiles": ["transformers.min.js", "ort-wasm-simd-threaded.jsep.mjs", "ort-wasm-simd-threaded.jsep.wasm"], "models": [{"key": "qwen-0.6b", "id": "onnx-community/Qwen3-0.6B-ONNX", "revision": "58ca03a5e7b354b480b1a82b34bde8dc7b854cc0", "name": "Qwen3 0.6B · default Chinese model", "nameZh": "Qwen3 0.6B · 默认中文模型", "dtype": "q8", "device": "wasm", "downloadMB": 635, "contextBudget": 1600, "maxNewTokens": 128, "languages": ["zh", "en"], "chatTemplateOptions": {"enable_thinking": false}, "license": "Apache-2.0", "licenseUrl": "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/LICENSE", "files": ["config.json", "generation_config.json", "tokenizer.json", "tokenizer_config.json", "onnx/model_quantized.onnx"], "sha256": {"onnx/model_quantized.onnx": "ccf8734e59fdf7475b2dc0c117005e267a3a08342c1d951e0a79f0bce57bf62a"}, "sizes": {"onnx/model_quantized.onnx": 617687575}}, {"key": "qwen-0.5b", "id": "onnx-community/Qwen2.5-0.5B-Instruct", "revision": "516c8d04add8a80c5228f32102b57953b8d421a9", "name": "Qwen2.5 0.5B · experimental alternative", "nameZh": "Qwen2.5 0.5B · 实验备选", "dtype": "q4", "device": "wasm", "downloadMB": 800, "contextBudget": 1600, "maxNewTokens": 128, "languages": ["zh", "en"], "license": "Apache-2.0", "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct/blob/main/LICENSE", "files": ["config.json", "generation_config.json", "tokenizer.json", "tokenizer_config.json", "onnx/model_q4.onnx"], "sha256": {"onnx/model_q4.onnx": "09235a3b1c135cd04ef570e5053b5c079e028078a2cc5f76ba6a251e91bf3296"}, "sizes": {"onnx/model_q4.onnx": 786156820}}, {"key": "smol-135m", "id": "onnx-community/SmolLM2-135M-Instruct-ONNX", "revision": "b8a5c0f183b78c55955a5364f610c36668b5e681", "name": "SmolLM2 135M · experimental lightweight English", "nameZh": "SmolLM2 135M · 实验英文轻量", "dtype": "q4", "device": "wasm", "downloadMB": 185, "contextBudget": 1100, "maxNewTokens": 128, "languages": ["en"], "license": "Apache-2.0", "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/blob/main/LICENSE", "files": ["config.json", "generation_config.json", "tokenizer.json", "tokenizer_config.json", "special_tokens_map.json", "onnx/model_q4.onnx"], "sha256": {"onnx/model_q4.onnx": "eb0d67c7e3b7d40f42d681b5f2eff4cef78968afe3f76c954f987dd870327a2a"}, "sizes": {"onnx/model_q4.onnx": 180581125}}]};
 
@@ -1556,6 +1562,7 @@ window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1"
         weather: "Clear Skies",
         logFilter: "all",
         autoHunt: false,
+        autoGather: false,
         rightTab: "quests",
         mapZoom: 1.0,
         cmdHistory: [],
@@ -2549,13 +2556,14 @@ window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1"
     // 9. NAVIGATION, BFS PATHFINDING, MAP ZOOM & BILINGUAL COMMAND PARSER
     // =========================================================================
     function adjustMapZoom(delta) {
+      if (typeof WorldMap !== "undefined") return WorldMap.zoom(delta);
       state.mapZoom = Math.max(0.55, Math.min(2.0, (state.mapZoom || 1.0) + delta));
       renderWorldMinimap();
     }
 
     function resetMapZoom() {
-      state.mapZoom = 1.0;
-      renderWorldMinimap();
+      if (typeof WorldMap !== "undefined") WorldMap.centerOnHero();
+      else { state.mapZoom = 1.0; renderWorldMinimap(); }
       const r = WORLD_ROOMS[state.world.currentRoom];
       if (r) {
         addLog(
@@ -4216,7 +4224,7 @@ window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1"
       // Right column World Atlas & Tabs
       const atlasH3 = document.querySelector("#world-atlas-card h3");
       if (atlasH3) {
-        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/32)`;
+        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/${Object.keys(WORLD_ROOMS).length})`;
       }
       setTxt("btn-reveal-map", uiText("scoutBtn"));
 
@@ -4543,13 +4551,13 @@ window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1"
       if (expBadge) expBadge.textContent = visited.size;
 
       const zoom = state.mapZoom || 1.0;
-      const vw = Math.round(250 / zoom);
-      const vh = Math.round(150 / zoom);
-      const vx = Math.round(currRoom.x - vw / 2);
-      const vy = Math.round(currRoom.y - vh / 2);
-      svg.setAttribute("viewBox", `${vx} ${vy} ${vw} ${vh}`);
-      svg.setAttribute("data-center-x", String(currRoom.x));
-      svg.setAttribute("data-center-y", String(currRoom.y));
+      const view = typeof WorldMap !== "undefined" ? WorldMap.getViewport(svg) : {
+        x: currRoom.x - 125 / zoom, y: currRoom.y - 75 / zoom,
+        width: 250 / zoom, height: 150 / zoom, centerX: currRoom.x, centerY: currRoom.y
+      };
+      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.width} ${view.height}`);
+      svg.setAttribute("data-center-x", String(view.centerX));
+      svg.setAttribute("data-center-y", String(view.centerY));
 
       const radarGrid = `
         <circle cx="${currRoom.x}" cy="${currRoom.y}" r="38" fill="none" stroke="#1e293b" stroke-width="0.8" stroke-dasharray="3,3" />
@@ -4594,13 +4602,13 @@ window.AETHELGARD_MODEL_REGISTRY = {"runtime": "@huggingface/transformers@3.8.1"
         const fill = isCurrent ? "#fbbf24" : (isVisited ? color : (isNeighbor ? "#475569" : "#1e293b"));
         const radius = isCurrent ? 8.5 : (r.bossRoom ? 6.8 : (isNeighbor ? 6.0 : 5.0));
         const stroke = isCurrent ? "#ffffff" : (isNeighbor ? "#fbbf24" : "#090b10");
-        const dist = Math.hypot(r.x - currRoom.x, r.y - currRoom.y);
-        const showLabel = isCurrent || isNeighbor || (isVisited && dist < 115);
+        const inView = r.x >= view.x - 64 && r.x <= view.x + view.width + 64 && r.y >= view.y - 32 && r.y <= view.y + view.height + 32;
+        const showLabel = isCurrent || isNeighbor || (isVisited && inView);
         const locTitle = trRoomTitle(r);
         const shortTitle = locTitle.length > 18 ? locTitle.slice(0, 17) + "…" : locTitle;
 
         return `
-          <g onclick="travelToRoomByClick('${r.id}')" class="cursor-pointer">
+          <g data-map-room="${escapeHtml(r.id)}" ${typeof WorldMap === "undefined" ? `onclick="travelToRoomByClick('${r.id}')"` : ''} class="cursor-pointer">
             <title>${escapeHtml(locTitle)} (${escapeHtml(trBiome(r.biome))})</title>
             ${isCurrent ? `<circle cx="${r.x}" cy="${r.y}" r="13" fill="none" stroke="#fbbf24" stroke-width="1.2" opacity="0.55" />` : ""}
             <circle cx="${r.x}" cy="${r.y}" r="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="1.6" class="${isCurrent ? 'player-beacon' : ''}" />
@@ -6548,6 +6556,49 @@ const CombatDirector = (() => {
     const [toolId, t] = pair;
     return { allowed: false, itemId, toolId, reasonEn: t.descriptionEn, reasonZh: t.descriptionZh };
   }
+  function harvestCost() { return Math.max(2, 6 - Math.min(4, state.player.talents.pathfinder)); }
+  // Manual and arrival-based gathering share the same costs, permissions and rewards.
+  // Automatic gathering can select a bounded set of nodes and take the affordable
+  // prefix; the manual Harvest action retains its existing all-or-nothing cost.
+  function harvest({ nodeIds = null, partial = false, quiet = false } = {}) {
+    const rejected = reason => ({ ok: false, reason, harvested: [], quantity: 0, stamina: 0 });
+    if (!canWrite(!quiet)) return rejected('read_only');
+    if (onlineBusy() || state.combat.inCombat) {
+      if (!quiet) peaceful();
+      return rejected(onlineBusy() ? 'online_battle' : 'combat');
+    }
+    const p = state.player, r = room(), nodes = r?.nodes || [];
+    const selected = Array.isArray(nodeIds) ? new Set(nodeIds) : null;
+    const ready = nodes.filter(n => (!selected || selected.has(n.id)) && !state.world.harvestedCooldowns[`${r.id}:${n.id}`]);
+    if (!ready.length) {
+      if (!quiet && !selected) legacy.harvest();
+      return rejected('unavailable');
+    }
+    const permitted = ready.filter(n => harvestAccess(n.item).allowed), blocked = ready.filter(n => !harvestAccess(n.item).allowed);
+    if (!quiet) for (const n of blocked) {
+      const access = harvestAccess(n.item);
+      say(`Gathering locked: ${access.reasonEn}`, `采集准备不足：${access.reasonZh}`, 'world', 'text-amber-300');
+    }
+    if (!permitted.length) { if (!quiet) renderAll(); return rejected('locked'); }
+    const unitCost = harvestCost();
+    const chosen = partial ? permitted.slice(0, Math.floor(p.sta / unitCost)) : permitted;
+    const cost = unitCost * chosen.length;
+    if (!chosen.length || p.sta < cost) {
+      if (!quiet) reportBlocked(`Harvesting these nodes needs ${unitCost * permitted.length} stamina.`, `采集这些节点需要${unitCost * permitted.length}体力。`);
+      return rejected('stamina');
+    }
+    const rewards = chosen.map(n => ({ node: n, qty: n.qty + (p.talents.pathfinder >= 2 ? 1 : 0) + (getActiveCompanion().id === 'golem' && /Ore|Metal/.test(n.item) ? 1 : 0) }));
+    if (rewards.some(({ node: n, qty }) => !ITEM_CATALOG[n.item] || !Number.isInteger(n.qty) || n.qty < 1 || !Number.isSafeInteger(qty) || qty > 9999)) return rejected('invalid_node');
+    p.sta -= cost;
+    for (const { node: n, qty } of rewards) {
+      state.world.harvestedCooldowns[`${r.id}:${n.id}`] = 5;
+      addItemToInventory(n.item, qty); state.telemetry.harvests++;
+      say(`Harvested ${qty} ${n.item}.`, `采集到${qty}份${ITEM_CATALOG[n.item].nameZh}。`, 'loot', 'text-emerald-300');
+    }
+    for (const b of state.quests.bounties) if (!b.claimed && b.targetHarvests) b.progress = Math.min(b.targetHarvests, b.progress + chosen.length);
+    emit('harvest', { nodes: chosen.length }); checkStoryQuests(); checkAchievements(); saveGameState(false); renderAll();
+    return { ok: true, reason: 'harvested', harvested: chosen.map(n => n.id), quantity: rewards.reduce((sum, reward) => sum + reward.qty, 0), stamina: cost };
+  }
   function atGuild() {
     return peaceful() && (state.world.currentRoom === 'r_guild_hall' || reportBlocked('Visit the Adventurers’ Guild Hall to use this service.', '请到冒险者公会大厅办理此服务。'));
   }
@@ -7202,25 +7253,7 @@ const CombatDirector = (() => {
       p.gold -= gold; removeItemFromInventory(mat, 1); p.refineLevel = next; derived();
       say(`✨ Equipment refined to +${next} (+${next * 12}% equipment stats).`, `✨ 全身装备精炼至+${next}（装备属性+${next * 12}%）。`, "loot"); emit("refine", { rank: next }); saveGameState(false); renderAll(); return true;
     };
-    harvestRoomNodes = function() {
-      if(!peaceful())return false;
-      const p=state.player,r=room(),nodes=r?.nodes||[],ready=nodes.filter(n=>!state.world.harvestedCooldowns[`${r.id}:${n.id}`]);
-      if(!ready.length)return legacy.harvest();
-      const permitted=ready.filter(n=>harvestAccess(n.item).allowed),blocked=ready.filter(n=>!harvestAccess(n.item).allowed);
-      for(const n of blocked){const access=harvestAccess(n.item);say(`Gathering locked: ${access.reasonEn}`,`采集准备不足：${access.reasonZh}`,'world','text-amber-300');}
-      if(!permitted.length){renderAll();return false;}
-      const cost=Math.max(2,6-Math.min(4,p.talents.pathfinder))*permitted.length;
-      if(p.sta<cost)return reportBlocked(`Harvesting these nodes needs ${cost} stamina.`,`采集这些节点需要${cost}体力。`);
-      if(permitted.some(n=>!ITEM_CATALOG[n.item]||!Number.isInteger(n.qty)||n.qty<1||n.qty>9998))return false;
-      p.sta-=cost;
-      for(const n of permitted){
-        const qty=n.qty+(p.talents.pathfinder>=2?1:0)+(getActiveCompanion().id==='golem'&&/Ore|Metal/.test(n.item)?1:0);
-        state.world.harvestedCooldowns[`${r.id}:${n.id}`]=5;addItemToInventory(n.item,qty);state.telemetry.harvests++;
-        say(`Harvested ${qty} ${n.item}.`,`采集到${qty}份${ITEM_CATALOG[n.item].nameZh}。`,'loot','text-emerald-300');
-      }
-      for(const b of state.quests.bounties)if(!b.claimed&&b.targetHarvests)b.progress=Math.min(b.targetHarvests,b.progress+permitted.length);
-      emit('harvest',{nodes:permitted.length});checkStoryQuests();checkAchievements();saveGameState(false);renderAll();return true;
-    };
+    harvestRoomNodes = () => harvest().ok;
     startRiftWaveChallenge = function() {
       if (!peaceful()) return false;
       const p = state.player;
@@ -7303,7 +7336,7 @@ const CombatDirector = (() => {
     UI_I18N.en.warlordDesc = "+8% ATK / +3% leech"; UI_I18N.zh.warlordDesc = "+8%物攻 / +3%吸血";
   }
   install();
-  return { ensure, action, startEncounter, grantLoot, rest, recover, render, shopPrice, getGuildContext, redeemSet, trainCompanion, purchaseTool, harvestAccess, getHuntContext, configureHunt, startHunt, stopHunt, getIntent: () => state.combat.enemy?.intent || null,
+  return { ensure, action, startEncounter, grantLoot, rest, recover, render, shopPrice, getGuildContext, redeemSet, trainCompanion, purchaseTool, harvestAccess, harvestCost, harvest, getHuntContext, configureHunt, startHunt, stopHunt, getIntent: () => state.combat.enemy?.intent || null,
     setSeedForTests(seed) { ensure().rng = (Number(seed) >>> 0) || 1; },
     getContext() {
       ensure(); ensureHunt();
@@ -7324,6 +7357,357 @@ const CombatDirector = (() => {
     }
   };
 })();
+
+
+/* Optional arrival-based gathering. Only the preference is saved; a pending
+ * pass belongs to this exact hero state and this stay in a room. */
+const AutoGather = (() => {
+  'use strict';
+  const text = (en, zh) => getLang() === 'zh' ? zh : en;
+  const canWrite = () => typeof window.AethelgardApp?.canWrite !== 'function' || window.AethelgardApp.canWrite();
+  const onlineBusy = () => typeof OnlineRealm !== 'undefined' && typeof OnlineRealm.isBusy === 'function' && OnlineRealm.isBusy();
+  let owner = state, pass = null, running = false;
+
+  function resetSession() { owner = state; pass = null; }
+  function ensure() {
+    if (owner !== state) resetSession();
+    if (state.autoGather !== true) {
+      state.autoGather = false;
+      pass = null;
+    }
+    if (pass && pass.roomId !== state.world.currentRoom) pass = null;
+    return state.autoGather;
+  }
+  function synchronize() {
+    ensure();
+    if (!pass) return;
+    const room = WORLD_ROOMS[pass.roomId];
+    // A manual harvest, changed permission or removed node settles that part of
+    // this pass. Never wait until its cooldown expires and collect it again.
+    pass.pending = pass.pending.filter(id => {
+      const node = room?.nodes?.find(n => n.id === id);
+      return node && !state.world.harvestedCooldowns[`${pass.roomId}:${id}`] && CombatDirector.harvestAccess(node.item).allowed;
+    });
+  }
+  function advance() {
+    synchronize();
+    if (running || !pass || !pass.pending.length || !state.autoGather) return false;
+    if (!canWrite() || onlineBusy() || state.combat.inCombat) return false;
+    const current = pass;
+    running = true;
+    try {
+      const result = CombatDirector.harvest({ nodeIds: current.pending, partial: true, quiet: true });
+      if (owner !== state || pass !== current) return false;
+      if (result.ok) {
+        const gathered = new Set(result.harvested);
+        current.pending = current.pending.filter(id => !gathered.has(id));
+        current.gathered += gathered.size;
+      } else if (result.reason === 'invalid_node') {
+        current.pending = [];
+        current.invalid = true;
+      }
+      return result.ok;
+    } finally { running = false; }
+  }
+  function arrive() {
+    ensure();
+    if (!state.autoGather || !canWrite()) return false;
+    const room = WORLD_ROOMS[state.world.currentRoom];
+    const nodes = room?.nodes || [];
+    const ready = nodes.filter(node => !state.world.harvestedCooldowns[`${room.id}:${node.id}`]);
+    const permitted = ready.filter(node => CombatDirector.harvestAccess(node.item).allowed);
+    pass = { roomId: state.world.currentRoom, pending: [...new Set(permitted.map(node => node.id))], gathered: 0,
+      nodes: nodes.length, cooling: nodes.length - ready.length, locked: ready.length - permitted.length, invalid: false };
+    const changed = advance();
+    render();
+    return changed;
+  }
+  function setEnabled(value) {
+    if (typeof value !== 'boolean' || !canWrite()) return false;
+    ensure();
+    if (state.autoGather === value) { render(); return true; }
+    state.autoGather = value;
+    if (value) arrive(); else resetSession();
+    addLog(value ? '🌿 Auto-gather enabled: collect available nodes once on each arrival.' : '🌿 Auto-gather disabled.', 'world', 'text-emerald-300',
+      value ? '🌿 自动采集已开启：到达地点后，采集当次可用的资源。' : '🌿 自动采集已关闭。');
+    saveGameState(false); renderAll();
+    return true;
+  }
+  function toggle() { return setEnabled(!ensure()); }
+  function getStatus() {
+    synchronize();
+    const result = { enabled: state.autoGather === true, phase: 'off', pending: pass?.pending.length || 0, gathered: pass?.gathered || 0,
+      locked: pass?.locked || 0, cooling: pass?.cooling || 0, roomId: pass?.roomId || null, message: '' };
+    if (!result.enabled) result.message = text('Off · gather manually or enable collection on arrival.', '已关闭 · 可手动采集，或开启到达后自动采集。');
+    else if (!canWrite()) {
+      result.phase = 'read_only'; result.message = text('Paused · another tab owns this hero.', '已暂停 · 另一标签页正在使用此英雄。');
+    } else if (onlineBusy()) {
+      result.phase = 'online_battle'; result.message = text('Paused during online battles.', '在线战斗期间暂停采集。');
+    } else if (state.combat.inCombat) {
+      result.phase = 'combat'; result.message = text('Paused during combat.', '战斗期间暂停采集。');
+    } else if (!pass) {
+      result.phase = 'idle'; result.message = text('On · collect once on each arrival; no idle farming.', '已开启 · 每次到达采集一轮，停留时不反复采集。');
+    } else if (pass.invalid) {
+      result.phase = 'invalid_node'; result.message = text('Stopped · this resource has invalid data.', '已停止本轮 · 资源数据无效。');
+    } else if (result.pending) {
+      result.phase = 'stamina'; result.message = text(`Waiting for stamina · ${result.pending} node(s) left; ${CombatDirector.harvestCost()} STA each.`, `等待体力恢复 · 还剩 ${result.pending} 处，每处消耗 ${CombatDirector.harvestCost()} 体力。`);
+    } else if (pass.gathered) {
+      result.phase = 'complete'; result.message = text(`Collected ${pass.gathered} node(s) here.${pass.locked ? ` ${pass.locked} require gathering preparation.` : ''} Continue exploring for the next pass.`, `本地点已采集 ${pass.gathered} 处。${pass.locked ? `另有 ${pass.locked} 处尚未解锁采集准备。` : ''}前往下一地点继续。`);
+    } else if (pass.locked) {
+      result.phase = 'locked'; result.message = text('No available nodes · gathering preparation is required.', '暂无可采集资源 · 需先解锁区域采集准备。');
+    } else if (pass.cooling) {
+      result.phase = 'cooldown'; result.message = text('Resources were recovering on arrival. Revisit later.', '到达时资源正在恢复，稍后重新到访可采集。');
+    } else {
+      result.phase = pass.nodes ? 'complete' : 'empty'; result.message = text(pass.nodes ? 'This pass is complete. Continue exploring.' : 'No resources here. Auto-gather stays on for the next location.', pass.nodes ? '本轮采集已结束，可继续探索。' : '此处没有资源，到达下一地点后继续自动采集。');
+    }
+    return result;
+  }
+  function render() {
+    const status = getStatus(), button = document.getElementById('btn-auto-gather'), label = document.getElementById('auto-gather-status');
+    if (button) {
+      button.textContent = text(`🌿 Auto-Gather: ${status.enabled ? 'ON' : 'OFF'}`, `🌿 自动采集：${status.enabled ? '开启' : '关闭'}`);
+      button.setAttribute('aria-pressed', String(status.enabled));
+      button.setAttribute('data-active', String(status.enabled));
+      button.title = text('Collect currently available resources on arrival. Costs stamina; respects cooldowns and gathering preparation.', '到达地点后采集当前可用资源；消耗体力，并遵守冷却与采集准备要求。');
+      button.disabled = status.phase === 'read_only';
+    }
+    if (label) { label.textContent = status.message; label.setAttribute('data-phase', status.phase); }
+  }
+
+  const previousMove = moveDirection;
+  moveDirection = function() {
+    const before = state.world.currentRoom;
+    const result = previousMove.apply(this, arguments);
+    if (state.world.currentRoom !== before) arrive();
+    return result;
+  };
+  const previousTick = runWorldTick;
+  runWorldTick = function() {
+    synchronize();
+    const result = previousTick.apply(this, arguments);
+    advance(); render();
+    return result;
+  };
+  const previousRender = renderAll;
+  renderAll = function() { const result = previousRender.apply(this, arguments); render(); return result; };
+  const previousCommand = executeCommand;
+  executeCommand = function(raw) {
+    const words = String(raw || '').trim().toLowerCase().split(/\s+/);
+    if (!['autogather', 'auto-gather', '自动采集'].includes(words[0])) return previousCommand.apply(this, arguments);
+    if (words.length === 1) return toggle();
+    if (words.length === 2 && ['on', '开启', '开'].includes(words[1])) return setEnabled(true);
+    if (words.length === 2 && ['off', '关闭', '关'].includes(words[1])) return setEnabled(false);
+    addLog('Use autogather [on/off].', 'world', 'text-slate-400', '输入：自动采集 [开启/关闭]。');
+    return false;
+  };
+  return { ensure, toggle, setEnabled, getStatus, render, resetSession };
+})();
+window.AutoGather = AutoGather;
+
+
+/** The atlas camera is a view preference, independent of the hero's actions. */
+const WorldMap = (() => {
+  const BASE_WIDTH = 250, DRAG_THRESHOLD = 6, MAX_ZOOM = 2.5;
+  let sourceState = null, svgElement = null, camera = null, dragging = null, completedGesture = null;
+  let resizeObserver = null, previousSize = '';
+  const text = (en, zh) => getLang() === 'zh' ? zh : en;
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  function bounds() {
+    const rooms = Object.values(WORLD_ROOMS).filter(r => Number.isFinite(r.x) && Number.isFinite(r.y));
+    const points = rooms.length ? rooms : [{ x: 0, y: 0 }];
+    // Include marker rings, boss symbols and the longest visible room labels.
+    return {
+      left: Math.min(...points.map(r => r.x)) - 64,
+      right: Math.max(...points.map(r => r.x)) + 64,
+      top: Math.min(...points.map(r => r.y)) - 32,
+      bottom: Math.max(...points.map(r => r.y)) + 32
+    };
+  }
+  function ensureCamera() {
+    if (!camera || sourceState !== state) {
+      sourceState = state;
+      const room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+      const savedZoom = Number(state.mapZoom);
+      camera = { mode: 'follow', centerX: room.x, centerY: room.y,
+        zoom: Number.isFinite(savedZoom) ? clamp(savedZoom, .55, MAX_ZOOM) : 1 };
+      dragging = null; completedGesture = null;
+      svgElement?.removeAttribute('data-dragging');
+    }
+    return camera;
+  }
+  function geometry(svg = svgElement) {
+    const c = ensureCamera(), room = WORLD_ROOMS[state.world.currentRoom] || WORLD_ROOMS.r_town_square;
+    const rect = svg?.getBoundingClientRect();
+    const aspect = rect?.width > 0 && rect?.height > 0 ? rect.width / rect.height : 250 / 150;
+    const b = bounds(), widthOfMap = b.right - b.left, heightOfMap = b.bottom - b.top;
+    const fitZoom = BASE_WIDTH / Math.max(widthOfMap, heightOfMap * aspect);
+    if (c.mode === 'fit') {
+      c.zoom = fitZoom; c.centerX = (b.left + b.right) / 2; c.centerY = (b.top + b.bottom) / 2;
+    } else if (c.mode === 'follow') {
+      c.centerX = room.x; c.centerY = room.y;
+    }
+    const width = BASE_WIDTH / c.zoom, height = width / aspect;
+    if (c.mode === 'free') {
+      // At least part of the map stays visible. Wide views keep the full axis centered.
+      c.centerX = width >= widthOfMap ? (b.left + b.right) / 2 : clamp(c.centerX, b.left + width * .15, b.right - width * .15);
+      c.centerY = height >= heightOfMap ? (b.top + b.bottom) / 2 : clamp(c.centerY, b.top + height * .15, b.bottom - height * .15);
+    }
+    return { x: c.centerX - width / 2, y: c.centerY - height / 2, width, height,
+      centerX: c.centerX, centerY: c.centerY, zoom: c.zoom, mode: c.mode, fitZoom };
+  }
+  function updateLabels(svg, view) {
+    const label = document.getElementById('map-view-mode');
+    if (label) label.textContent = view.mode === 'follow' ? text('🎯 Follow hero', '🎯 跟随角色')
+      : view.mode === 'fit' ? text('▣ Full map', '▣ 全图') : text('✋ Free view', '✋ 自由查看');
+    const hint = document.getElementById('map-interaction-hint');
+    if (hint) hint.textContent = text('Drag to explore · wheel to zoom · click a place to travel. Arrow keys pan; Home follows your hero; F fits the map.', '拖动查看 · 滚轮缩放 · 点击地点寻路。方向键平移；Home 回到角色；F 显示全图。');
+    const labels = [
+      ['btn-map-zoom-in', null, text('Zoom in', '放大地图')],
+      ['btn-map-zoom-out', null, text('Zoom out', '缩小地图')],
+      ['btn-map-reset-zoom', text('🎯 Hero', '🎯 角色'), text('Follow hero at normal zoom', '回到角色并恢复标准缩放')],
+      ['btn-map-fit-all', text('▣ Fit all', '▣ 全图'), text('Show every location, including the frontier', '显示所有地点，包含新开拓区域')]
+    ];
+    for (const [id, caption, title] of labels) {
+      const el = document.getElementById(id); if (!el) continue;
+      if (caption) el.textContent = caption;
+      el.title = title; el.setAttribute('aria-label', title);
+    }
+    svg.setAttribute('aria-label', text('Interactive world map', '可拖动的世界地图'));
+    svg.setAttribute('data-map-mode', view.mode);
+  }
+  function redraw() { if (typeof renderWorldMinimap === 'function') renderWorldMinimap(); }
+  function centerOnHero() {
+    const c = ensureCamera(); c.mode = 'follow'; c.zoom = 1;
+    redraw();
+  }
+  function fitAll() { ensureCamera().mode = 'fit'; redraw(); }
+  function panBy(dx, dy) {
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) return false;
+    const view = geometry(), c = ensureCamera();
+    c.mode = 'free'; c.centerX = view.centerX + dx; c.centerY = view.centerY + dy;
+    redraw(); return true;
+  }
+  function zoom(delta, anchor = null) {
+    if (!Number.isFinite(delta) || delta === 0) return false;
+    const before = geometry(), c = ensureCamera();
+    c.zoom = clamp(before.zoom * Math.pow(1.4, delta / .25), Math.min(.55, before.fitZoom * .8), MAX_ZOOM);
+    if (c.mode === 'fit') c.mode = 'free';
+    if (anchor) {
+      const rect = svgElement?.getBoundingClientRect();
+      if (rect?.width && rect?.height) {
+        // SVG uses xMidYMid meet. Account for any letterboxing in the conversion.
+        const scale = Math.min(rect.width / before.width, rect.height / before.height);
+        const offsetX = (rect.width - before.width * scale) / 2;
+        const offsetY = (rect.height - before.height * scale) / 2;
+        const x = before.x + (anchor.x - rect.left - offsetX) / scale;
+        const y = before.y + (anchor.y - rect.top - offsetY) / scale;
+        c.mode = 'free';
+        c.centerX = x - (x - before.centerX) * before.zoom / c.zoom;
+        c.centerY = y - (y - before.centerY) * before.zoom / c.zoom;
+      }
+    }
+    redraw(); return true;
+  }
+  function roomFromTarget(target) {
+    const marker = target?.closest?.('[data-map-room]');
+    return marker && svgElement?.contains?.(marker) ? marker.getAttribute('data-map-room') : null;
+  }
+  function releasePointer(svg, id) {
+    try { if (svg.hasPointerCapture?.(id)) svg.releasePointerCapture(id); } catch (_) { /* A canceled pointer may already be released. */ }
+  }
+  function mount(svg) {
+    if (svgElement === svg) return;
+    svgElement = svg;
+    svg.setAttribute('tabindex', '0');
+    svg.setAttribute('role', 'group');
+    svg.setAttribute('aria-describedby', 'map-interaction-hint');
+    svg.addEventListener('pointerdown', event => {
+      if (dragging) { dragging.moved = true; return; }
+      if (event.isPrimary === false || (event.button !== undefined && event.button !== 0)) return;
+      completedGesture = null;
+      const view = geometry(svg), rect = svg.getBoundingClientRect();
+      const scale = Math.min(rect.width / view.width, rect.height / view.height);
+      if (!(scale > 0)) return;
+      dragging = { id: event.pointerId, x: event.clientX, y: event.clientY, centerX: view.centerX,
+        centerY: view.centerY, scale, moved: false, roomId: roomFromTarget(event.target) };
+      svg.focus({ preventScroll: true });
+      try { svg.setPointerCapture?.(event.pointerId); } catch (_) { /* Synthetic pointers do not have capture. */ }
+    });
+    svg.addEventListener('pointermove', event => {
+      if (!dragging || dragging.id !== event.pointerId) return;
+      const dx = event.clientX - dragging.x, dy = event.clientY - dragging.y;
+      if (!dragging.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+      dragging.moved = true;
+      const c = ensureCamera(); c.mode = 'free';
+      c.centerX = dragging.centerX - dx / dragging.scale;
+      c.centerY = dragging.centerY - dy / dragging.scale;
+      svg.setAttribute('data-dragging', 'true');
+      event.preventDefault(); redraw();
+    });
+    svg.addEventListener('pointerup', event => {
+      if (!dragging || dragging.id !== event.pointerId) return;
+      const rect = svg.getBoundingClientRect();
+      const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+      completedGesture = { moved: dragging.moved || outside, roomId: dragging.roomId, at: performance.now() };
+      dragging = null; svg.removeAttribute('data-dragging'); releasePointer(svg, event.pointerId);
+    });
+    const cancel = event => {
+      if (!dragging || dragging.id !== event.pointerId) return;
+      dragging = null; completedGesture = { moved: true, roomId: null, at: performance.now() };
+      svg.removeAttribute('data-dragging'); releasePointer(svg, event.pointerId);
+    };
+    svg.addEventListener('pointercancel', cancel);
+    svg.addEventListener('lostpointercapture', cancel);
+    svg.addEventListener('click', event => {
+      const gesture = completedGesture;
+      completedGesture = null;
+      let id;
+      if (event.detail !== 0 && gesture && performance.now() - gesture.at < 1200) {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (gesture.moved) return;
+        id = gesture.roomId;
+      } else {
+        id = roomFromTarget(event.target);
+        if (id) { event.preventDefault(); event.stopImmediatePropagation(); }
+      }
+      if (id && Object.hasOwn(WORLD_ROOMS, id)) travelToRoomByClick(id);
+    }, true);
+    svg.addEventListener('wheel', event => {
+      if (dragging || !event.deltaY) return;
+      event.preventDefault(); zoom(event.deltaY < 0 ? .25 : -.25, { x: event.clientX, y: event.clientY });
+    }, { passive: false });
+    svg.addEventListener('keydown', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const view = geometry(svg), key = event.key;
+      const direction = { ArrowLeft: [-.2, 0], ArrowRight: [.2, 0], ArrowUp: [0, -.2], ArrowDown: [0, .2] }[key];
+      if (!direction && !['+', '=', '-', '_', 'Home', 'f', 'F'].includes(key)) return;
+      event.preventDefault(); event.stopPropagation();
+      if (direction) panBy(direction[0] * view.width, direction[1] * view.height);
+      else if (key === 'Home') centerOnHero();
+      else if (key === 'f' || key === 'F') fitAll();
+      else zoom(key === '+' || key === '=' ? .25 : -.25);
+    });
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver?.disconnect();
+      resizeObserver = new ResizeObserver(() => {
+        const rect = svg.getBoundingClientRect(), size = `${rect.width}:${rect.height}`;
+        if (size !== previousSize) { previousSize = size; redraw(); }
+      });
+      resizeObserver.observe(svg);
+    }
+  }
+  window.addEventListener('resize', redraw);
+  function getViewport(svg) {
+    mount(svg);
+    const view = geometry(svg); updateLabels(svg, view); return view;
+  }
+  function getView() {
+    const { fitZoom, ...view } = geometry(); return view;
+  }
+  return { getViewport, getView, zoom, panBy, centerOnHero, fitAll };
+})();
+window.WorldMap = WorldMap;
 
 
 /* Genuine local AI, bounded context, visible provenance, and an honest rules helper. */
@@ -8797,7 +9181,7 @@ const AethelgardApp = (() => {
   const webLocks = Boolean(navigator.locks?.request), leaseMs = 20000;
   let ownership = 'unclaimed', ownershipReason = '', expectedRaw, releaseLock = null, acquisition = null;
   let conflictKey = null, latestBuild = null, registration = null, refreshRequested = false, booted = false;
-  const build = window.AETHELGARD_BUILD || { version: '11.0.0', id: 'development', protocol: 11 };
+  const build = window.AETHELGARD_BUILD || { version: '11.1.0', id: 'development', protocol: 11 };
 
   function disk() { return localStorage.getItem(STORAGE_KEY); }
   function lease() {
@@ -8815,6 +9199,7 @@ const AethelgardApp = (() => {
   }
   function stopBackgroundPlay() {
     state.autoHunt = false;
+    if (typeof AutoGather !== 'undefined') AutoGather.resetSession();
     if (tickIntervalHandle !== null) { clearInterval(tickIntervalHandle); tickIntervalHandle = null; }
     if (savingTimer !== null) { clearTimeout(savingTimer); savingTimer = null; }
     if (autoWalkHandle) { clearInterval(autoWalkHandle); autoWalkHandle = null; }
@@ -8980,6 +9365,7 @@ const AethelgardApp = (() => {
     result.tickCount = Math.floor(bounded(result.tickCount, 1, 1));
     result.mapZoom = bounded(result.mapZoom, 1, .45, 2.5);
     result.autoHunt = false; // Loading never silently resumes unattended attacks.
+    result.autoGather = result.autoGather === true;
     if (record(result.hunt?.session) && result.hunt.session.status === 'running') {
       result.hunt.session.status = 'stopped'; result.hunt.session.stopReason = 'reloaded'; result.hunt.session.stoppedTick = result.tickCount;
     }
@@ -9032,6 +9418,7 @@ const AethelgardApp = (() => {
     }
   }
   function stopLiveActivity() {
+    if (typeof AutoGather !== 'undefined') AutoGather.resetSession();
     if (autoWalkHandle) { clearInterval(autoWalkHandle); autoWalkHandle = null; }
     AethelgardAI.resetSession(); OnlineRealm.disconnect(true); GameDirector.close();
   }
@@ -9191,6 +9578,8 @@ const AethelgardApp = (() => {
       ['Local AI DM', '本地 AI 智脑', 'AI DM → Browser CPU → choose a model → Download / load. Qwen supports Chinese and English; SmolLM2 is a lighter English model. No API key is required. First download needs internet; cached or prepared model packages can run offline.', '智脑 → 浏览器 CPU → 选择模型 → 下载并加载。Qwen 支持中文和英文；SmolLM2 是更轻量的英文模型。无需 API Key。首次下载需要网络；缓存或准备好的模型包可离线运行。'],
       ['Ollama alternative', '使用本机 Ollama', 'Start this game with the local launcher. Run ollama pull qwen2.5:0.5b, select Ollama, then Connect / check models. Keep the local Ollama service running.', '用本地启动器打开游戏，执行 ollama pull qwen2.5:0.5b。选择 Ollama 并点击“连接并检测模型”，保持本机 Ollama 服务运行。'],
       ['Guild and companions', '公会与伙伴', 'Guild services show reputation ranks, trade benefits, gathering preparation, shard equipment exchanges and companion training. Read each price and unlock condition. A companion’s displayed level is its real training level.', '公会服务展示声望等级、交易权益、采集准备、碎片装备兑换与伙伴培养。操作前可查看价格与解锁条件。伙伴显示的等级就是实际培养等级。'],
+      ['Gather as you explore', '边走边采集', 'Enable Auto-Gather beside Harvest to collect available resources here and on each arrival, including map routes. It respects stamina, cooldowns and regional preparations, and pauses in combat. If stamina runs out, the remaining resources from this arrival wait for recovery. It does not repeatedly farm a room while you stay there.', '点击“采集”旁的“自动采集”开关，即会采集当前地点与每次到达地点可用的资源，也适用于地图自动寻路。沿用体力、冷却和区域准备要求，战斗中暂停。体力不足时，等待恢复后补采本次到达时未采完的资源；停留原地不会反复刷取再生资源。'],
+      ['Explore the whole atlas', '拖动查看完整地图', 'Drag the map with a mouse or touch. Panning keeps your chosen view during world updates. Fit all shows every mapped location, including new frontier rooms; Center on Hero follows your location again. A click on a room still plots a route; a drag does not move your hero.', '用鼠标按住或手指拖动地图，世界更新时也会保留你选择的视角。“全图”显示所有地图地点与新开拓区域；“回到角色”恢复跟随当前位置。点击地点仍可自动寻路，拖动地图不会移动角色。'],
       ['Multiplayer', '与真实玩家联机', 'Internet raids and arenas require the protocol 11 Worker. Diagnostics show both build versions. Finished rewards are retained by the server until your hero saves and acknowledges them; reconnect with the same hero and realm to recover pending rewards. An empty endpoint enables local tab chat only.', '互联网副本与竞技场需要协议11的 Worker，诊断面板可查看前后端构建版本。服务器保留未确认的胜利结算，使用同一英雄连接同一服务器和世界可补领。地址留空仅启用本机标签页聊天。'],
       ['Keep your chronicle', '保存你的旅程', 'Only one tab writes a hero. Other tabs can take over and load its latest progress. Export JSON before changing devices or local ports. v9/v10 saves migrate. New chronicles and imports require a verified backup; recovery snapshots remain available in Save.', '同一英雄仅由一个标签页保存，其他标签页可接管并载入最新进度。更换设备或本地端口前请导出 JSON。v9/v10存档自动迁移。新旅程和导入都需先确认备份成功；恢复快照可在存档面板查看。']
     ];

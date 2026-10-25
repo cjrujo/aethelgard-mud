@@ -100,7 +100,7 @@ export function createHarness(options = {}) {
   globals.self = globals;
   const context = vm.createContext(globals);
   const run = (code, timeout = 10000) => vm.runInContext(code, context, { timeout });
-  const modules = options.modules || ['core', 'gameplay', 'combat', 'bootstrap'];
+  const modules = options.modules || ['core', 'gameplay', 'combat', 'auto-gather', 'map-controls', 'bootstrap'];
   for (const name of modules) {
     const file = name.endsWith('.js') ? name : `src/${name}.js`;
     const sourcePath = path.isAbsolute(file) ? file : path.join(projectRoot, file);

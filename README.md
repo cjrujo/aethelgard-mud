@@ -1,8 +1,10 @@
-# Aethelgard · Living Chronicles（v11.0.0）
+# Aethelgard · Living Chronicles（v11.1.0）
 
 艾瑟尔加德是一款浏览器文字角色扮演游戏：在五个区域中探索、与人物建立关系、应对有预兆的敌人，并通过持续生效的选择决定裂隙的结局。
 
-**v11 把故事、战斗和成长串成可以持续推进的旅程**：默认路线包含各章关键事件，自动狩猎有明确终点，碎片可兑换套装并培养伙伴，高阶采集需要区域准备。存档增加单标签写入、恢复快照和保存后更新；在线战斗使用协议 **11**，前端与 Cloudflare Worker 需要一起升级。
+**v11.1 新增自动采集与可拖动地图**：在“采集”旁开启“自动采集”，当前地点及之后每次到达的地点都会收集已就绪、已解锁的资源；体力不足时会等待恢复后补采本次尚未采完的资源。右侧地图支持鼠标与触屏拖动、“全图”和“回到角色”，手动查看的区域不会被世界心跳拉回。详见 [v11.1 使用与更新说明](docs/v11.1-update.md)。
+
+**v11 把故事、战斗和成长串成可以持续推进的旅程**：默认路线包含各章关键事件，自动狩猎有明确终点，碎片可兑换套装并培养伙伴，高阶采集需要区域准备。存档增加单标签写入、恢复快照和保存后更新；在线战斗使用协议 **11**。从 v9/v10 升到 v11 时，前端与 Cloudflare Worker 需要一起升级；已经使用 v11 服务端时，本次 v11.1 前端更新继续兼容，无需重新部署 Worker。
 
 **智脑运行真实的本地模型，默认是 Qwen3 0.6B q8。** 浏览器通过独立 Web Worker 加载实际 ONNX 权重，在 CPU/WASM 上生成文字；也可连接本机 Ollama，无需云端 API Key。未加载模型时可以选择有明确来源标记的规则助手。v11 增加共享战斗事实、长期人物与承诺记录、取消后的“重新加载并继续”和本机回答反馈。[AI 实现与使用说明](docs/ai-dm.md)
 
@@ -16,15 +18,15 @@ Windows、macOS 与 Linux 均需要 **Python 3.10 或更新版本**和现代浏�
 
 | 包 | 包含什么 | 使用本地模型的准备 |
 | --- | --- | --- |
-| `aethelgard-v11.0.0-qwen-0.6b-offline.zip` · 完整离线包 | 已构建游戏、可维护源码、**实际 Qwen3 0.6B q8 权重**、运行库与校验清单 | 解压后可加载内置模型，游玩无需在线下载 |
-| `aethelgard-v11.0.0-source.zip` · 轻量源码/游戏包 | 已构建游戏、源码、文档与工具；不含模型权重和运行库 | 规则玩法立即可用；真实模型需提前准备文件，或首次联网加载 |
+| `aethelgard-v11.1.0-qwen-0.6b-offline.zip` · 完整离线包 | 已构建游戏、可维护源码、**实际 Qwen3 0.6B q8 权重**、运行库与校验清单 | 解压后可加载内置模型，游玩无需在线下载 |
+| `aethelgard-v11.1.0-source.zip` · 轻量源码/游戏包 | 已构建游戏、源码、文档与工具；不含模型权重和运行库 | 规则玩法立即可用；真实模型需提前准备文件，或首次联网加载 |
 
 ### 从 GitHub 下载
 
 打开仓库的 [Verify game and local AI 工作流](https://github.com/cjrujo/aethelgard-mud/actions/workflows/verify.yml)，选择与你要使用的提交对应的运行，在 **Artifacts** 中下载：
 
-- **`aethelgard-source-game`**：内含 `aethelgard-v11.0.0-source.zip`，由游戏与工具验证任务生成。
-- **`aethelgard-qwen-offline`**：内含 `aethelgard-v11.0.0-qwen-0.6b-offline.zip`，由实际浏览器模型任务在准备权重、完成验证后生成。
+- **`aethelgard-source-game`**：内含 `aethelgard-v11.1.0-source.zip`，由游戏与工具验证任务生成。
+- **`aethelgard-qwen-offline`**：内含 `aethelgard-v11.1.0-qwen-0.6b-offline.zip`，由实际浏览器模型任务在准备权重、完成验证后生成。
 
 相应任务成功上传后才会出现 artifact。GitHub 的下载外层也可能是 ZIP，先解压到上述交付包，再完整解压交付包。**Code → Download ZIP 取得的是仓库源码，不包含模型权重**。若对应运行还未生成交付包，可按下文命令自行准备和打包；不要把某次旧运行的成功当作当前提交的验证结果。
 
@@ -221,7 +223,7 @@ python tools/package_release.py --model qwen-0.6b
 
 ## English quickstart
 
-Install **Python 3.10+** on Windows, macOS or Linux. In the [Verify workflow](https://github.com/cjrujo/aethelgard-mud/actions/workflows/verify.yml), choose the intended revision and download `aethelgard-source-game` or `aethelgard-qwen-offline` after its corresponding job succeeds. These contain `aethelgard-v11.0.0-source.zip` and `aethelgard-v11.0.0-qwen-0.6b-offline.zip`, respectively; the repository's ordinary source ZIP does not contain model weights.
+Install **Python 3.10+** on Windows, macOS or Linux. In the [Verify workflow](https://github.com/cjrujo/aethelgard-mud/actions/workflows/verify.yml), choose the intended revision and download `aethelgard-source-game` or `aethelgard-qwen-offline` after its corresponding job succeeds. These contain `aethelgard-v11.1.0-source.zip` and `aethelgard-v11.1.0-qwen-0.6b-offline.zip`, respectively; the repository's ordinary source ZIP does not contain model weights.
 
 Extract the package and enter its `aethelgard-mud` folder. Double-click `start_Windows.cmd` on Windows; on macOS/Linux run `sh start_unix.sh` or `python3 tools/serve.py --open`. Keep the terminal open and use the printed HTTP address. The launcher initially tries port 8765, falls back within 18865–18874 if necessary, and remembers its choice. **Export/import save JSON when changing ports or hosts**: browser saves belong to their original origin. Start with **Journey → Story here**.
 
