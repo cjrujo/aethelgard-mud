@@ -34,7 +34,7 @@ class PackageReleaseTests(unittest.TestCase):
         for name in ("src/build_mud_game.py", "tools/prepare_offline.py", "tools/package_release.py"):
             shutil.copyfile(REPO / name, self.root / name)
         self.write("src/game.html", b"<!doctype html><title>fixture</title><!-- AETHELGARD_SCRIPTS -->")
-        for name in ("core", "gameplay", "combat", "ai-dm", "online", "bootstrap"):
+        for name in ("core", "gameplay", "combat", "auto-gather", "map-controls", "ai-dm", "online", "bootstrap"):
             self.write(f"src/{name}.js", (f"// fixture {name}\n").encode())
         self.write("src/service-worker.js", b"const build = '__BUILD_ID__';\n")
         self.write("docs/guide.md", b"Release fixture documentation.\n")

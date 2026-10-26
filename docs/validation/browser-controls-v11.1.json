@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-10-24T19:21:00.819Z",
+  "modelInferenceIncluded": false,
+  "checks": [
+    {
+      "name": "DOM switch gathers the current room with the real stamina cost and cooldown",
+      "passed": true,
+      "detail": {
+        "enabled": true,
+        "phase": "complete",
+        "pending": 0,
+        "gathered": 1,
+        "locked": 0,
+        "cooling": 0,
+        "roomId": "r_alchemist",
+        "message": "本地点已采集 1 处。前往下一地点继续。"
+      }
+    },
+    {
+      "name": "expired cooldowns do not restart gathering while standing in the same room",
+      "passed": true
+    },
+    {
+      "name": "real map click route gathers herbs, copper, and silver at each intermediate arrival",
+      "passed": true
+    },
+    {
+      "name": "off disables arrival gathering; reload preserves the switch without starting a new pass",
+      "passed": true
+    },
+    {
+      "name": "an arrival waits for natural stamina recovery, completes once, and never farms its cooldown",
+      "passed": true
+    },
+    {
+      "name": "background mouse drag moves the camera and survives world heartbeats without moving the hero",
+      "passed": true
+    },
+    {
+      "name": "dragging a room marker does not travel; a separate intentional click still travels",
+      "passed": true
+    },
+    {
+      "name": "keyboard, hero centering, zoom, and fit-all include newly generated frontier rooms",
+      "passed": true,
+      "detail": {
+        "rooms": 35,
+        "view": {
+          "x": -150.7179915048544,
+          "y": 8,
+          "width": 879.4359830097088,
+          "height": 402,
+          "centerX": 289,
+          "centerY": 209,
+          "zoom": 0.2842731077985014,
+          "mode": "fit"
+        }
+      }
+    },
+    {
+      "name": "fit-all adapts to the 980px layout without horizontal page overflow",
+      "passed": true
+    },
+    {
+      "name": "390px native touch drag pans without travel; full map remains available",
+      "passed": true,
+      "detail": {
+        "rooms": 32,
+        "view": {
+          "x": -58.505263157894774,
+          "y": 8,
+          "width": 667.0105263157895,
+          "height": 354,
+          "centerX": 275,
+          "centerY": 185,
+          "zoom": 0.37480667866048034,
+          "mode": "fit"
+        }
+      }
+    },
+    {
+      "name": "no JavaScript errors, failed assets, or external requests",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failedAssets": [],
+  "build": {
+    "id": "71eebbc12f258f53",
+    "protocol": 11,
+    "version": "11.1.0"
+  },
+  "passed": true
+}

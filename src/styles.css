@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+#btn-auto-gather[data-active="true"] {
+  background: #064e3b;
+  border-color: #34d399;
+  color: #d1fae5;
+}
+#btn-auto-gather:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+
 /* Legible, responsive controls remain available without external fonts. */
 [hidden] { display: none !important; }
 button, select, input, textarea { touch-action: manipulation; }
@@ -84,4 +94,18 @@ input, select, textarea { min-width: 0; max-width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Pointer capture stays on the SVG while its room markers are redrawn. */
+#world-minimap { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+#world-minimap[data-dragging="true"], #world-minimap[data-dragging="true"] * { cursor: grabbing !important; }
+#world-minimap:focus-visible { outline: 2px solid #7dd3fc; outline-offset: -3px; }
+.map-toolbar button { min-height: 28px; }
+.map-navigation { display: flex; align-items: center; justify-content: space-between; gap: .65rem; margin-top: .35rem; }
+#map-interaction-hint { flex: 1 1 170px; margin: 0; color: #94a3b8; font-size: 10px; line-height: 1.55; }
+.map-compass { flex: 0 0 88px; width: 88px; }
+@media (pointer: coarse) {
+  .map-toolbar button { min-height: 36px; padding-left: .55rem; padding-right: .55rem; }
+  .map-compass { flex-basis: 112px; width: 112px; }
+  .map-compass button { min-height: 30px; }
 }

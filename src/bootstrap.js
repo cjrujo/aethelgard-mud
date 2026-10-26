@@ -12,7 +12,7 @@ const AethelgardApp = (() => {
   const webLocks = Boolean(navigator.locks?.request), leaseMs = 20000;
   let ownership = 'unclaimed', ownershipReason = '', expectedRaw, releaseLock = null, acquisition = null;
   let conflictKey = null, latestBuild = null, registration = null, refreshRequested = false, booted = false;
-  const build = window.AETHELGARD_BUILD || { version: '11.0.0', id: 'development', protocol: 11 };
+  const build = window.AETHELGARD_BUILD || { version: '11.1.0', id: 'development', protocol: 11 };
 
   function disk() { return localStorage.getItem(STORAGE_KEY); }
   function lease() {
@@ -30,6 +30,7 @@ const AethelgardApp = (() => {
   }
   function stopBackgroundPlay() {
     state.autoHunt = false;
+    if (typeof AutoGather !== 'undefined') AutoGather.resetSession();
     if (tickIntervalHandle !== null) { clearInterval(tickIntervalHandle); tickIntervalHandle = null; }
     if (savingTimer !== null) { clearTimeout(savingTimer); savingTimer = null; }
     if (autoWalkHandle) { clearInterval(autoWalkHandle); autoWalkHandle = null; }
@@ -195,6 +196,7 @@ const AethelgardApp = (() => {
     result.tickCount = Math.floor(bounded(result.tickCount, 1, 1));
     result.mapZoom = bounded(result.mapZoom, 1, .45, 2.5);
     result.autoHunt = false; // Loading never silently resumes unattended attacks.
+    result.autoGather = result.autoGather === true;
     if (record(result.hunt?.session) && result.hunt.session.status === 'running') {
       result.hunt.session.status = 'stopped'; result.hunt.session.stopReason = 'reloaded'; result.hunt.session.stoppedTick = result.tickCount;
     }
@@ -247,6 +249,7 @@ const AethelgardApp = (() => {
     }
   }
   function stopLiveActivity() {
+    if (typeof AutoGather !== 'undefined') AutoGather.resetSession();
     if (autoWalkHandle) { clearInterval(autoWalkHandle); autoWalkHandle = null; }
     AethelgardAI.resetSession(); OnlineRealm.disconnect(true); GameDirector.close();
   }
@@ -406,6 +409,8 @@ const AethelgardApp = (() => {
       ['Local AI DM', '本地 AI 智脑', 'AI DM → Browser CPU → choose a model → Download / load. Qwen supports Chinese and English; SmolLM2 is a lighter English model. No API key is required. First download needs internet; cached or prepared model packages can run offline.', '智脑 → 浏览器 CPU → 选择模型 → 下载并加载。Qwen 支持中文和英文；SmolLM2 是更轻量的英文模型。无需 API Key。首次下载需要网络；缓存或准备好的模型包可离线运行。'],
       ['Ollama alternative', '使用本机 Ollama', 'Start this game with the local launcher. Run ollama pull qwen2.5:0.5b, select Ollama, then Connect / check models. Keep the local Ollama service running.', '用本地启动器打开游戏，执行 ollama pull qwen2.5:0.5b。选择 Ollama 并点击“连接并检测模型”，保持本机 Ollama 服务运行。'],
       ['Guild and companions', '公会与伙伴', 'Guild services show reputation ranks, trade benefits, gathering preparation, shard equipment exchanges and companion training. Read each price and unlock condition. A companion’s displayed level is its real training level.', '公会服务展示声望等级、交易权益、采集准备、碎片装备兑换与伙伴培养。操作前可查看价格与解锁条件。伙伴显示的等级就是实际培养等级。'],
+      ['Gather as you explore', '边走边采集', 'Enable Auto-Gather beside Harvest to collect available resources here and on each arrival, including map routes. It respects stamina, cooldowns and regional preparations, and pauses in combat. If stamina runs out, the remaining resources from this arrival wait for recovery. It does not repeatedly farm a room while you stay there.', '点击“采集”旁的“自动采集”开关，即会采集当前地点与每次到达地点可用的资源，也适用于地图自动寻路。沿用体力、冷却和区域准备要求，战斗中暂停。体力不足时，等待恢复后补采本次到达时未采完的资源；停留原地不会反复刷取再生资源。'],
+      ['Explore the whole atlas', '拖动查看完整地图', 'Drag the map with a mouse or touch. Panning keeps your chosen view during world updates. Fit all shows every mapped location, including new frontier rooms; Center on Hero follows your location again. A click on a room still plots a route; a drag does not move your hero.', '用鼠标按住或手指拖动地图，世界更新时也会保留你选择的视角。“全图”显示所有地图地点与新开拓区域；“回到角色”恢复跟随当前位置。点击地点仍可自动寻路，拖动地图不会移动角色。'],
       ['Multiplayer', '与真实玩家联机', 'Internet raids and arenas require the protocol 11 Worker. Diagnostics show both build versions. Finished rewards are retained by the server until your hero saves and acknowledges them; reconnect with the same hero and realm to recover pending rewards. An empty endpoint enables local tab chat only.', '互联网副本与竞技场需要协议11的 Worker，诊断面板可查看前后端构建版本。服务器保留未确认的胜利结算，使用同一英雄连接同一服务器和世界可补领。地址留空仅启用本机标签页聊天。'],
       ['Keep your chronicle', '保存你的旅程', 'Only one tab writes a hero. Other tabs can take over and load its latest progress. Export JSON before changing devices or local ports. v9/v10 saves migrate. New chronicles and imports require a verified backup; recovery snapshots remain available in Save.', '同一英雄仅由一个标签页保存，其他标签页可接管并载入最新进度。更换设备或本地端口前请导出 JSON。v9/v10存档自动迁移。新旅程和导入都需先确认备份成功；恢复快照可在存档面板查看。']
     ];

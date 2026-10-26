@@ -1,6 +1,6 @@
 {
   "name": "aethelgard-living-chronicles",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "private": true,
   "description": "An offline-capable browser RPG with genuine local model inference and an optional multiplayer realm.",
   "scripts": {
@@ -10,7 +10,8 @@
     "test:browser": "node tests/browser.mjs",
     "css": "tailwindcss -i src/styles.css -o assets/game.css --minify",
     "test:python": "python -m unittest discover -s tests -p \"test_*.py\"",
-    "verify": "python tests/verify_mud.py"
+    "verify": "python tests/verify_mud.py",
+    "test:controls": "node tests/browser-controls.mjs"
   },
   "devDependencies": {
     "@huggingface/transformers": "3.8.1",

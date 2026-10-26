@@ -27,6 +27,7 @@ jobs:
       - run: python tests/verify_mud.py
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - run: npm run test:controls
       - run: node tests/browser-update.mjs
       - run: python tools/package_release.py
       - uses: actions/upload-artifact@v4

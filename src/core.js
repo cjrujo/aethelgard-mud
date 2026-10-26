@@ -619,6 +619,7 @@
         weather: "Clear Skies",
         logFilter: "all",
         autoHunt: false,
+        autoGather: false,
         rightTab: "quests",
         mapZoom: 1.0,
         cmdHistory: [],
@@ -1612,13 +1613,14 @@
     // 9. NAVIGATION, BFS PATHFINDING, MAP ZOOM & BILINGUAL COMMAND PARSER
     // =========================================================================
     function adjustMapZoom(delta) {
+      if (typeof WorldMap !== "undefined") return WorldMap.zoom(delta);
       state.mapZoom = Math.max(0.55, Math.min(2.0, (state.mapZoom || 1.0) + delta));
       renderWorldMinimap();
     }
 
     function resetMapZoom() {
-      state.mapZoom = 1.0;
-      renderWorldMinimap();
+      if (typeof WorldMap !== "undefined") WorldMap.centerOnHero();
+      else { state.mapZoom = 1.0; renderWorldMinimap(); }
       const r = WORLD_ROOMS[state.world.currentRoom];
       if (r) {
         addLog(
@@ -3279,7 +3281,7 @@
       // Right column World Atlas & Tabs
       const atlasH3 = document.querySelector("#world-atlas-card h3");
       if (atlasH3) {
-        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/32)`;
+        atlasH3.innerHTML = `${escapeHtml(uiText("atlasTitle"))} (<span id="explored-count">${state.world.visitedRooms.length}</span>/${Object.keys(WORLD_ROOMS).length})`;
       }
       setTxt("btn-reveal-map", uiText("scoutBtn"));
 
@@ -3606,13 +3608,13 @@
       if (expBadge) expBadge.textContent = visited.size;
 
       const zoom = state.mapZoom || 1.0;
-      const vw = Math.round(250 / zoom);
-      const vh = Math.round(150 / zoom);
-      const vx = Math.round(currRoom.x - vw / 2);
-      const vy = Math.round(currRoom.y - vh / 2);
-      svg.setAttribute("viewBox", `${vx} ${vy} ${vw} ${vh}`);
-      svg.setAttribute("data-center-x", String(currRoom.x));
-      svg.setAttribute("data-center-y", String(currRoom.y));
+      const view = typeof WorldMap !== "undefined" ? WorldMap.getViewport(svg) : {
+        x: currRoom.x - 125 / zoom, y: currRoom.y - 75 / zoom,
+        width: 250 / zoom, height: 150 / zoom, centerX: currRoom.x, centerY: currRoom.y
+      };
+      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.width} ${view.height}`);
+      svg.setAttribute("data-center-x", String(view.centerX));
+      svg.setAttribute("data-center-y", String(view.centerY));
 
       const radarGrid = `
         <circle cx="${currRoom.x}" cy="${currRoom.y}" r="38" fill="none" stroke="#1e293b" stroke-width="0.8" stroke-dasharray="3,3" />
@@ -3657,13 +3659,13 @@
         const fill = isCurrent ? "#fbbf24" : (isVisited ? color : (isNeighbor ? "#475569" : "#1e293b"));
         const radius = isCurrent ? 8.5 : (r.bossRoom ? 6.8 : (isNeighbor ? 6.0 : 5.0));
         const stroke = isCurrent ? "#ffffff" : (isNeighbor ? "#fbbf24" : "#090b10");
-        const dist = Math.hypot(r.x - currRoom.x, r.y - currRoom.y);
-        const showLabel = isCurrent || isNeighbor || (isVisited && dist < 115);
+        const inView = r.x >= view.x - 64 && r.x <= view.x + view.width + 64 && r.y >= view.y - 32 && r.y <= view.y + view.height + 32;
+        const showLabel = isCurrent || isNeighbor || (isVisited && inView);
         const locTitle = trRoomTitle(r);
         const shortTitle = locTitle.length > 18 ? locTitle.slice(0, 17) + "…" : locTitle;
 
         return `
-          <g onclick="travelToRoomByClick('${r.id}')" class="cursor-pointer">
+          <g data-map-room="${escapeHtml(r.id)}" ${typeof WorldMap === "undefined" ? `onclick="travelToRoomByClick('${r.id}')"` : ''} class="cursor-pointer">
             <title>${escapeHtml(locTitle)} (${escapeHtml(trBiome(r.biome))})</title>
             ${isCurrent ? `<circle cx="${r.x}" cy="${r.y}" r="13" fill="none" stroke="#fbbf24" stroke-width="1.2" opacity="0.55" />` : ""}
             <circle cx="${r.x}" cy="${r.y}" r="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="1.6" class="${isCurrent ? 'player-beacon' : ''}" />

@@ -131,6 +131,49 @@ const CombatDirector = (() => {
     const [toolId, t] = pair;
     return { allowed: false, itemId, toolId, reasonEn: t.descriptionEn, reasonZh: t.descriptionZh };
   }
+  function harvestCost() { return Math.max(2, 6 - Math.min(4, state.player.talents.pathfinder)); }
+  // Manual and arrival-based gathering share the same costs, permissions and rewards.
+  // Automatic gathering can select a bounded set of nodes and take the affordable
+  // prefix; the manual Harvest action retains its existing all-or-nothing cost.
+  function harvest({ nodeIds = null, partial = false, quiet = false } = {}) {
+    const rejected = reason => ({ ok: false, reason, harvested: [], quantity: 0, stamina: 0 });
+    if (!canWrite(!quiet)) return rejected('read_only');
+    if (onlineBusy() || state.combat.inCombat) {
+      if (!quiet) peaceful();
+      return rejected(onlineBusy() ? 'online_battle' : 'combat');
+    }
+    const p = state.player, r = room(), nodes = r?.nodes || [];
+    const selected = Array.isArray(nodeIds) ? new Set(nodeIds) : null;
+    const ready = nodes.filter(n => (!selected || selected.has(n.id)) && !state.world.harvestedCooldowns[`${r.id}:${n.id}`]);
+    if (!ready.length) {
+      if (!quiet && !selected) legacy.harvest();
+      return rejected('unavailable');
+    }
+    const permitted = ready.filter(n => harvestAccess(n.item).allowed), blocked = ready.filter(n => !harvestAccess(n.item).allowed);
+    if (!quiet) for (const n of blocked) {
+      const access = harvestAccess(n.item);
+      say(`Gathering locked: ${access.reasonEn}`, `采集准备不足：${access.reasonZh}`, 'world', 'text-amber-300');
+    }
+    if (!permitted.length) { if (!quiet) renderAll(); return rejected('locked'); }
+    const unitCost = harvestCost();
+    const chosen = partial ? permitted.slice(0, Math.floor(p.sta / unitCost)) : permitted;
+    const cost = unitCost * chosen.length;
+    if (!chosen.length || p.sta < cost) {
+      if (!quiet) reportBlocked(`Harvesting these nodes needs ${unitCost * permitted.length} stamina.`, `采集这些节点需要${unitCost * permitted.length}体力。`);
+      return rejected('stamina');
+    }
+    const rewards = chosen.map(n => ({ node: n, qty: n.qty + (p.talents.pathfinder >= 2 ? 1 : 0) + (getActiveCompanion().id === 'golem' && /Ore|Metal/.test(n.item) ? 1 : 0) }));
+    if (rewards.some(({ node: n, qty }) => !ITEM_CATALOG[n.item] || !Number.isInteger(n.qty) || n.qty < 1 || !Number.isSafeInteger(qty) || qty > 9999)) return rejected('invalid_node');
+    p.sta -= cost;
+    for (const { node: n, qty } of rewards) {
+      state.world.harvestedCooldowns[`${r.id}:${n.id}`] = 5;
+      addItemToInventory(n.item, qty); state.telemetry.harvests++;
+      say(`Harvested ${qty} ${n.item}.`, `采集到${qty}份${ITEM_CATALOG[n.item].nameZh}。`, 'loot', 'text-emerald-300');
+    }
+    for (const b of state.quests.bounties) if (!b.claimed && b.targetHarvests) b.progress = Math.min(b.targetHarvests, b.progress + chosen.length);
+    emit('harvest', { nodes: chosen.length }); checkStoryQuests(); checkAchievements(); saveGameState(false); renderAll();
+    return { ok: true, reason: 'harvested', harvested: chosen.map(n => n.id), quantity: rewards.reduce((sum, reward) => sum + reward.qty, 0), stamina: cost };
+  }
   function atGuild() {
     return peaceful() && (state.world.currentRoom === 'r_guild_hall' || reportBlocked('Visit the Adventurers’ Guild Hall to use this service.', '请到冒险者公会大厅办理此服务。'));
   }
@@ -785,25 +828,7 @@ const CombatDirector = (() => {
       p.gold -= gold; removeItemFromInventory(mat, 1); p.refineLevel = next; derived();
       say(`✨ Equipment refined to +${next} (+${next * 12}% equipment stats).`, `✨ 全身装备精炼至+${next}（装备属性+${next * 12}%）。`, "loot"); emit("refine", { rank: next }); saveGameState(false); renderAll(); return true;
     };
-    harvestRoomNodes = function() {
-      if(!peaceful())return false;
-      const p=state.player,r=room(),nodes=r?.nodes||[],ready=nodes.filter(n=>!state.world.harvestedCooldowns[`${r.id}:${n.id}`]);
-      if(!ready.length)return legacy.harvest();
-      const permitted=ready.filter(n=>harvestAccess(n.item).allowed),blocked=ready.filter(n=>!harvestAccess(n.item).allowed);
-      for(const n of blocked){const access=harvestAccess(n.item);say(`Gathering locked: ${access.reasonEn}`,`采集准备不足：${access.reasonZh}`,'world','text-amber-300');}
-      if(!permitted.length){renderAll();return false;}
-      const cost=Math.max(2,6-Math.min(4,p.talents.pathfinder))*permitted.length;
-      if(p.sta<cost)return reportBlocked(`Harvesting these nodes needs ${cost} stamina.`,`采集这些节点需要${cost}体力。`);
-      if(permitted.some(n=>!ITEM_CATALOG[n.item]||!Number.isInteger(n.qty)||n.qty<1||n.qty>9998))return false;
-      p.sta-=cost;
-      for(const n of permitted){
-        const qty=n.qty+(p.talents.pathfinder>=2?1:0)+(getActiveCompanion().id==='golem'&&/Ore|Metal/.test(n.item)?1:0);
-        state.world.harvestedCooldowns[`${r.id}:${n.id}`]=5;addItemToInventory(n.item,qty);state.telemetry.harvests++;
-        say(`Harvested ${qty} ${n.item}.`,`采集到${qty}份${ITEM_CATALOG[n.item].nameZh}。`,'loot','text-emerald-300');
-      }
-      for(const b of state.quests.bounties)if(!b.claimed&&b.targetHarvests)b.progress=Math.min(b.targetHarvests,b.progress+permitted.length);
-      emit('harvest',{nodes:permitted.length});checkStoryQuests();checkAchievements();saveGameState(false);renderAll();return true;
-    };
+    harvestRoomNodes = () => harvest().ok;
     startRiftWaveChallenge = function() {
       if (!peaceful()) return false;
       const p = state.player;
@@ -886,7 +911,7 @@ const CombatDirector = (() => {
     UI_I18N.en.warlordDesc = "+8% ATK / +3% leech"; UI_I18N.zh.warlordDesc = "+8%物攻 / +3%吸血";
   }
   install();
-  return { ensure, action, startEncounter, grantLoot, rest, recover, render, shopPrice, getGuildContext, redeemSet, trainCompanion, purchaseTool, harvestAccess, getHuntContext, configureHunt, startHunt, stopHunt, getIntent: () => state.combat.enemy?.intent || null,
+  return { ensure, action, startEncounter, grantLoot, rest, recover, render, shopPrice, getGuildContext, redeemSet, trainCompanion, purchaseTool, harvestAccess, harvestCost, harvest, getHuntContext, configureHunt, startHunt, stopHunt, getIntent: () => state.combat.enemy?.intent || null,
     setSeedForTests(seed) { ensure().rng = (Number(seed) >>> 0) || 1; },
     getContext() {
       ensure(); ensureHunt();

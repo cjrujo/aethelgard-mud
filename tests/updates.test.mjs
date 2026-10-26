@@ -21,7 +21,7 @@ async function fixture(options={}) {
   };
   const serviceWorker={controller:{},register:async()=>registration,
     addEventListener(name,fn){listeners.set(name,fn);}};
-  const h=createHarness({modules:['core','gameplay','combat','bootstrap'],boot:true,globals:{
+  const h=createHarness({modules:['core','gameplay','combat','auto-gather','map-controls','bootstrap'],boot:true,globals:{
     navigator:{language:'en',onLine:!options.offline,serviceWorker},
     location:{protocol:'http:',origin:'http://localhost:8000',href:'http://localhost:8000/index.html',hostname:'localhost',reload(){reloads++;}},
     fetch:async()=>{if(options.offline)throw new TypeError('NetworkError: offline');return Response.json(announced);}
